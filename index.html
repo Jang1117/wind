@@ -144,11 +144,11 @@
             if (isSatellite) {
                 map.setMapTypeId(kakao.maps.MapTypeId.ROADMAP);
                 document.getElementById('map-type-toggle').textContent = '기본 지도';
-                isSatellite = false;
+                isSatellite = true;
             } else {
                 map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
                 document.getElementById('map-type-toggle').textContent = '위성 지도';
-                isSatellite = true;
+                isSatellite = false;
             }
             console.log("지도 유형 변경:", isSatellite ? "위성" : "기본");
         }
