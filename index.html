@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>한국 풍력 발전소 지도 (24.08.16) by S.H. Jang</title>
+    <title>한국 풍력 발전소 지도 (24.08.16)</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b8113591f35c3409335bdb4b5ee5613&libraries=clusterer&autoload=false" defer></script>
@@ -65,7 +65,7 @@
         let overlays = [];
         let currentInfowindow = null;
         let allWindFarms = [];
-        let isSatellite = true;
+        let isSatellite = true; // 초기값을 true로 변경
         let turbineCountByComplex = {};
         let myLocationMarker = null;
         let watchId = null;
@@ -97,34 +97,28 @@
                 });
                 console.log("단지별 터빈 수:", turbineCountByComplex);
 
-                // 모든 풍력 단지의 중앙 좌표 계산
-                const validFarms = allWindFarms.filter(farm => farm.lat && farm.lon); // 유효한 좌표만 필터링
-                const avgLat = validFarms.reduce((sum, farm) => sum + farm.lat, 0) / validFarms.length;
-                const avgLon = validFarms.reduce((sum, farm) => sum + farm.lon, 0) / validFarms.length;
-                console.log("중앙 좌표:", avgLat, avgLon);
-
-                initMap(avgLat, avgLon); // 계산된 중앙 좌표를 initMap에 전달
+                initMap();
             } catch (error) {
                 console.error('CSV 로드 실패:', error);
                 document.getElementById('error-message').innerText = `데이터를 로드할 수 없습니다: ${error.message}`;
             }
         }
 
-        function initMap(avgLat, avgLon) {
+        function initMap() {
             console.log("initMap 호출됨");
             const container = document.getElementById('map');
             console.log("컨테이너:", container);
             const options = {
-                center: new kakao.maps.LatLng(avgLat, avgLon), // 모든 풍력 단지의 평균 좌표로 설정
+                center: new kakao.maps.LatLng(36.41119125, 129.4146661), // 영덕 중심
                 level: 13 // 초기 줌 레벨 (단지명 표시)
             };
             map = new kakao.maps.Map(container, options);
-            map.setMapTypeId(kakao.maps.MapTypeId.HYBRID); // 초기 지도 타입을 위성으로
+            map.setMapTypeId(kakao.maps.MapTypeId.HYBRID); // 초기 지도 타입을 위성(HYBRID)으로 설정
             console.log("지도 생성됨:", map);
 
             setTimeout(() => {
                 map.relayout();
-                map.setCenter(new kakao.maps.LatLng(avgLat, avgLon)); // 중앙 좌표로 재설정
+                map.setCenter(new kakao.maps.LatLng(36.41119125, 129.4146661));
                 console.log("지도 렌더링 완료");
                 updateMarkers();
                 startTrackingLocation();
