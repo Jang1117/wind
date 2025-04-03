@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>한국 풍력 발전소 지도 (24.08.16)</title>
+    <title> Korea Wind Power Plant Map (24.08.16) by Seungho Jang</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b8113591f35c3409335bdb4b5ee5613&libraries=clusterer&autoload=false" defer></script>
@@ -50,6 +50,7 @@
             border: 1px solid #ccc;
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
             cursor: pointer;
+            white-space: nowrap; /* 텍스트가 줄바꿈되지 않도록 */
         }
     </style>
 </head>
@@ -63,9 +64,9 @@
         let map;
         let markers = [];
         let overlays = [];
-        let currentInfowindow = null;
+        let currentInfowindows = []; // 열린 설명창들을 추적
         let allWindFarms = [];
-        let isSatellite = true; // 초기값을 true로 변경
+        let isSatellite = true;
         let turbineCountByComplex = {};
         let myLocationMarker = null;
         let watchId = null;
@@ -113,7 +114,7 @@
                 level: 13 // 초기 줌 레벨 (단지명 표시)
             };
             map = new kakao.maps.Map(container, options);
-            map.setMapTypeId(kakao.maps.MapTypeId.HYBRID); // 초기 지도 타입을 위성(HYBRID)으로 설정
+            map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
             console.log("지도 생성됨:", map);
 
             setTimeout(() => {
@@ -125,10 +126,8 @@
             }, 100);
 
             kakao.maps.event.addListener(map, 'click', () => {
-                if (currentInfowindow) {
-                    currentInfowindow.setMap(null);
-                    currentInfowindow = null;
-                }
+                currentInfowindows.forEach(infowindow => infowindow.setMap(null));
+                currentInfowindows = [];
             });
 
             kakao.maps.event.addListener(map, 'zoom_changed', updateMarkers);
@@ -203,6 +202,8 @@
             overlays.forEach(overlay => overlay.setMap(null));
             markers = [];
             overlays = [];
+            currentInfowindows.forEach(infowindow => infowindow.setMap(null));
+            currentInfowindows = [];
         }
 
         function updateMarkers() {
@@ -285,15 +286,10 @@
         }
 
         window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon) {
-            if (currentInfowindow) {
-                currentInfowindow.setMap(null);
-                currentInfowindow = null;
-            }
-
             const turbineName = `${name} ${turbineId}`;
             const totalTurbines = turbineCountByComplex[name] || 0;
             const content = `
-                <div class="detail-window" onclick="window.closeInfowindow()">
+                <div class="detail-window" onclick="window.closeInfowindow(event, this)">
                     <strong>${turbineName}</strong><br>
                     단지 내 총 터빈 수: ${totalTurbines}<br>
                     분류: ${type || '정보 없음'}<br>
@@ -301,21 +297,38 @@
                     주소: ${address || '정보 없음'}<br>
                 </div>
             `;
-            const position = new kakao.maps.LatLng(lat, lon);
+
+            const basePosition = new kakao.maps.LatLng(lat, lon);
+            let offsetY = -0.005; // 기본적으로 마커 위쪽으로 띄움 (위도 단위로 조정)
+            
+            // 기존 열린 설명창들과 겹치지 않도록 위치 조정
+            currentInfowindows.forEach(infowindow => {
+                const existingPos = infowindow.getPosition();
+                if (Math.abs(existingPos.getLat() - lat) < 0.01 && Math.abs(existingPos.getLng() - lon) < 0.01) {
+                    offsetY -= 0.005; // 겹치면 더 위로 이동
+                }
+            });
+
+            const adjustedPosition = new kakao.maps.LatLng(lat + offsetY, lon);
             const infowindow = new kakao.maps.InfoWindow({
-                position: position,
+                position: adjustedPosition,
                 content: content,
-                zIndex: 20
+                zIndex: 20,
+                removable: true // 닫기 버튼 활성화
             });
 
             infowindow.open(map);
-            currentInfowindow = infowindow;
+            currentInfowindows.push(infowindow);
         };
 
-        window.closeInfowindow = function() {
-            if (currentInfowindow) {
-                currentInfowindow.setMap(null);
-                currentInfowindow = null;
+        window.closeInfowindow = function(event, element) {
+            event.stopPropagation(); // 클릭 이벤트가 지도로 전파되지 않도록 방지
+            const infowindowToClose = currentInfowindows.find(infowindow => 
+                infowindow.getContent().includes(element.innerHTML)
+            );
+            if (infowindowToClose) {
+                infowindowToClose.setMap(null);
+                currentInfowindows = currentInfowindows.filter(iw => iw !== infowindowToClose);
                 console.log("정보 창 닫힘");
             }
         };
