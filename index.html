@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b8113591f35c3409335bdb4b5ee5613&libraries=clusterer&autoload=false" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         html, body {
             margin: 0;
@@ -50,7 +51,7 @@
             border: 1px solid #ccc;
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
             cursor: pointer;
-            white-space: nowrap; /* 텍스트가 줄바꿈되지 않도록 */
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -64,14 +65,13 @@
         let map;
         let markers = [];
         let overlays = [];
-        let currentInfowindows = []; // 열린 설명창들을 추적
+        let currentInfowindows = [];
         let allWindFarms = [];
         let isSatellite = true;
         let turbineCountByComplex = {};
         let myLocationMarker = null;
         let watchId = null;
 
-        // 천 단위 쉼표 추가 함수
         function formatNumberWithCommas(number) {
             if (!number) return "정보 없음";
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -85,35 +85,46 @@
                 }
                 const text = await response.text();
                 console.log("CSV 데이터:", text);
-                const lines = text.split('\n').slice(1).filter(line => line.trim() !== '');
-                allWindFarms = lines.map(line => {
-                    const [complexId, name, turbineId, completionDate, type, address, xCoord, yCoord, lat, lon, capacity, manufacturer] = line.split(',');
-                    return {
-                        complexId,
-                        name,
-                        turbineId,
-                        completionDate,
-                        type,
-                        address,
-                        xCoord: parseFloat(xCoord),
-                        yCoord: parseFloat(yCoord),
-                        lat: parseFloat(lat),
-                        lon: parseFloat(lon),
-                        capacity: capacity ? parseFloat(capacity) : null, // 용량(kW)
-                        manufacturer: manufacturer ? manufacturer.trim() : null // 제조사
-                    };
-                });
-                console.log("파싱된 데이터:", allWindFarms);
 
-                allWindFarms.forEach(farm => {
-                    if (!turbineCountByComplex[farm.name]) {
-                        turbineCountByComplex[farm.name] = 0;
+                Papa.parse(text, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        allWindFarms = results.data.map(row => {
+                            const name = row['단지명'] ? row['단지명'].trim() : null;
+                            if (!name) return null;
+                            return {
+                                complexId: row['단지번호'] ? row['단지번호'].trim() : null,
+                                name: name,
+                                turbineId: row['풍력기번호(임시)'] ? row['풍력기번호(임시)'].trim() : null,
+                                completionDate: row['준공일'] ? row['준공일'].trim() : null,
+                                type: row['분류'] ? row['분류'].trim() : null,
+                                address: row['주소'] ? row['주소'].trim() : null,
+                                xCoord: row['엑스좌표(GRS80_C_x)'] ? parseFloat(row['엑스좌표(GRS80_C_x)']) : null,
+                                yCoord: row['와이좌표(GRS80_C_y)'] ? parseFloat(row['와이좌표(GRS80_C_y)']) : null,
+                                lat: row['위도(lat)'] ? parseFloat(row['위도(lat)']) : null,
+                                lon: row['경도(lon)'] ? parseFloat(row['경도(lon)']) : null,
+                                capacity: row['용량(kW)'] ? parseFloat(row['용량(kW)']) : null,
+                                manufacturer: row['제조사'] ? row['제조사'].trim() : null
+                            };
+                        }).filter(row => row !== null);
+                        console.log("파싱된 데이터:", allWindFarms);
+
+                        allWindFarms.forEach(farm => {
+                            if (!turbineCountByComplex[farm.name]) {
+                                turbineCountByComplex[farm.name] = 0;
+                            }
+                            turbineCountByComplex[farm.name]++;
+                        });
+                        console.log("단지별 터빈 수:", turbineCountByComplex);
+
+                        initMap();
+                    },
+                    error: function(error) {
+                        console.error('CSV 파싱 실패:', error);
+                        document.getElementById('error-message').innerText = `CSV 파싱 실패: ${error.message}`;
                     }
-                    turbineCountByComplex[farm.name]++;
                 });
-                console.log("단지별 터빈 수:", turbineCountByComplex);
-
-                initMap();
             } catch (error) {
                 console.error('CSV 로드 실패:', error);
                 document.getElementById('error-message').innerText = `데이터를 로드할 수 없습니다: ${error.message}`;
@@ -125,8 +136,8 @@
             const container = document.getElementById('map');
             console.log("컨테이너:", container);
             const options = {
-                center: new kakao.maps.LatLng(36.41119125, 129.4146661), // 영덕 중심
-                level: 13 // 초기 줌 레벨 (단지명 표시)
+                center: new kakao.maps.LatLng(36.41119125, 129.4146661),
+                level: 13
             };
             map = new kakao.maps.Map(container, options);
             map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
@@ -301,9 +312,12 @@
         }
 
         window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer) {
+            currentInfowindows.forEach(infowindow => infowindow.setMap(null));
+            currentInfowindows = [];
+
             const turbineName = `${name} ${turbineId}`;
             const totalTurbines = turbineCountByComplex[name] || 0;
-            const formattedCapacity = formatNumberWithCommas(capacity); // 천 단위 쉼표 추가
+            const formattedCapacity = formatNumberWithCommas(capacity);
             const content = `
                 <div class="detail-window" onclick="window.closeInfowindow(event, this)">
                     <strong>${turbineName}</strong><br>
@@ -317,22 +331,12 @@
             `;
 
             const basePosition = new kakao.maps.LatLng(lat, lon);
-            let offsetY = -0.005; // 기본적으로 마커 위쪽으로 띄움 (위도 단위로 조정)
-            
-            // 기존 열린 설명창들과 겹치지 않도록 위치 조정
-            currentInfowindows.forEach(infowindow => {
-                const existingPos = infowindow.getPosition();
-                if (Math.abs(existingPos.getLat() - lat) < 0.01 && Math.abs(existingPos.getLng() - lon) < 0.01) {
-                    offsetY -= 0.005; // 겹치면 더 위로 이동
-                }
-            });
-
-            const adjustedPosition = new kakao.maps.LatLng(lat + offsetY, lon);
+            const adjustedPosition = new kakao.maps.LatLng(lat - 0.005, lon);
             const infowindow = new kakao.maps.InfoWindow({
                 position: adjustedPosition,
                 content: content,
                 zIndex: 20,
-                removable: true // 닫기 버튼 활성화
+                removable: true
             });
 
             infowindow.open(map);
@@ -340,7 +344,7 @@
         };
 
         window.closeInfowindow = function(event, element) {
-            event.stopPropagation(); // 클릭 이벤트가 지도로 전파되지 않도록 방지
+            event.stopPropagation();
             const infowindowToClose = currentInfowindows.find(infowindow => 
                 infowindow.getContent().includes(element.innerHTML)
             );
