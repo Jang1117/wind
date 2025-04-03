@@ -65,7 +65,7 @@
         let overlays = [];
         let currentInfowindow = null;
         let allWindFarms = [];
-        let isSatellite = false;
+        let isSatellite = true;
         let turbineCountByComplex = {};
         let myLocationMarker = null; // 내 위치 마커
         let watchId = null; // 위치 추적 ID
@@ -111,6 +111,7 @@
             const options = {
                 center: new kakao.maps.LatLng(36.41119125, 129.4146661), // 영덕 중심
                 level: 13 // 초기 줌 레벨 (단지명 표시)
+                mapTypeId: kakao.maps.MapTypeId.HYBRID // 위성 지도 기본 설정
             };
             map = new kakao.maps.Map(container, options);
             console.log("지도 생성됨:", map);
@@ -142,11 +143,11 @@
         function toggleMapType() {
             if (isSatellite) {
                 map.setMapTypeId(kakao.maps.MapTypeId.ROADMAP);
-                document.getElementById('map-type-toggle').textContent = '위성 지도';
+                document.getElementById('map-type-toggle').textContent = '기본 지도';
                 isSatellite = false;
             } else {
                 map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
-                document.getElementById('map-type-toggle').textContent = '기본 지도';
+                document.getElementById('map-type-toggle').textContent = '위성 지도';
                 isSatellite = true;
             }
             console.log("지도 유형 변경:", isSatellite ? "위성" : "기본");
