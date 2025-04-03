@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>한국 풍력 발전소 지도</title>
+    <title>한국 풍력 발전소 지도 (24.08.16)</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b8113591f35c3409335bdb4b5ee5613&libraries=clusterer&autoload=false" defer></script>
@@ -57,7 +57,7 @@
     <div id="map"></div>
     <div id="loading">지도 로딩 중...</div>
     <div id="error-message"></div>
-    <button id="map-type-toggle">위성 지도</button>
+    <button id="map-type-toggle">기본 지도</button>
 
     <script>
         let map;
@@ -65,10 +65,10 @@
         let overlays = [];
         let currentInfowindow = null;
         let allWindFarms = [];
-        let isSatellite = true;
+        let isSatellite = true; // 초기값을 true로 변경
         let turbineCountByComplex = {};
-        let myLocationMarker = null; // 내 위치 마커
-        let watchId = null; // 위치 추적 ID
+        let myLocationMarker = null;
+        let watchId = null;
 
         async function loadCSVData() {
             try {
@@ -113,6 +113,7 @@
                 level: 13 // 초기 줌 레벨 (단지명 표시)
             };
             map = new kakao.maps.Map(container, options);
+            map.setMapTypeId(kakao.maps.MapTypeId.HYBRID); // 초기 지도 타입을 위성(HYBRID)으로 설정
             console.log("지도 생성됨:", map);
 
             setTimeout(() => {
@@ -120,7 +121,7 @@
                 map.setCenter(new kakao.maps.LatLng(36.41119125, 129.4146661));
                 console.log("지도 렌더링 완료");
                 updateMarkers();
-                startTrackingLocation(); // 내 위치 추적 시작
+                startTrackingLocation();
             }, 100);
 
             kakao.maps.event.addListener(map, 'click', () => {
@@ -180,23 +181,21 @@
         function updateMyLocation(lat, lon) {
             const position = new kakao.maps.LatLng(lat, lon);
 
-            // 기존 마커 제거
             if (myLocationMarker) {
                 myLocationMarker.setMap(null);
             }
 
-            // 새 마커 생성 (파란색 원형 마커로 구분)
             myLocationMarker = new kakao.maps.Marker({
                 position: position,
                 title: "내 위치",
                 clickable: false,
                 image: new kakao.maps.MarkerImage(
-                    'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png', // 빨간색 마커 (내 위치 구분용)
+                    'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
                     new kakao.maps.Size(24, 35)
                 )
             });
             myLocationMarker.setMap(map);
-            markers.push(myLocationMarker); // markers 배열에 추가해 clearMap에서 관리
+            markers.push(myLocationMarker);
         }
 
         function clearMap() {
@@ -279,7 +278,6 @@
                 });
             }
 
-            // 내 위치 마커가 있다면 다시 추가
             if (myLocationMarker) {
                 myLocationMarker.setMap(map);
                 markers.push(myLocationMarker);
@@ -329,7 +327,6 @@
             });
         });
 
-        // 페이지 종료 시 위치 추적 중지
         window.addEventListener('unload', () => {
             if (watchId !== null) {
                 navigator.geolocation.clearWatch(watchId);
