@@ -37,103 +37,24 @@
             border: 1px solid #ccc;
             cursor: pointer;
         }
-        .info-window {
-            background: rgba(255, 255, 255, 0.8);
-            padding: 5px;
-            border: 1px solid #ccc;
-            font-size: 12px;
-            pointer-events: auto;
-        }
-        .detail-window {
-            background: white;
-            padding: 10px;
-            border: 1px solid #ccc;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
     <div id="map"></div>
     <div id="loading">지도 로딩 중...</div>
-    <div id="error-message"></div>
-    <button id="map-type-toggle">위성 지도</button>
-
+    <button id="map-type-toggle">기본 지도</button>
     <script>
         let map;
-        let markers = [];
-        let overlays = [];
-        let currentInfowindow = null;
-        let allWindFarms = [];
-        let isSatellite = false;
-        let turbineCountByComplex = {};
-        let myLocationMarker = null; // 내 위치 마커
-        let watchId = null; // 위치 추적 ID
-
-        async function loadCSVData() {
-            try {
-                const response = await fetch('windfarm_data.csv');
-                if (!response.ok) {
-                    throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
-                }
-                const text = await response.text();
-                console.log("CSV 데이터:", text);
-                const lines = text.split('\n').slice(1).filter(line => line.trim() !== '');
-                allWindFarms = lines.map(line => {
-                    const [complexId, name, turbineId, completionDate, type, address, xCoord, yCoord, lat, lon] = line.split(',');
-                    return {
-                        complexId, name, turbineId, completionDate, type, address,
-                        xCoord: parseFloat(xCoord), yCoord: parseFloat(yCoord),
-                        lat: parseFloat(lat), lon: parseFloat(lon)
-                    };
-                });
-                console.log("파싱된 데이터:", allWindFarms);
-
-                allWindFarms.forEach(farm => {
-                    if (!turbineCountByComplex[farm.name]) {
-                        turbineCountByComplex[farm.name] = 0;
-                    }
-                    turbineCountByComplex[farm.name]++;
-                });
-                console.log("단지별 터빈 수:", turbineCountByComplex);
-
-                initMap();
-            } catch (error) {
-                console.error('CSV 로드 실패:', error);
-                document.getElementById('error-message').innerText = `데이터를 로드할 수 없습니다: ${error.message}`;
-            }
-        }
+        let isSatellite = true;
 
         function initMap() {
-            console.log("initMap 호출됨");
             const container = document.getElementById('map');
-            console.log("컨테이너:", container);
             const options = {
-                center: new kakao.maps.LatLng(36.41119125, 129.4146661), // 영덕 중심
-                level: 13 // 초기 줌 레벨 (단지명 표시)
+                center: new kakao.maps.LatLng(36.41119125, 129.4146661),
+                level: 13,
+                mapTypeId: kakao.maps.MapTypeId.HYBRID
             };
             map = new kakao.maps.Map(container, options);
-            console.log("지도 생성됨:", map);
-
-            setTimeout(() => {
-                map.relayout();
-                map.setCenter(new kakao.maps.LatLng(36.41119125, 129.4146661));
-                console.log("지도 렌더링 완료");
-                updateMarkers();
-                startTrackingLocation(); // 내 위치 추적 시작
-            }, 100);
-
-            kakao.maps.event.addListener(map, 'click', () => {
-                if (currentInfowindow) {
-                    currentInfowindow.setMap(null);
-                    currentInfowindow = null;
-                }
-            });
-
-            kakao.maps.event.addListener(map, 'zoom_changed', updateMarkers);
-            kakao.maps.event.addListener(map, 'idle', updateMarkers);
-
-            document.getElementById('loading').style.display = 'none';
 
             const toggleButton = document.getElementById('map-type-toggle');
             toggleButton.addEventListener('click', toggleMapType);
@@ -149,192 +70,10 @@
                 document.getElementById('map-type-toggle').textContent = '기본 지도';
                 isSatellite = true;
             }
-            console.log("지도 유형 변경:", isSatellite ? "위성" : "기본");
         }
-
-        function startTrackingLocation() {
-            if (navigator.geolocation) {
-                watchId = navigator.geolocation.watchPosition(
-                    position => {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        console.log("내 위치 업데이트:", lat, lon);
-                        updateMyLocation(lat, lon);
-                    },
-                    error => {
-                        console.error("위치 가져오기 실패:", error);
-                        document.getElementById('error-message').innerText = "위치 정보를 가져올 수 없습니다.";
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 5000,
-                        maximumAge: 0
-                    }
-                );
-            } else {
-                console.error("Geolocation 지원 안 됨");
-                document.getElementById('error-message').innerText = "브라우저가 Geolocation을 지원하지 않습니다.";
-            }
-        }
-
-        function updateMyLocation(lat, lon) {
-            const position = new kakao.maps.LatLng(lat, lon);
-
-            // 기존 마커 제거
-            if (myLocationMarker) {
-                myLocationMarker.setMap(null);
-            }
-
-            // 새 마커 생성 (파란색 원형 마커로 구분)
-            myLocationMarker = new kakao.maps.Marker({
-                position: position,
-                title: "내 위치",
-                clickable: false,
-                image: new kakao.maps.MarkerImage(
-                    'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png', // 빨간색 마커 (내 위치 구분용)
-                    new kakao.maps.Size(24, 35)
-                )
-            });
-            myLocationMarker.setMap(map);
-            markers.push(myLocationMarker); // markers 배열에 추가해 clearMap에서 관리
-        }
-
-        function clearMap() {
-            markers.forEach(marker => marker.setMap(null));
-            overlays.forEach(overlay => overlay.setMap(null));
-            markers = [];
-            overlays = [];
-        }
-
-        function updateMarkers() {
-            clearMap();
-            const zoomLevel = map.getLevel();
-            console.log("현재 줌 레벨:", zoomLevel);
-
-            if (zoomLevel >= 10) {
-                const farmsByComplex = {};
-                allWindFarms.forEach(farm => {
-                    if (!farmsByComplex[farm.name]) farmsByComplex[farm.name] = [];
-                    farmsByComplex[farm.name].push(farm);
-                });
-
-                Object.keys(farmsByComplex).forEach(complex => {
-                    const group = farmsByComplex[complex];
-                    const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
-                    const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
-                    const position = new kakao.maps.LatLng(avgLat, avgLon);
-
-                    const marker = new kakao.maps.Marker({
-                        position: position,
-                        title: `${complex} (${group.length}개 터빈)`,
-                        clickable: true
-                    });
-                    marker.setMap(map);
-                    markers.push(marker);
-
-                    const overlay = new kakao.maps.CustomOverlay({
-                        position: position,
-                        content: `<div class="info-window">${complex} (${group.length}개)</div>`,
-                        xAnchor: 0.5,
-                        yAnchor: 2,
-                        zIndex: 10
-                    });
-                    overlay.setMap(map);
-                    overlays.push(overlay);
-
-                    kakao.maps.event.addListener(marker, 'click', () => {
-                        map.setCenter(position);
-                        map.setLevel(9);
-                    });
-                });
-            } else {
-                const bounds = map.getBounds();
-                const visibleFarms = allWindFarms.filter(farm => 
-                    farm.lat && farm.lon && bounds.contain(new kakao.maps.LatLng(farm.lat, farm.lon))
-                );
-                console.log("표시될 터빈 수:", visibleFarms.length);
-
-                visibleFarms.forEach(farm => {
-                    const position = new kakao.maps.LatLng(farm.lat, farm.lon);
-                    const turbineName = `${farm.name} ${farm.turbineId}`;
-                    const marker = new kakao.maps.Marker({
-                        position: position,
-                        title: turbineName,
-                        clickable: true
-                    });
-                    marker.setMap(map);
-                    markers.push(marker);
-
-                    const overlay = new kakao.maps.CustomOverlay({
-                        position: position,
-                        content: `<div class="info-window" onclick="toggleFarmDetails('${farm.name}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${farm.address}', ${farm.lat}, ${farm.lon})">${turbineName}</div>`,
-                        xAnchor: 0.5,
-                        yAnchor: 2,
-                        zIndex: 10
-                    });
-                    overlay.setMap(map);
-                    overlays.push(overlay);
-
-                    kakao.maps.event.addListener(marker, 'click', () => toggleFarmDetails(farm.name, farm.turbineId, farm.type, farm.completionDate, farm.address, farm.lat, farm.lon));
-                });
-            }
-
-            // 내 위치 마커가 있다면 다시 추가
-            if (myLocationMarker) {
-                myLocationMarker.setMap(map);
-                markers.push(myLocationMarker);
-            }
-        }
-
-        window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon) {
-            if (currentInfowindow) {
-                currentInfowindow.setMap(null);
-                currentInfowindow = null;
-            }
-
-            const turbineName = `${name} ${turbineId}`;
-            const totalTurbines = turbineCountByComplex[name] || 0;
-            const content = `
-                <div class="detail-window" onclick="window.closeInfowindow()">
-                    <strong>${turbineName}</strong><br>
-                    단지 내 총 터빈 수: ${totalTurbines}<br>
-                    분류: ${type || '정보 없음'}<br>
-                    준공일: ${completionDate || '정보 없음'}<br>
-                    주소: ${address || '정보 없음'}<br>
-                </div>
-            `;
-            const position = new kakao.maps.LatLng(lat, lon);
-            const infowindow = new kakao.maps.InfoWindow({
-                position: position,
-                content: content,
-                zIndex: 20
-            });
-
-            infowindow.open(map);
-            currentInfowindow = infowindow;
-        };
-
-        window.closeInfowindow = function() {
-            if (currentInfowindow) {
-                currentInfowindow.setMap(null);
-                currentInfowindow = null;
-                console.log("정보 창 닫힘");
-            }
-        };
 
         document.addEventListener('DOMContentLoaded', function() {
-            kakao.maps.load(() => {
-                console.log("Kakao Maps API 로드 성공");
-                loadCSVData();
-            });
-        });
-
-        // 페이지 종료 시 위치 추적 중지
-        window.addEventListener('unload', () => {
-            if (watchId !== null) {
-                navigator.geolocation.clearWatch(watchId);
-                console.log("위치 추적 중지");
-            }
+            kakao.maps.load(initMap);
         });
     </script>
 </body>
