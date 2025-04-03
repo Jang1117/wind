@@ -71,6 +71,12 @@
         let myLocationMarker = null;
         let watchId = null;
 
+        // 천 단위 쉼표 추가 함수
+        function formatNumberWithCommas(number) {
+            if (!number) return "정보 없음";
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
         async function loadCSVData() {
             try {
                 const response = await fetch('windfarm_data.csv');
@@ -81,11 +87,20 @@
                 console.log("CSV 데이터:", text);
                 const lines = text.split('\n').slice(1).filter(line => line.trim() !== '');
                 allWindFarms = lines.map(line => {
-                    const [complexId, name, turbineId, completionDate, type, address, xCoord, yCoord, lat, lon] = line.split(',');
+                    const [complexId, name, turbineId, completionDate, type, address, xCoord, yCoord, lat, lon, capacity, manufacturer] = line.split(',');
                     return {
-                        complexId, name, turbineId, completionDate, type, address,
-                        xCoord: parseFloat(xCoord), yCoord: parseFloat(yCoord),
-                        lat: parseFloat(lat), lon: parseFloat(lon)
+                        complexId,
+                        name,
+                        turbineId,
+                        completionDate,
+                        type,
+                        address,
+                        xCoord: parseFloat(xCoord),
+                        yCoord: parseFloat(yCoord),
+                        lat: parseFloat(lat),
+                        lon: parseFloat(lon),
+                        capacity: capacity ? parseFloat(capacity) : null, // 용량(kW)
+                        manufacturer: manufacturer ? manufacturer.trim() : null // 제조사
                     };
                 });
                 console.log("파싱된 데이터:", allWindFarms);
@@ -267,7 +282,7 @@
 
                     const overlay = new kakao.maps.CustomOverlay({
                         position: position,
-                        content: `<div class="info-window" onclick="toggleFarmDetails('${farm.name}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${farm.address}', ${farm.lat}, ${farm.lon})">${turbineName}</div>`,
+                        content: `<div class="info-window" onclick="toggleFarmDetails('${farm.name}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${farm.address}', ${farm.lat}, ${farm.lon}, '${farm.capacity}', '${farm.manufacturer}')">${turbineName}</div>`,
                         xAnchor: 0.5,
                         yAnchor: 2,
                         zIndex: 10
@@ -275,7 +290,7 @@
                     overlay.setMap(map);
                     overlays.push(overlay);
 
-                    kakao.maps.event.addListener(marker, 'click', () => toggleFarmDetails(farm.name, farm.turbineId, farm.type, farm.completionDate, farm.address, farm.lat, farm.lon));
+                    kakao.maps.event.addListener(marker, 'click', () => toggleFarmDetails(farm.name, farm.turbineId, farm.type, farm.completionDate, farm.address, farm.lat, farm.lon, farm.capacity, farm.manufacturer));
                 });
             }
 
@@ -285,9 +300,10 @@
             }
         }
 
-        window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon) {
+        window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer) {
             const turbineName = `${name} ${turbineId}`;
             const totalTurbines = turbineCountByComplex[name] || 0;
+            const formattedCapacity = formatNumberWithCommas(capacity); // 천 단위 쉼표 추가
             const content = `
                 <div class="detail-window" onclick="window.closeInfowindow(event, this)">
                     <strong>${turbineName}</strong><br>
@@ -295,6 +311,8 @@
                     분류: ${type || '정보 없음'}<br>
                     준공일: ${completionDate || '정보 없음'}<br>
                     주소: ${address || '정보 없음'}<br>
+                    용량(kW): ${formattedCapacity}<br>
+                    제조사: ${manufacturer || '정보 없음'}<br>
                 </div>
             `;
 
