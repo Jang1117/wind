@@ -28,7 +28,7 @@
             background: rgba(255, 255, 255, 0.8);
             padding: 10px;
         }
-        #map-type-toggle, #info-toggle-button {
+        #map-type-toggle, #name-toggle-button {
             position: absolute;
             right: 10px;
             z-index: 10;
@@ -40,7 +40,7 @@
         #map-type-toggle {
             top: 10px;
         }
-        #info-toggle-button {
+        #name-toggle-button {
             top: 40px; /* map-type-toggle 버튼 아래에 배치 */
         }
         .info-window {
@@ -65,7 +65,7 @@
     <div id="loading">지도 로딩 중...</div>
     <div id="error-message"></div>
     <button id="map-type-toggle">기본 지도</button>
-    <button id="info-toggle-button">설명창 열기</button>
+    <button id="name-toggle-button">터빈 이름 끄기</button>
 
     <script>
         let map;
@@ -77,7 +77,7 @@
         let turbineCountByComplex = {};
         let myLocationMarker = null;
         let watchId = null;
-        let areInfoWindowsVisible = false; // 정보 창 토글 상태 추적
+        let areNamesVisible = true; // 터빈 이름 표시 상태 추적
 
         function formatNumberWithCommas(number) {
             if (!number) return "정보 없음";
@@ -161,8 +161,6 @@
             kakao.maps.event.addListener(map, 'click', () => {
                 currentInfowindows.forEach(infowindow => infowindow.setMap(null));
                 currentInfowindows = [];
-                areInfoWindowsVisible = false;
-                document.getElementById('info-toggle-button').textContent = '설명창 열기';
             });
 
             kakao.maps.event.addListener(map, 'zoom_changed', updateMarkers);
@@ -173,8 +171,8 @@
             const toggleButton = document.getElementById('map-type-toggle');
             toggleButton.addEventListener('click', toggleMapType);
 
-            const infoToggleButton = document.getElementById('info-toggle-button');
-            infoToggleButton.addEventListener('click', toggleAllInfoWindows);
+            const nameToggleButton = document.getElementById('name-toggle-button');
+            nameToggleButton.addEventListener('click', toggleNamesVisibility);
         }
 
         function toggleMapType() {
@@ -188,6 +186,12 @@
                 isSatellite = true;
             }
             console.log("지도 유형 변경:", isSatellite ? "위성" : "기본");
+        }
+
+        function toggleNamesVisibility() {
+            areNamesVisible = !areNamesVisible;
+            document.getElementById('name-toggle-button').textContent = areNamesVisible ? '터빈 이름 끄기' : '터빈 이름 켜기';
+            updateMarkers(); // 마커와 오버레이를 다시 렌더링하여 이름 표시 여부를 반영
         }
 
         function startTrackingLocation() {
@@ -270,29 +274,24 @@
                     marker.setMap(map);
                     markers.push(marker);
 
-                    const overlay = new kakao.maps.CustomOverlay({
-                        position: position,
-                        content: `<div class="info-window">${complex} (${group.length}개)</div>`,
-                        xAnchor: 0.5,
-                        yAnchor: 2,
-                        zIndex: 10
-                    });
-                    overlay.setMap(map);
-                    overlays.push(overlay);
+                    if (areNamesVisible) {
+                        const overlay = new kakao.maps.CustomOverlay({
+                            position: position,
+                            content: `<div class="info-window">${complex} (${group.length}개)</div>`,
+                            xAnchor: 0.5,
+                            yAnchor: 2,
+                            zIndex: 10
+                        });
+                        overlay.setMap(map);
+                        overlays.push(overlay);
+                    }
 
                     kakao.maps.event.addListener(marker, 'click', () => {
                         map.setCenter(position);
                         map.setLevel(9);
                     });
                 });
-
-                // 줌 레벨이 10 이상일 때는 정보 창 토글 버튼 비활성화
-                document.getElementById('info-toggle-button').disabled = true;
-                document.getElementById('info-toggle-button').textContent = '설명창 열기 (줌 필요)';
             } else {
-                document.getElementById('info-toggle-button').disabled = false;
-                document.getElementById('info-toggle-button').textContent = areInfoWindowsVisible ? '설명창 닫기' : '설명창 열기';
-
                 const bounds = map.getBounds();
                 const visibleFarms = allWindFarms.filter(farm => 
                     farm.lat && farm.lon && bounds.contain(new kakao.maps.LatLng(farm.lat, farm.lon))
@@ -310,22 +309,19 @@
                     marker.setMap(map);
                     markers.push(marker);
 
-                    const overlay = new kakao.maps.CustomOverlay({
-                        position: position,
-                        content: `<div class="info-window" onclick="toggleFarmDetails('${farm.name}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${farm.address}', ${farm.lat}, ${farm.lon}, '${farm.capacity}', '${farm.manufacturer}')">${turbineName}</div>`,
-                        xAnchor: 0.5,
-                        yAnchor: 2,
-                        zIndex: 10
-                    });
-                    overlay.setMap(map);
-                    overlays.push(overlay);
+                    if (areNamesVisible) {
+                        const overlay = new kakao.maps.CustomOverlay({
+                            position: position,
+                            content: `<div class="info-window" onclick="toggleFarmDetails('${farm.name}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${farm.address}', ${farm.lat}, ${farm.lon}, '${farm.capacity}', '${farm.manufacturer}')">${turbineName}</div>`,
+                            xAnchor: 0.5,
+                            yAnchor: 2,
+                            zIndex: 10
+                        });
+                        overlay.setMap(map);
+                        overlays.push(overlay);
+                    }
 
                     kakao.maps.event.addListener(marker, 'click', () => toggleFarmDetails(farm.name, farm.turbineId, farm.type, farm.completionDate, farm.address, farm.lat, farm.lon, farm.capacity, farm.manufacturer));
-
-                    // 정보 창이 열려 있어야 한다면 자동으로 열기
-                    if (areInfoWindowsVisible) {
-                        toggleFarmDetails(farm.name, farm.turbineId, farm.type, farm.completionDate, farm.address, farm.lat, farm.lon, farm.capacity, farm.manufacturer);
-                    }
                 });
             }
 
@@ -335,44 +331,9 @@
             }
         }
 
-        function toggleAllInfoWindows() {
-            const zoomLevel = map.getLevel();
-            if (zoomLevel >= 10) return; // 줌 레벨이 10 이상이면 동작하지 않음
-
-            if (areInfoWindowsVisible) {
-                currentInfowindows.forEach(infowindow => infowindow.setMap(null));
-                currentInfowindows = [];
-                areInfoWindowsVisible = false;
-                document.getElementById('info-toggle-button').textContent = '설명창 열기';
-            } else {
-                const bounds = map.getBounds();
-                const visibleFarms = allWindFarms.filter(farm => 
-                    farm.lat && farm.lon && bounds.contain(new kakao.maps.LatLng(farm.lat, farm.lon))
-                );
-
-                visibleFarms.forEach(farm => {
-                    toggleFarmDetails(farm.name, farm.turbineId, farm.type, farm.completionDate, farm.address, farm.lat, farm.lon, farm.capacity, farm.manufacturer);
-                });
-                areInfoWindowsVisible = true;
-                document.getElementById('info-toggle-button').textContent = '설명창 닫기';
-            }
-        }
-
         window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer) {
-            const existingInfowindow = currentInfowindows.find(iw => {
-                const content = iw.getContent();
-                return content.includes(`${name} ${turbineId}`);
-            });
-
-            if (existingInfowindow) {
-                existingInfowindow.setMap(null);
-                currentInfowindows = currentInfowindows.filter(iw => iw !== existingInfowindow);
-                if (currentInfowindows.length === 0) {
-                    areInfoWindowsVisible = false;
-                    document.getElementById('info-toggle-button').textContent = '설명창 열기';
-                }
-                return;
-            }
+            currentInfowindows.forEach(infowindow => infowindow.setMap(null));
+            currentInfowindows = [];
 
             const turbineName = `${name} ${turbineId}`;
             const totalTurbines = turbineCountByComplex[name] || 0;
@@ -400,8 +361,6 @@
 
             infowindow.open(map);
             currentInfowindows.push(infowindow);
-            areInfoWindowsVisible = true;
-            document.getElementById('info-toggle-button').textContent = '설명창 닫기';
         };
 
         window.closeInfowindow = function(event, element) {
@@ -412,10 +371,6 @@
             if (infowindowToClose) {
                 infowindowToClose.setMap(null);
                 currentInfowindows = currentInfowindows.filter(iw => iw !== infowindowToClose);
-                if (currentInfowindows.length === 0) {
-                    areInfoWindowsVisible = false;
-                    document.getElementById('info-toggle-button').textContent = '설명창 열기';
-                }
                 console.log("정보 창 닫힘");
             }
         };
