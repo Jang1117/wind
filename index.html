@@ -41,7 +41,7 @@
             top: 10px;
         }
         #name-toggle-button {
-            top: 40px;
+            top: 40px; /* map-type-toggle 버튼 아래에 배치 */
         }
         .info-window {
             background: rgba(255, 255, 255, 0.8);
@@ -77,19 +77,7 @@
         let turbineCountByComplex = {};
         let myLocationMarker = null;
         let watchId = null;
-        let areNamesVisible = true;
-
-        const turbineIcon = new kakao.maps.MarkerImage(
-            'https://img.icons8.com/ios-filled/50/000000/wind-turbine.png',
-            new kakao.maps.Size(30, 30),
-            { offset: new kakao.maps.Point(15, 15) }
-        );
-
-        const complexIcon = new kakao.maps.MarkerImage(
-            'https://img.icons8.com/ios-filled/50/000000/wind-turbine.png',
-            new kakao.maps.Size(40, 40),
-            { offset: new kakao.maps.Point(20, 20) }
-        );
+        let areNamesVisible = true; // 터빈 이름 표시 상태 추적
 
         function formatNumberWithCommas(number) {
             if (!number) return "정보 없음";
@@ -203,7 +191,7 @@
         function toggleNamesVisibility() {
             areNamesVisible = !areNamesVisible;
             document.getElementById('name-toggle-button').textContent = areNamesVisible ? '터빈 이름 끄기' : '터빈 이름 켜기';
-            updateMarkers();
+            updateMarkers(); // 마커와 오버레이를 다시 렌더링하여 이름 표시 여부를 반영
         }
 
         function startTrackingLocation() {
@@ -281,8 +269,7 @@
                     const marker = new kakao.maps.Marker({
                         position: position,
                         title: `${complex} (${group.length}개 터빈)`,
-                        clickable: true,
-                        image: complexIcon
+                        clickable: true
                     });
                     marker.setMap(map);
                     markers.push(marker);
@@ -317,8 +304,7 @@
                     const marker = new kakao.maps.Marker({
                         position: position,
                         title: turbineName,
-                        clickable: true,
-                        image: turbineIcon
+                        clickable: true
                     });
                     marker.setMap(map);
                     markers.push(marker);
@@ -352,21 +338,15 @@
             const turbineName = `${name} ${turbineId}`;
             const totalTurbines = turbineCountByComplex[name] || 0;
             const formattedCapacity = formatNumberWithCommas(capacity);
-            
-            // 단지 용량(MW) 계산: (개별 터빈 용량 * 총 터빈 수) / 1000
-            const complexCapacityMW = capacity && totalTurbines ? (capacity * totalTurbines) / 1000 : '정보 없음';
-            const formattedComplexCapacity = typeof complexCapacityMW === 'number' ? formatNumberWithCommas(complexCapacityMW.toFixed(2)) : complexCapacityMW;
-
             const content = `
                 <div class="detail-window" onclick="window.closeInfowindow(event, this)">
-                    <strong>#${turbineName}</strong><br>
+                    <strong>${turbineName}</strong><br>
                     터빈 제조사: ${manufacturer || '정보 없음'}<br>
-                    터빈 용량(kW): ${formattedCapacity}<br>
-                    총 터빈 수: ${totalTurbines}<br>
-                    단지 용량(MW): ${formattedComplexCapacity}<br>
-                    분류: ${type || '정보 없음'}<br>
+					터빈 용량(kW): ${formattedCapacity}<br>
+					단지 내 총 터빈 수: ${totalTurbines}<br>
+					<!--분류: ${type || '정보 없음'}<br>-->
                     준공일: ${completionDate || '정보 없음'}<br>
-                    주소: ${address || '정보 없음'}<br>
+                    주소: ${address || '정보 없음'}<br>                    
                 </div>
             `;
 
