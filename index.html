@@ -300,19 +300,19 @@
 
                 visibleFarms.forEach(farm => {
                     const position = new kakao.maps.LatLng(farm.lat, farm.lon);
-                    const turbineName = `${farm.name} ${farm.turbineId}`;
+                    const turbineName = farm.name; // 수정: 터빈 번호 제거, 단지명만 표시
                     const marker = new kakao.maps.Marker({
                         position: position,
-                        title: turbineName,
+                        title: turbineName, // 수정: 마커의 title도 단지명만 표시
                         clickable: true
                     });
                     marker.setMap(map);
                     markers.push(marker);
 
                     if (areNamesVisible) {
-                        const overlay = new kakao.maps.CustomOverlay({
+ sachant                        const overlay = new kakao.maps.CustomOverlay({
                             position: position,
-                            content: `<div class="info-window" onclick="toggleFarmDetails('${farm.name}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${farm.address}', ${farm.lat}, ${farm.lon}, '${farm.capacity}', '${farm.manufacturer}')">${turbineName}</div>`,
+                            content: `<div class="info-window" onclick="toggleFarmDetails('${farm.name}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${farm.address}', ${farm.lat}, ${farm.lon}, '${farm.capacity}', '${farm.manufacturer}')">${turbineName}</div>`, // 수정: 오버레이에도 단지명만 표시
                             xAnchor: 0.5,
                             yAnchor: 2,
                             zIndex: 10
@@ -335,16 +335,16 @@
             currentInfowindows.forEach(infowindow => infowindow.setMap(null));
             currentInfowindows = [];
 
-            const turbineName = `${name} ${turbineId}`;
+            const turbineName = name; // 수정: 터빈 번호 제거, 단지명만 표시
             const totalTurbines = turbineCountByComplex[name] || 0;
             const formattedCapacity = formatNumberWithCommas(capacity);
             const content = `
                 <div class="detail-window" onclick="window.closeInfowindow(event, this)">
                     <strong>${turbineName}</strong><br>
                     터빈 제조사: ${manufacturer || '정보 없음'}<br>
-					터빈 용량(kW): ${formattedCapacity}<br>
-					단지 내 총 터빈 수: ${totalTurbines}<br>
-					<!--분류: ${type || '정보 없음'}<br>-->
+                    터빈 용량(kW): ${formattedCapacity}<br>
+                    단지 내 총 터빈 수: ${totalTurbines}<br>
+                    <!--분류: ${type || '정보 없음'}<br>-->
                     준공일: ${completionDate || '정보 없음'}<br>
                     주소: ${address || '정보 없음'}<br>                    
                 </div>
