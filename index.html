@@ -28,7 +28,7 @@
             background: rgba(255, 255, 255, 0.8);
             padding: 10px;
         }
-        #map-type-toggle, #name-toggle-button {
+        #map-type-toggle, #name-toggle-button, #language-toggle-button {
             position: absolute;
             right: 10px;
             z-index: 10;
@@ -41,7 +41,10 @@
             top: 10px;
         }
         #name-toggle-button {
-            top: 40px; /* map-type-toggle 버튼 아래에 배치 */
+            top: 40px;
+        }
+        #language-toggle-button {
+            top: 70px; /* name-toggle-button 아래에 배치 */
         }
         .info-window {
             background: rgba(255, 255, 255, 0.8);
@@ -66,6 +69,7 @@
     <div id="error-message"></div>
     <button id="map-type-toggle">기본 지도</button>
     <button id="name-toggle-button">터빈 이름 끄기</button>
+    <button id="language-toggle-button">English</button> <!-- 언어 토글 버튼 추가 -->
 
     <script>
         let map;
@@ -77,10 +81,69 @@
         let turbineCountByComplex = {};
         let myLocationMarker = null;
         let watchId = null;
-        let areNamesVisible = true; // 터빈 이름 표시 상태 추적
+        let areNamesVisible = true;
+        let currentLanguage = 'ko'; // 현재 언어 상태 (기본값: 한국어)
+
+        // 언어 데이터 정의
+        const languageData = {
+            ko: {
+                loading: "지도 로딩 중...",
+                mapTypeToggle: {
+                    default: "기본 지도",
+                    satellite: "위성 지도"
+                },
+                nameToggle: {
+                    on: "터빈 이름 끄기",
+                    off: "터빈 이름 켜기"
+                },
+                languageToggle: "English",
+                error: {
+                    csvParseFail: "CSV 파싱 실패: ",
+                    dataLoadFail: "데이터를 로드할 수 없습니다: ",
+                    locationFail: "위치 정보를 가져올 수 없습니다.",
+                    geolocationNotSupported: "브라우저가 Geolocation을 지원하지 않습니다."
+                },
+                detailWindow: {
+                    manufacturer: "터빈 제조사: ",
+                    singleCapacity: "단일 터빈 용량(kW): ",
+                    totalTurbines: "단지 내 총 터빈 수: ",
+                    totalCapacity: "단지 총 용량(kW): ",
+                    completionDate: "준공일: ",
+                    address: "주소: ",
+                    noInfo: "정보 없음"
+                }
+            },
+            en: {
+                loading: "Loading map...",
+                mapTypeToggle: {
+                    default: "Default Map",
+                    satellite: "Satellite Map"
+                },
+                nameToggle: {
+                    on: "Hide Turbine Names",
+                    off: "Show Turbine Names"
+                },
+                languageToggle: "한국어",
+                error: {
+                    csvParseFail: "CSV parsing failed: ",
+                    dataLoadFail: "Unable to load data: ",
+                    locationFail: "Unable to retrieve location information.",
+                    geolocationNotSupported: "Browser does not support Geolocation."
+                },
+                detailWindow: {
+                    manufacturer: "Turbine Manufacturer: ",
+                    singleCapacity: "Single Turbine Capacity(kW): ",
+                    totalTurbines: "Total Turbines in Complex: ",
+                    totalCapacity: "Total Complex Capacity(kW): ",
+                    completionDate: "Completion Date: ",
+                    address: "Address: ",
+                    noInfo: "No information"
+                }
+            }
+        };
 
         function formatNumberWithCommas(number) {
-            if (!number) return "정보 없음";
+            if (!number) return languageData[currentLanguage].detailWindow.noInfo;
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
@@ -129,12 +192,12 @@
                     },
                     error: function(error) {
                         console.error('CSV 파싱 실패:', error);
-                        document.getElementById('error-message').innerText = `CSV 파싱 실패: ${error.message}`;
+                        document.getElementById('error-message').innerText = `${languageData[currentLanguage].error.csvParseFail}${error.message}`;
                     }
                 });
             } catch (error) {
                 console.error('CSV 로드 실패:', error);
-                document.getElementById('error-message').innerText = `데이터를 로드할 수 없습니다: ${error.message}`;
+                document.getElementById('error-message').innerText = `${languageData[currentLanguage].error.dataLoadFail}${error.message}`;
             }
         }
 
@@ -166,23 +229,30 @@
             kakao.maps.event.addListener(map, 'zoom_changed', updateMarkers);
             kakao.maps.event.addListener(map, 'idle', updateMarkers);
 
+            document.getElementById('loading').innerText = languageData[currentLanguage].loading;
             document.getElementById('loading').style.display = 'none';
 
             const toggleButton = document.getElementById('map-type-toggle');
+            toggleButton.innerText = languageData[currentLanguage].mapTypeToggle.default;
             toggleButton.addEventListener('click', toggleMapType);
 
             const nameToggleButton = document.getElementById('name-toggle-button');
+            nameToggleButton.innerText = languageData[currentLanguage].nameToggle.on;
             nameToggleButton.addEventListener('click', toggleNamesVisibility);
+
+            const languageToggleButton = document.getElementById('language-toggle-button');
+            languageToggleButton.innerText = languageData[currentLanguage].languageToggle;
+            languageToggleButton.addEventListener('click', toggleLanguage);
         }
 
         function toggleMapType() {
             if (isSatellite) {
                 map.setMapTypeId(kakao.maps.MapTypeId.ROADMAP);
-                document.getElementById('map-type-toggle').textContent = '위성 지도';
+                document.getElementById('map-type-toggle').innerText = languageData[currentLanguage].mapTypeToggle.satellite;
                 isSatellite = false;
             } else {
                 map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
-                document.getElementById('map-type-toggle').textContent = '기본 지도';
+                document.getElementById('map-type-toggle').innerText = languageData[currentLanguage].mapTypeToggle.default;
                 isSatellite = true;
             }
             console.log("지도 유형 변경:", isSatellite ? "위성" : "기본");
@@ -190,8 +260,29 @@
 
         function toggleNamesVisibility() {
             areNamesVisible = !areNamesVisible;
-            document.getElementById('name-toggle-button').textContent = areNamesVisible ? '터빈 이름 끄기' : '터빈 이름 켜기';
-            updateMarkers(); // 마커와 오버레이를 다시 렌더링하여 이름 표시 여부를 반영
+            document.getElementById('name-toggle-button').innerText = areNamesVisible ? languageData[currentLanguage].nameToggle.on : languageData[currentLanguage].nameToggle.off;
+            updateMarkers();
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'ko' ? 'en' : 'ko';
+            document.getElementById('language-toggle-button').innerText = languageData[currentLanguage].languageToggle;
+
+            // UI 요소 업데이트
+            document.getElementById('map-type-toggle').innerText = isSatellite ? languageData[currentLanguage].mapTypeToggle.default : languageData[currentLanguage].mapTypeToggle.satellite;
+            document.getElementById('name-toggle-button').innerText = areNamesVisible ? languageData[currentLanguage].nameToggle.on : languageData[currentLanguage].nameToggle.off;
+            document.getElementById('loading').innerText = languageData[currentLanguage].loading;
+
+            // 에러 메시지 업데이트
+            const errorMessage = document.getElementById('error-message').innerText;
+            if (errorMessage) {
+                const errorKey = errorMessage.includes("CSV") ? "csvParseFail" : errorMessage.includes("데이터") || errorMessage.includes("data") ? "dataLoadFail" : errorMessage.includes("위치") || errorMessage.includes("location") ? "locationFail" : "geolocationNotSupported";
+                const errorDetail = errorMessage.split(": ")[1] || "";
+                document.getElementById('error-message').innerText = `${languageData[currentLanguage].error[errorKey]}${errorDetail}`;
+            }
+
+            // 열려 있는 팝업 창 업데이트
+            updateMarkers();
         }
 
         function startTrackingLocation() {
@@ -205,7 +296,7 @@
                     },
                     error => {
                         console.error("위치 가져오기 실패:", error);
-                        document.getElementById('error-message').innerText = "위치 정보를 가져올 수 없습니다.";
+                        document.getElementById('error-message').innerText = languageData[currentLanguage].error.locationFail;
                     },
                     {
                         enableHighAccuracy: true,
@@ -215,7 +306,7 @@
                 );
             } else {
                 console.error("Geolocation 지원 안 됨");
-                document.getElementById('error-message').innerText = "브라우저가 Geolocation을 지원하지 않습니다.";
+                document.getElementById('error-message').innerText = languageData[currentLanguage].error.geolocationNotSupported;
             }
         }
 
@@ -228,7 +319,7 @@
 
             myLocationMarker = new kakao.maps.Marker({
                 position: position,
-                title: "내 위치",
+                title: currentLanguage === 'ko' ? "내 위치" : "My Location",
                 clickable: false,
                 image: new kakao.maps.MarkerImage(
                     'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
@@ -268,7 +359,7 @@
 
                     const marker = new kakao.maps.Marker({
                         position: position,
-                        title: `${complex} (${group.length}개 터빈)`,
+                        title: `${complex} (${group.length}${currentLanguage === 'ko' ? '개 터빈' : ' turbines'})`,
                         clickable: true
                     });
                     marker.setMap(map);
@@ -277,7 +368,7 @@
                     if (areNamesVisible) {
                         const overlay = new kakao.maps.CustomOverlay({
                             position: position,
-                            content: `<div class="info-window">${complex} (${group.length}개)</div>`,
+                            content: `<div class="info-window">${complex} (${group.length}${currentLanguage === 'ko' ? '개' : ''})</div>`,
                             xAnchor: 0.5,
                             yAnchor: 2,
                             zIndex: 10
@@ -300,7 +391,7 @@
 
                 visibleFarms.forEach(farm => {
                     const position = new kakao.maps.LatLng(farm.lat, farm.lon);
-                    const turbineName = `${farm.name} ${farm.turbineId}`;
+                    const turbineName = farm.name; // 단지명만 표시
                     const marker = new kakao.maps.Marker({
                         position: position,
                         title: turbineName,
@@ -331,47 +422,43 @@
             }
         }
 
-		window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer) {
-			currentInfowindows.forEach(infowindow => infowindow.setMap(null));
-			currentInfowindows = [];
+        window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer) {
+            currentInfowindows.forEach(infowindow => infowindow.setMap(null));
+            currentInfowindows = [];
 
-			const turbineName = name; // 단지명만 표시
-			const totalTurbines = turbineCountByComplex[name] || 0;
-			const formattedCapacity = formatNumberWithCommas(capacity);
+            const turbineName = name;
+            const totalTurbines = turbineCountByComplex[name] || 0;
+            const formattedCapacity = formatNumberWithCommas(capacity);
 
-			// 단일 터빈 용량과 총 터빈 수를 a, b로 정의
-			const a = capacity; // 단일 터빈 용량 (kW), formatNumberWithCommas 적용 전 숫자 값 사용
-			const b = totalTurbines; // 단지 내 총 터빈 수
+            const a = capacity;
+            const b = totalTurbines;
+            const totalComplexCapacity = a * b;
+            const formattedTotalComplexCapacity = formatNumberWithCommas(totalComplexCapacity);
 
-			// 단지 총 용량 계산 (a * b)
-			const totalComplexCapacity = a * b;
-			const formattedTotalComplexCapacity = formatNumberWithCommas(totalComplexCapacity); // 천 단위 구분 기호 추가
+            const content = `
+                <div class="detail-window" onclick="window.closeInfowindow(event, this)">
+                    <strong>${turbineName}</strong><br>
+                    ${languageData[currentLanguage].detailWindow.manufacturer}${manufacturer || languageData[currentLanguage].detailWindow.noInfo}<br>
+                    ${languageData[currentLanguage].detailWindow.singleCapacity}${formattedCapacity}<br>
+                    ${languageData[currentLanguage].detailWindow.totalTurbines}${totalTurbines}<br>
+                    ${languageData[currentLanguage].detailWindow.totalCapacity}${formattedTotalComplexCapacity}<br>
+                    ${languageData[currentLanguage].detailWindow.completionDate}${completionDate || languageData[currentLanguage].detailWindow.noInfo}<br>
+                    ${languageData[currentLanguage].detailWindow.address}${address || languageData[currentLanguage].detailWindow.noInfo}<br>                    
+                </div>
+            `;
 
-			const content = `
-				<div class="detail-window" onclick="window.closeInfowindow(event, this)">
-					<strong>${turbineName}</strong><br>
-					터빈 제조사: ${manufacturer || '정보 없음'}<br>
-					단일 터빈 용량(kW): ${formattedCapacity}<br>
-					단지 내 총 터빈 수: ${totalTurbines}<br>
-					단지 총 용량(kW): ${formattedTotalComplexCapacity}<br> <!-- 단지 총 용량 추가 -->
-					<!--분류: ${type || '정보 없음'}<br>-->
-					준공일: ${completionDate || '정보 없음'}<br>
-					주소: ${address || '정보 없음'}<br>                    
-				</div>
-			`;
+            const basePosition = new kakao.maps.LatLng(lat, lon);
+            const adjustedPosition = new kakao.maps.LatLng(lat - 0.005, lon);
+            const infowindow = new kakao.maps.InfoWindow({
+                position: adjustedPosition,
+                content: content,
+                zIndex: 20,
+                removable: true
+            });
 
-			const basePosition = new kakao.maps.LatLng(lat, lon);
-			const adjustedPosition = new kakao.maps.LatLng(lat - 0.005, lon);
-			const infowindow = new kakao.maps.InfoWindow({
-				position: adjustedPosition,
-				content: content,
-				zIndex: 20,
-				removable: true
-			});
-
-			infowindow.open(map);
-			currentInfowindows.push(infowindow);
-		};
+            infowindow.open(map);
+            currentInfowindows.push(infowindow);
+        };
 
         window.closeInfowindow = function(event, element) {
             event.stopPropagation();
