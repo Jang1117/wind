@@ -312,7 +312,7 @@
                     if (areNamesVisible) {
                         const overlay = new kakao.maps.CustomOverlay({
                             position: position,
-                            content: `<div class="info-window" onclick="toggleFarmDetails('${farm.name}', '${farm.type}', '${farm.completionDate}', '${farm.address}', ${farm.lat}, ${farm.lon}, '${farm.capacity}', '${farm.manufacturer}')">${turbineName}</div>`,
+                            content: `<div class="info-window" onclick="toggleFarmDetails('${farm.name}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${farm.address}', ${farm.lat}, ${farm.lon}, '${farm.capacity}', '${farm.manufacturer}')">${turbineName}</div>`,
                             xAnchor: 0.5,
                             yAnchor: 2,
                             zIndex: 10
@@ -321,7 +321,7 @@
                         overlays.push(overlay);
                     }
 
-                    kakao.maps.event.addListener(marker, 'click', () => toggleFarmDetails(farm.name, farm.type, farm.completionDate, farm.address, farm.lat, farm.lon, farm.capacity, farm.manufacturer));
+                    kakao.maps.event.addListener(marker, 'click', () => toggleFarmDetails(farm.name, farm.turbineId, farm.type, farm.completionDate, farm.address, farm.lat, farm.lon, farm.capacity, farm.manufacturer));
                 });
             }
 
@@ -331,12 +331,12 @@
             }
         }
 
-        window.toggleFarmDetails = function(name, type, completionDate, address, lat, lon, capacity, manufacturer) {
+        window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer) {
             currentInfowindows.forEach(infowindow => infowindow.setMap(null));
             currentInfowindows = [];
 
-            const turbineName = `${name} ${turbineId}`;
-            <!--const totalTurbines = turbineCountByComplex[name] || 0;-->
+            const turbineName = `${name}`;
+            const totalTurbines = turbineCountByComplex[name] || 0;
             const formattedCapacity = formatNumberWithCommas(capacity);
             const content = `
                 <div class="detail-window" onclick="window.closeInfowindow(event, this)">
