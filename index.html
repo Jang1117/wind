@@ -44,7 +44,7 @@
             top: 40px;
         }
         #language-toggle-button {
-            top: 70px; /* name-toggle-button 아래에 배치 */
+            top: 70px;
         }
         .info-window {
             background: rgba(255, 255, 255, 0.8);
@@ -69,7 +69,7 @@
     <div id="error-message"></div>
     <button id="map-type-toggle">기본 지도</button>
     <button id="name-toggle-button">터빈 이름 끄기</button>
-    <button id="language-toggle-button">English</button> <!-- 언어 토글 버튼 추가 -->
+    <button id="language-toggle-button">English</button>
 
     <script>
         let map;
@@ -82,9 +82,9 @@
         let myLocationMarker = null;
         let watchId = null;
         let areNamesVisible = true;
-        let currentLanguage = 'ko'; // 현재 언어 상태 (기본값: 한국어)
+        let currentLanguage = 'ko';
 
-        // 언어 데이터 정의
+        // 언어 데이터 정의 (UI 및 CSV 데이터 번역 포함)
         const languageData = {
             ko: {
                 loading: "지도 로딩 중...",
@@ -111,6 +111,103 @@
                     completionDate: "준공일: ",
                     address: "주소: ",
                     noInfo: "정보 없음"
+                },
+                type: {
+                    육상: "육상",
+                    해상: "해상"
+                },
+                manufacturer: {
+                    Vestas: "Vestas",
+                    Acciona: "Acciona",
+                    한진산업: "한진산업",
+                    유니슨: "유니슨",
+                    Mitsubishi: "Mitsubishi",
+                    SGRE: "SGRE",
+                    두산에너빌리티: "두산에너빌리티",
+                    현대일렉트릭: "현대일렉트릭",
+                    Enercon: "Enercon"
+                },
+                complexNames: {
+                    행원: "행원",
+                    전북: "전북",
+                    영덕: "영덕",
+                    한경: "한경",
+                    한경1: "한경1",
+                    한경2: "한경2",
+                    강원: "강원",
+                    신창: "신창",
+                    양양: "양양",
+                    월정: "월정",
+                    고리: "고리",
+                    태기산: "태기산",
+                    신안: "신안",
+                    영양: "영양",
+                    삼달: "삼달",
+                    누에섬: "누에섬",
+                    성산1: "성산1",
+                    "영광(육상)": "영광(육상)",
+                    "영광(해상)": "영광(해상)",
+                    "완도 신지": "완도 신지",
+                    제주수망: "제주수망",
+                    영양양구: "영양양구",
+                    "태백 귀네미": "태백 귀네미",
+                    태백귀네미: "태백귀네미",
+                    "군위 화산": "군위 화산",
+                    "청송 노래산": "청송 노래산",
+                    "북촌 서모": "북촌 서모",
+                    "서남해(실증단지)": "서남해(실증단지)",
+                    "태백 가덕산": "태백 가덕산",
+                    "태백 삼수": "태백 삼수",
+                    전남4: "전남4",
+                    양산원동: "양산원동",
+                    경주호림: "경주호림",
+                    태백원동: "태백원동",
+                    신흥: "신흥",
+                    평창청산: "평창청산",
+                    장흥: "장흥",
+                    태백금봉1: "태백금봉1",
+                    태백금봉2: "태백금봉2",
+                    군산2: "군산2",
+                    해맞이: "해맞이",
+                    GS영양2: "GS영양2"
+                },
+                addresses: {
+                    "제주특별자치도 제주시 구좌읍 해맞이해안로 712-3 (제주대 660)": "제주특별자치도 제주시 구좌읍 해맞이해안로 712-3 (제주대 660)",
+                    "전라북도 부안군": "전라북도 부안군",
+                    "경상북도 영덕군 영덕읍 화수리": "경상북도 영덕군 영덕읍 화수리",
+                    "제주특별자치도 제주시 한경면 용수리 3879-5": "제주특별자치도 제주시 한경면 용수리 3879-5",
+                    "강원도 평창군 대관령면 횡계리": "강원도 평창군 대관령면 횡계리",
+                    "제주특별자치도 제주시": "제주특별자치도 제주시",
+                    "강원도 양양군 서면 영덕리": "강원도 양양군 서면 영덕리",
+                    "부산광역시 기장군 장안읍 효암리 258번지": "부산광역시 기장군 장안읍 효암리 258번지",
+                    "강원도 횡성군 둔내면 태기리 산1-5번지": "강원도 횡성군 둔내면 태기리 산1-5번지",
+                    "전라남도 신안군 비금면 구림리 산1-1": "전라남도 신안군 비금면 구림리 산1-1",
+                    "경상북도 영양군 석보면 맹동산길 284-40": "경상북도 영양군 석보면 맹동산길 284-40",
+                    "제주특별자치도 서귀포시 성산읍 삼달리 2004번지": "제주특별자치도 서귀포시 성산읍 삼달리 2004번지",
+                    "경기도 안산시": "경기도 안산시",
+                    "제주특별자치도 서귀포시 성산읍 수산리 4403-3": "제주특별자치도 서귀포시 성산읍 수산리 4403-3",
+                    "전라남도 영광군 백수읍 하사리,약수리, 염산면 축동리,신성리,송암리 일원": "전라남도 영광군 백수읍 하사리,약수리, 염산면 축동리,신성리,송암리 일원",
+                    "전라남도 완도군 신지면 신지로 1134-287": "전라남도 완도군 신지면 신지로 1134-287",
+                    "제주특별자치도 서귀포시 제주도 서귀포시": "제주특별자치도 서귀포시 제주도 서귀포시",
+                    "경상북도 영양군 석보면 홍계길 449-7": "경상북도 영양군 석보면 홍계길 449-7",
+                    "강원도 태백시 하사미동 산220-3 일원": "강원도 태백시 하사미동 산220-3 일원",
+                    "경상북도 군위군 영천시 신녕면 화남리 산64, 군위군 고로면 화북리 산229-1번지 외 3필지": "경상북도 군위군 영천시 신녕면 화남리 산64, 군위군 고로면 화북리 산229-1번지 외 3필지",
+                    "경상북도 청송군 안덕면 노래리 산68-1번지 일원": "경상북도 청송군 안덕면 노래리 산68-1번지 일원",
+                    "제주특별자치도 제주시 구좌읍 북흘로 255": "제주특별자치도 제주시 구좌읍 북흘로 255",
+                    "전라북도 부안군 위도 및 전남 영광군 안마도 해상 일원": "전라북도 부안군 위도 및 전남 영광군 안마도 해상 일원",
+                    "강원도 태백시 원동 산97, 산13-1일원": "강원도 태백시 원동 산97, 산13-1일원",
+                    "강원도 태백시 창죽동 산1-172번지": "강원도 태백시 창죽동 산1-172번지",
+                    "전남 영광군 백수읍 백수로3길 338-26": "전남 영광군 백수읍 백수로3길 338-26",
+                    "경남 양산시 원동면 영포리 산21-3(늘밭로방향)": "경남 양산시 원동면 영포리 산21-3(늘밭로방향)",
+                    "경상북도 경주시 강동면 강동산단로 43-3": "경상북도 경주시 강동면 강동산단로 43-3",
+                    "강원특별자치도 태백시 원동 산 13-7": "강원특별자치도 태백시 원동 산 13-7",
+                    "전남 무안군 운남면 내리 607-9": "전남 무안군 운남면 내리 607-9",
+                    "강원특별자치도 평창군 봉평면 진조리 산 80-5": "강원특별자치도 평창군 봉평면 진조리 산 80-5",
+                    "전남 장흥군 유치면 송정리 산 3-7": "전남 장흥군 유치면 송정리 산 3-7",
+                    "강원특별자치도 태백시 황지동 287-75": "강원특별자치도 태백시 황지동 287-75",
+                    "전라북도 군산시 앞바다": "전라북도 군산시 앞바다",
+                    "경상북도 영덕군 영덕읍 삼계리 산25": "경상북도 영덕군 영덕읍 삼계리 산25",
+                    "경상북도 영양군 석보면 삼의리 일대": "경상북도 영양군 석보면 삼의리 일대"
                 }
             },
             en: {
@@ -138,6 +235,103 @@
                     completionDate: "Completion Date: ",
                     address: "Address: ",
                     noInfo: "No information"
+                },
+                type: {
+                    육상: "Onshore",
+                    해상: "Offshore"
+                },
+                manufacturer: {
+                    Vestas: "Vestas",
+                    Acciona: "Acciona",
+                    한진산업: "Hanjin Industry",
+                    유니슨: "Unison",
+                    Mitsubishi: "Mitsubishi",
+                    SGRE: "SGRE",
+                    두산에너빌리티: "Doosan Enerbility",
+                    현대일렉트릭: "Hyundai Electric",
+                    Enercon: "Enercon"
+                },
+                complexNames: {
+                    행원: "Haengwon",
+                    전북: "Jeonbuk",
+                    영덕: "Yeongdeok",
+                    한경: "Hangyeong",
+                    한경1: "Hangyeong1",
+                    한경2: "Hangyeong2",
+                    강원: "Gangwon",
+                    신창: "Sinchang",
+                    양양: "Yangyang",
+                    월정: "Woljeong",
+                    고리: "Gori",
+                    태기산: "Taegisan",
+                    신안: "Sinan",
+                    영양: "Yeongyang",
+                    삼달: "Samdal",
+                    누에섬: "Nue Island",
+                    성산1: "Seongsan1",
+                    "영광(육상)": "Yeonggwang (Onshore)",
+                    "영광(해상)": "Yeonggwang (Offshore)",
+                    "완도 신지": "Wando Sinji",
+                    제주수망: "Jeju Sumang",
+                    영양양구: "Yeongyang Yanggu",
+                    "태백 귀네미": "Taebaek Guenemi",
+                    태백귀네미: "Taebaek Guenemi",
+                    "군위 화산": "Gunwi Hwasan",
+                    "청송 노래산": "Cheongsong Noraesan",
+                    "북촌 서모": "Bukchon Seomo",
+                    "서남해(실증단지)": "Seonamhae (Demonstration Complex)",
+                    "태백 가덕산": "Taebaek Gadeoksan",
+                    "태백 삼수": "Taebaek Samsu",
+                    전남4: "Jeonnam4",
+                    양산원동: "Yangsan Wondong",
+                    경주호림: "Gyeongju Horim",
+                    태백원동: "Taebaek Wondong",
+                    신흥: "Sinheung",
+                    평창청산: "Pyeongchang Cheongsan",
+                    장흥: "Jangheung",
+                    태백금봉1: "Taebaek Geumbong1",
+                    태백금봉2: "Taebaek Geumbong2",
+                    군산2: "Gunsan2",
+                    해맞이: "Haemaji",
+                    GS영양2: "GS Yeongyang2"
+                },
+                addresses: {
+                    "제주특별자치도 제주시 구좌읍 해맞이해안로 712-3 (제주대 660)": "712-3 Haemajihaean-ro, Gujwa-eup, Jeju-si, Jeju Special Self-Governing Province (Jeju University 660)",
+                    "전라북도 부안군": "Buan-gun, Jeollabuk-do",
+                    "경상북도 영덕군 영덕읍 화수리": "Hwasu-ri, Yeongdeok-eup, Yeongdeok-gun, Gyeongsangbuk-do",
+                    "제주특별자치도 제주시 한경면 용수리 3879-5": "3879-5 Yongsu-ri, Hangyeong-myeon, Jeju-si, Jeju Special Self-Governing Province",
+                    "강원도 평창군 대관령면 횡계리": "Hoenggye-ri, Daegwallyeong-myeon, Pyeongchang-gun, Gangwon-do",
+                    "제주특별자치도 제주시": "Jeju-si, Jeju Special Self-Governing Province",
+                    "강원도 양양군 서면 영덕리": "Yeongdeok-ri, Seo-myeon, Yangyang-gun, Gangwon-do",
+                    "부산광역시 기장군 장안읍 효암리 258번지": "258 Hyoam-ri, Jangan-eup, Gijang-gun, Busan Metropolitan City",
+                    "강원도 횡성군 둔내면 태기리 산1-5번지": "San 1-5, Taegi-ri, Dunnae-myeon, Hoengseong-gun, Gangwon-do",
+                    "전라남도 신안군 비금면 구림리 산1-1": "San 1-1, Gurim-ri, Bigeum-myeon, Sinan-gun, Jeollanam-do",
+                    "경상북도 영양군 석보면 맹동산길 284-40": "284-40 Maengdongsan-gil, Seokbo-myeon, Yeongyang-gun, Gyeongsangbuk-do",
+                    "제주특별자치도 서귀포시 성산읍 삼달리 2004번지": "2004 Samdal-ri, Seongsan-eup, Seogwipo-si, Jeju Special Self-Governing Province",
+                    "경기도 안산시": "Ansan-si, Gyeonggi-do",
+                    "제주특별자치도 서귀포시 성산읍 수산리 4403-3": "4403-3 Susan-ri, Seongsan-eup, Seogwipo-si, Jeju Special Self-Governing Province",
+                    "전라남도 영광군 백수읍 하사리,약수리, 염산면 축동리,신성리,송암리 일원": "Areas of Hasa-ri, Yaksu-ri, Baeksu-eup, Chukdong-ri, Sinseong-ri, Songam-ri, Yeomsan-myeon, Yeonggwang-gun, Jeollanam-do",
+                    "전라남도 완도군 신지면 신지로 1134-287": "1134-287 Sinji-ro, Sinji-myeon, Wando-gun, Jeollanam-do",
+                    "제주특별자치도 서귀포시 제주도 서귀포시": "Seogwipo-si, Jeju-do, Jeju Special Self-Governing Province",
+                    "경상북도 영양군 석보면 홍계길 449-7": "449-7 Honggye-gil, Seokbo-myeon, Yeongyang-gun, Gyeongsangbuk-do",
+                    "강원도 태백시 하사미동 산220-3 일원": "Areas of San 220-3, Hasami-dong, Taebaek-si, Gangwon-do",
+                    "경상북도 군위군 영천시 신녕면 화남리 산64, 군위군 고로면 화북리 산229-1번지 외 3필지": "San 64, Hwanam-ri, Sinnyeong-myeon, Yeongcheon-si, Gunwi-gun, and San 229-1, Hwabuk-ri, Goro-myeon, Gunwi-gun, Gyeongsangbuk-do, and 3 other parcels",
+                    "경상북도 청송군 안덕면 노래리 산68-1번지 일원": "Areas of San 68-1, Norae-ri, Andeok-myeon, Cheongsong-gun, Gyeongsangbuk-do",
+                    "제주특별자치도 제주시 구좌읍 북흘로 255": "255 Bukheul-ro, Gujwa-eup, Jeju-si, Jeju Special Self-Governing Province",
+                    "전라북도 부안군 위도 및 전남 영광군 안마도 해상 일원": "Offshore areas of Wido, Buan-gun, Jeollabuk-do, and Anmado, Yeonggwang-gun, Jeollanam-do",
+                    "강원도 태백시 원동 산97, 산13-1일원": "Areas of San 97, San 13-1, Wondong, Taebaek-si, Gangwon-do",
+                    "강원도 태백시 창죽동 산1-172번지": "San 1-172, Changjuk-dong, Taebaek-si, Gangwon-do",
+                    "전남 영광군 백수읍 백수로3길 338-26": "338-26 Baeksu-ro 3-gil, Baeksu-eup, Yeonggwang-gun, Jeollanam-do",
+                    "경남 양산시 원동면 영포리 산21-3(늘밭로방향)": "San 21-3, Yeongpo-ri, Wondong-myeon, Yangsan-si, Gyeongsangnam-do (Neulbat-ro direction)",
+                    "경상북도 경주시 강동면 강동산단로 43-3": "43-3 Gangdongsandan-ro, Gangdong-myeon, Gyeongju-si, Gyeongsangbuk-do",
+                    "강원특별자치도 태백시 원동 산 13-7": "San 13-7, Wondong, Taebaek-si, Gangwon Special Self-Governing Province",
+                    "전남 무안군 운남면 내리 607-9": "607-9 Nae-ri, Unnam-myeon, Muan-gun, Jeollanam-do",
+                    "강원특별자치도 평창군 봉평면 진조리 산 80-5": "San 80-5, Jinjo-ri, Bongpyeong-myeon, Pyeongchang-gun, Gangwon Special Self-Governing Province",
+                    "전남 장흥군 유치면 송정리 산 3-7": "San 3-7, Songjeong-ri, Yuchi-myeon, Jangheung-gun, Jeollanam-do",
+                    "강원특별자치도 태백시 황지동 287-75": "287-75 Hwangji-dong, Taebaek-si, Gangwon Special Self-Governing Province",
+                    "전라북도 군산시 앞바다": "Offshore area of Gunsan-si, Jeollabuk-do",
+                    "경상북도 영덕군 영덕읍 삼계리 산25": "San 25, Samgye-ri, Yeongdeok-eup, Yeongdeok-gun, Gyeongsangbuk-do",
+                    "경상북도 영양군 석보면 삼의리 일대": "Areas of Samui-ri, Seokbo-myeon, Yeongyang-gun, Gyeongsangbuk-do"
                 }
             }
         };
@@ -151,10 +345,10 @@
             try {
                 const response = await fetch('windfarm_data.csv');
                 if (!response.ok) {
-                    throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
+                    throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
                 }
                 const text = await response.text();
-                console.log("CSV 데이터:", text);
+                console.log("CSV data:", text);
 
                 Papa.parse(text, {
                     header: true,
@@ -178,7 +372,7 @@
                                 manufacturer: row['제조사'] ? row['제조사'].trim() : null
                             };
                         }).filter(row => row !== null);
-                        console.log("파싱된 데이터:", allWindFarms);
+                        console.log("Parsed data:", allWindFarms);
 
                         allWindFarms.forEach(farm => {
                             if (!turbineCountByComplex[farm.name]) {
@@ -186,37 +380,37 @@
                             }
                             turbineCountByComplex[farm.name]++;
                         });
-                        console.log("단지별 터빈 수:", turbineCountByComplex);
+                        console.log("Turbine count by complex:", turbineCountByComplex);
 
                         initMap();
                     },
                     error: function(error) {
-                        console.error('CSV 파싱 실패:', error);
+                        console.error('CSV parsing failed:', error);
                         document.getElementById('error-message').innerText = `${languageData[currentLanguage].error.csvParseFail}${error.message}`;
                     }
                 });
             } catch (error) {
-                console.error('CSV 로드 실패:', error);
+                console.error('CSV load failed:', error);
                 document.getElementById('error-message').innerText = `${languageData[currentLanguage].error.dataLoadFail}${error.message}`;
             }
         }
 
         function initMap() {
-            console.log("initMap 호출됨");
+            console.log("initMap called");
             const container = document.getElementById('map');
-            console.log("컨테이너:", container);
+            console.log("Container:", container);
             const options = {
                 center: new kakao.maps.LatLng(36.41119125, 129.4146661),
                 level: 13
             };
             map = new kakao.maps.Map(container, options);
             map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
-            console.log("지도 생성됨:", map);
+            console.log("Map created:", map);
 
             setTimeout(() => {
                 map.relayout();
                 map.setCenter(new kakao.maps.LatLng(36.41119125, 129.4146661));
-                console.log("지도 렌더링 완료");
+                console.log("Map rendering complete");
                 updateMarkers();
                 startTrackingLocation();
             }, 100);
@@ -255,7 +449,7 @@
                 document.getElementById('map-type-toggle').innerText = languageData[currentLanguage].mapTypeToggle.default;
                 isSatellite = true;
             }
-            console.log("지도 유형 변경:", isSatellite ? "위성" : "기본");
+            console.log("Map type changed:", isSatellite ? "Satellite" : "Default");
         }
 
         function toggleNamesVisibility() {
@@ -291,11 +485,11 @@
                     position => {
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
-                        console.log("내 위치 업데이트:", lat, lon);
+                        console.log("My location updated:", lat, lon);
                         updateMyLocation(lat, lon);
                     },
                     error => {
-                        console.error("위치 가져오기 실패:", error);
+                        console.error("Location retrieval failed:", error);
                         document.getElementById('error-message').innerText = languageData[currentLanguage].error.locationFail;
                     },
                     {
@@ -305,7 +499,7 @@
                     }
                 );
             } else {
-                console.error("Geolocation 지원 안 됨");
+                console.error("Geolocation not supported");
                 document.getElementById('error-message').innerText = languageData[currentLanguage].error.geolocationNotSupported;
             }
         }
@@ -342,7 +536,7 @@
         function updateMarkers() {
             clearMap();
             const zoomLevel = map.getLevel();
-            console.log("현재 줌 레벨:", zoomLevel);
+            console.log("Current zoom level:", zoomLevel);
 
             if (zoomLevel >= 10) {
                 const farmsByComplex = {};
@@ -357,9 +551,10 @@
                     const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
                     const position = new kakao.maps.LatLng(avgLat, avgLon);
 
+                    const translatedComplexName = languageData[currentLanguage].complexNames[complex] || complex;
                     const marker = new kakao.maps.Marker({
                         position: position,
-                        title: `${complex} (${group.length}${currentLanguage === 'ko' ? '개 터빈' : ' turbines'})`,
+                        title: `${translatedComplexName} (${group.length}${currentLanguage === 'ko' ? '개 터빈' : ' turbines'})`,
                         clickable: true
                     });
                     marker.setMap(map);
@@ -368,7 +563,7 @@
                     if (areNamesVisible) {
                         const overlay = new kakao.maps.CustomOverlay({
                             position: position,
-                            content: `<div class="info-window">${complex} (${group.length}${currentLanguage === 'ko' ? '개' : ''})</div>`,
+                            content: `<div class="info-window">${translatedComplexName} (${group.length}${currentLanguage === 'ko' ? '개' : ''})</div>`,
                             xAnchor: 0.5,
                             yAnchor: 2,
                             zIndex: 10
@@ -387,14 +582,14 @@
                 const visibleFarms = allWindFarms.filter(farm => 
                     farm.lat && farm.lon && bounds.contain(new kakao.maps.LatLng(farm.lat, farm.lon))
                 );
-                console.log("표시될 터빈 수:", visibleFarms.length);
+                console.log("Number of turbines to display:", visibleFarms.length);
 
                 visibleFarms.forEach(farm => {
                     const position = new kakao.maps.LatLng(farm.lat, farm.lon);
-                    const turbineName = farm.name; // 단지명만 표시
+                    const translatedComplexName = languageData[currentLanguage].complexNames[farm.name] || farm.name;
                     const marker = new kakao.maps.Marker({
                         position: position,
-                        title: turbineName,
+                        title: translatedComplexName,
                         clickable: true
                     });
                     marker.setMap(map);
@@ -403,7 +598,7 @@
                     if (areNamesVisible) {
                         const overlay = new kakao.maps.CustomOverlay({
                             position: position,
-                            content: `<div class="info-window" onclick="toggleFarmDetails('${farm.name}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${farm.address}', ${farm.lat}, ${farm.lon}, '${farm.capacity}', '${farm.manufacturer}')">${turbineName}</div>`,
+                            content: `<div class="info-window" onclick="toggleFarmDetails('${farm.name}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${farm.address}', ${farm.lat}, ${farm.lon}, '${farm.capacity}', '${farm.manufacturer}')">${translatedComplexName}</div>`,
                             xAnchor: 0.5,
                             yAnchor: 2,
                             zIndex: 10
@@ -426,24 +621,24 @@
             currentInfowindows.forEach(infowindow => infowindow.setMap(null));
             currentInfowindows = [];
 
-            const turbineName = name;
+            const translatedComplexName = languageData[currentLanguage].complexNames[name] || name;
+            const translatedType = languageData[currentLanguage].type[type] || type;
+            const translatedAddress = languageData[currentLanguage].addresses[address] || address;
+            const translatedManufacturer = languageData[currentLanguage].manufacturer[manufacturer] || manufacturer;
             const totalTurbines = turbineCountByComplex[name] || 0;
             const formattedCapacity = formatNumberWithCommas(capacity);
-
-            const a = capacity;
-            const b = totalTurbines;
-            const totalComplexCapacity = a * b;
+            const totalComplexCapacity = capacity * totalTurbines;
             const formattedTotalComplexCapacity = formatNumberWithCommas(totalComplexCapacity);
 
             const content = `
                 <div class="detail-window" onclick="window.closeInfowindow(event, this)">
-                    <strong>${turbineName}</strong><br>
-                    ${languageData[currentLanguage].detailWindow.manufacturer}${manufacturer || languageData[currentLanguage].detailWindow.noInfo}<br>
+                    <strong>${translatedComplexName}</strong><br>
+                    ${languageData[currentLanguage].detailWindow.manufacturer}${translatedManufacturer || languageData[currentLanguage].detailWindow.noInfo}<br>
                     ${languageData[currentLanguage].detailWindow.singleCapacity}${formattedCapacity}<br>
                     ${languageData[currentLanguage].detailWindow.totalTurbines}${totalTurbines}<br>
                     ${languageData[currentLanguage].detailWindow.totalCapacity}${formattedTotalComplexCapacity}<br>
                     ${languageData[currentLanguage].detailWindow.completionDate}${completionDate || languageData[currentLanguage].detailWindow.noInfo}<br>
-                    ${languageData[currentLanguage].detailWindow.address}${address || languageData[currentLanguage].detailWindow.noInfo}<br>                    
+                    ${languageData[currentLanguage].detailWindow.address}${translatedAddress || languageData[currentLanguage].detailWindow.noInfo}<br>                    
                 </div>
             `;
 
@@ -468,13 +663,13 @@
             if (infowindowToClose) {
                 infowindowToClose.setMap(null);
                 currentInfowindows = currentInfowindows.filter(iw => iw !== infowindowToClose);
-                console.log("정보 창 닫힘");
+                console.log("Info window closed");
             }
         };
 
         document.addEventListener('DOMContentLoaded', function() {
             kakao.maps.load(() => {
-                console.log("Kakao Maps API 로드 성공");
+                console.log("Kakao Maps API loaded successfully");
                 loadCSVData();
             });
         });
@@ -482,7 +677,7 @@
         window.addEventListener('unload', () => {
             if (watchId !== null) {
                 navigator.geolocation.clearWatch(watchId);
-                console.log("위치 추적 중지");
+                console.log("Location tracking stopped");
             }
         });
     </script>
