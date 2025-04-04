@@ -77,8 +77,6 @@
         let overlays = [];
         let currentInfowindows = [];
         let allWindFarms = [];
-        let koreanData = [];
-        let englishData = [];
         let isSatellite = true;
         let turbineCountByComplex = {};
         let myLocationMarker = null;
@@ -149,83 +147,67 @@
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
-        async function loadCSVData(file, targetArray) {
+        async function loadCSVData() {
+            // 언어에 따라 적절한 CSV 파일 선택
+            const csvFile = currentLanguage === 'ko' ? 'windfarm_data.csv' : 'windfarm_data_en.csv';
             try {
-                const response = await fetch(file);
+                const response = await fetch(csvFile);
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
                 }
                 const text = await response.text();
-                console.log(`Loaded ${file}:`, text);
+                console.log(`Loaded ${csvFile}:`, text);
 
-                return new Promise((resolve, reject) => {
-                    Papa.parse(text, {
-                        header: true,
-                        skipEmptyLines: true,
-                        complete: function(results) {
-                            const parsedData = results.data.map(row => {
-                                const name = row['단지명'] ? row['단지명'].trim() : null;
-                                if (!name) return null;
-                                return {
-                                    complexId: row['단지번호'] ? row['단지번호'].trim() : null,
-                                    name: name,
-                                    turbineId: row['풍력기번호(임시)'] ? row['풍력기번호(임시)'].trim() : null,
-                                    completionDate: row['준공일'] ? row['준공일'].trim() : null,
-                                    type: row['분류'] ? row['분류'].trim() : null,
-                                    address: row['주소'] ? row['주소'].trim() : null,
-                                    xCoord: row['엑스좌표(GRS80_C_x)'] ? parseFloat(row['엑스좌표(GRS80_C_x)']) : null,
-                                    yCoord: row['와이좌표(GRS80_C_y)'] ? parseFloat(row['와이좌표(GRS80_C_y)']) : null,
-                                    lat: row['위도(lat)'] ? parseFloat(row['위도(lat)']) : null,
-                                    lon: row['경도(lon)'] ? parseFloat(row['경도(lon)']) : null,
-                                    capacity: row['용량(kW)'] ? parseFloat(row['용량(kW)']) : null,
-                                    manufacturer: row['제조사'] ? row['제조사'].trim() : null
-                                };
-                            }).filter(row => row !== null);
-                            targetArray.push(...parsedData);
-                            resolve();
-                        },
-                        error: function(error) {
-                            console.error(`CSV parsing failed for ${file}:`, error);
-                            document.getElementById('error-message').innerText = `${languageData[currentLanguage].error.csvParseFail}${error.message}`;
-                            reject(error);
+                Papa.parse(text, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        allWindFarms = results.data.map(row => {
+                            const name = row['단지명'] ? row['단지명'].trim() : null;
+                            if (!name) return null;
+                            return {
+                                complexId: row['단지번호'] ? row['단지번호'].trim() : null,
+                                name: name,
+                                turbineId: row['풍력기번호(임시)'] ? row['풍력기번호(임시)'].trim() : null,
+                                completionDate: row['준공일'] ? row['준공일'].trim() : null,
+                                type: row['분류'] ? row['분류'].trim() : null,
+                                address: row['주소'] ? row['주소'].trim() : null,
+                                xCoord: row['엑스좌표(GRS80_C_x)'] ? parseFloat(row['엑스좌표(GRS80_C_x)']) : null,
+                                yCoord: row['와이좌표(GRS80_C_y)'] ? parseFloat(row['와이좌표(GRS80_C_y)']) : null,
+                                lat: row['위도(lat)'] ? parseFloat(row['위도(lat)']) : null,
+                                lon: row['경도(lon)'] ? parseFloat(row['경도(lon)']) : null,
+                                capacity: row['용량(kW)'] ? parseFloat(row['용량(kW)']) : null,
+                                manufacturer: row['제조사'] ? row['제조사'].trim() : null
+                            };
+                        }).filter(row => row !== null);
+                        console.log("Parsed data:", allWindFarms);
+
+                        // 단지별 터빈 수 계산
+                        turbineCountByComplex = {};
+                        allWindFarms.forEach(farm => {
+                            if (!turbineCountByComplex[farm.name]) {
+                                turbineCountByComplex[farm.name] = 0;
+                            }
+                            turbineCountByComplex[farm.name]++;
+                        });
+                        console.log("Turbine count by complex:", turbineCountByComplex);
+
+                        // 지도 초기화 또는 마커 업데이트
+                        if (!map) {
+                            initMap();
+                        } else {
+                            updateMarkers();
                         }
-                    });
+                    },
+                    error: function(error) {
+                        console.error('CSV parsing failed:', error);
+                        document.getElementById('error-message').innerText = `${languageData[currentLanguage].error.csvParseFail}${error.message}`;
+                    }
                 });
             } catch (error) {
-                console.error(`CSV load failed for ${file}:`, error);
+                console.error('CSV load failed:', error);
                 document.getElementById('error-message').innerText = `${languageData[currentLanguage].error.dataLoadFail}${error.message}`;
-                throw error;
             }
-        }
-
-        async function preloadCSVData() {
-            try {
-                // 두 CSV 파일을 병렬로 로드
-                await Promise.all([
-                    loadCSVData('windfarm_data.csv', koreanData),
-                    loadCSVData('windfarm_data_en.csv', englishData)
-                ]);
-                console.log("Korean Data:", koreanData);
-                console.log("English Data:", englishData);
-
-                // 초기 데이터 설정 (기본 언어: 한국어)
-                allWindFarms = koreanData;
-                updateTurbineCount();
-                initMap();
-            } catch (error) {
-                console.error("Failed to preload CSV data:", error);
-            }
-        }
-
-        function updateTurbineCount() {
-            turbineCountByComplex = {};
-            allWindFarms.forEach(farm => {
-                if (!turbineCountByComplex[farm.name]) {
-                    turbineCountByComplex[farm.name] = 0;
-                }
-                turbineCountByComplex[farm.name]++;
-            });
-            console.log("Turbine count by complex:", turbineCountByComplex);
         }
 
         function initMap() {
@@ -308,10 +290,8 @@
                 document.getElementById('error-message').innerText = `${languageData[currentLanguage].error[errorKey]}${errorDetail}`;
             }
 
-            // 캐싱된 데이터로 전환
-            allWindFarms = currentLanguage === 'ko' ? koreanData : englishData;
-            updateTurbineCount();
-            updateMarkers();
+            // CSV 데이터 다시 로드
+            loadCSVData();
         }
 
         function startTrackingLocation() {
@@ -499,7 +479,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             kakao.maps.load(() => {
                 console.log("Kakao Maps API loaded successfully");
-                preloadCSVData();
+                loadCSVData();
             });
         });
 
