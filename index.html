@@ -15,7 +15,7 @@
         }
         #map {
             width: 100%;
-            height: 100%;
+            height: calc(100% - 40px); /* 푸터 높이만큼 빼줌 */
             background: #f0f0f0;
             position: relative;
         }
@@ -41,7 +41,7 @@
             top: 10px;
         }
         #name-toggle-button {
-            top: 40px; /* map-type-toggle 버튼 아래에 배치 */
+            top: 40px;
         }
         .info-window {
             background: rgba(255, 255, 255, 0.8);
@@ -58,6 +58,26 @@
             cursor: pointer;
             white-space: nowrap;
         }
+        /* 푸터 스타일 추가 */
+        #footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            line-height: 40px;
+            font-size: 14px;
+            border-top: 1px solid #ccc;
+            z-index: 10;
+        }
+        #footer a {
+            color: #0078d4;
+            text-decoration: none;
+        }
+        #footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -66,8 +86,13 @@
     <div id="error-message"></div>
     <button id="map-type-toggle">기본 지도</button>
     <button id="name-toggle-button">터빈 이름 끄기</button>
+    <!-- 푸터 추가 -->
+    <div id="footer">
+        제작자: 장승호 (Seungho Jang) | 연락처: <a href="mailto:7911171g@gmail.com">7911171g@gmail.com</a>
+    </div>
 
     <script>
+        // 기존 스크립트는 그대로 유지
         let map;
         let markers = [];
         let overlays = [];
@@ -77,7 +102,7 @@
         let turbineCountByComplex = {};
         let myLocationMarker = null;
         let watchId = null;
-        let areNamesVisible = true; // 터빈 이름 표시 상태 추적
+        let areNamesVisible = true;
 
         function formatNumberWithCommas(number) {
             if (!number) return "정보 없음";
@@ -191,7 +216,7 @@
         function toggleNamesVisibility() {
             areNamesVisible = !areNamesVisible;
             document.getElementById('name-toggle-button').textContent = areNamesVisible ? '터빈 이름 끄기' : '터빈 이름 켜기';
-            updateMarkers(); // 마커와 오버레이를 다시 렌더링하여 이름 표시 여부를 반영
+            updateMarkers();
         }
 
         function startTrackingLocation() {
@@ -331,47 +356,43 @@
             }
         }
 
-		window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer) {
-			currentInfowindows.forEach(infowindow => infowindow.setMap(null));
-			currentInfowindows = [];
+        window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer) {
+            currentInfowindows.forEach(infowindow => infowindow.setMap(null));
+            currentInfowindows = [];
 
-			const turbineName = name; // 단지명만 표시
-			const totalTurbines = turbineCountByComplex[name] || 0;
-			const formattedCapacity = formatNumberWithCommas(capacity);
+            const turbineName = name;
+            const totalTurbines = turbineCountByComplex[name] || 0;
+            const formattedCapacity = formatNumberWithCommas(capacity);
 
-			// 단일 터빈 용량과 총 터빈 수를 a, b로 정의
-			const a = capacity; // 단일 터빈 용량 (kW), formatNumberWithCommas 적용 전 숫자 값 사용
-			const b = totalTurbines; // 단지 내 총 터빈 수
+            const a = capacity;
+            const b = totalTurbines;
+            const totalComplexCapacity = a * b;
+            const formattedTotalComplexCapacity = formatNumberWithCommas(totalComplexCapacity);
 
-			// 단지 총 용량 계산 (a * b)
-			const totalComplexCapacity = a * b;
-			const formattedTotalComplexCapacity = formatNumberWithCommas(totalComplexCapacity); // 천 단위 구분 기호 추가
+            const content = `
+                <div class="detail-window" onclick="window.closeInfowindow(event, this)">
+                    <strong>${turbineName}</strong><br>
+                    터빈 제조사: ${manufacturer || '정보 없음'}<br>
+                    단일 터빈 용량(kW): ${formattedCapacity}<br>
+                    단지 내 총 터빈 수: ${totalTurbines}<br>
+                    단지 총 용량(kW): ${formattedTotalComplexCapacity}<br>
+                    준공일: ${completionDate || '정보 없음'}<br>
+                    주소: ${address || '정보 없음'}<br>                    
+                </div>
+            `;
 
-			const content = `
-				<div class="detail-window" onclick="window.closeInfowindow(event, this)">
-					<strong>${turbineName}</strong><br>
-					터빈 제조사: ${manufacturer || '정보 없음'}<br>
-					단일 터빈 용량(kW): ${formattedCapacity}<br>
-					단지 내 총 터빈 수: ${totalTurbines}<br>
-					단지 총 용량(kW): ${formattedTotalComplexCapacity}<br> <!-- 단지 총 용량 추가 -->
-					<!--분류: ${type || '정보 없음'}<br>-->
-					준공일: ${completionDate || '정보 없음'}<br>
-					주소: ${address || '정보 없음'}<br>                    
-				</div>
-			`;
+            const basePosition = new kakao.maps.LatLng(lat, lon);
+            const adjustedPosition = new kakao.maps.LatLng(lat - 0.005, lon);
+            const infowindow = new kakao.maps.InfoWindow({
+                position: adjustedPosition,
+                content: content,
+                zIndex: 20,
+                removable: true
+            });
 
-			const basePosition = new kakao.maps.LatLng(lat, lon);
-			const adjustedPosition = new kakao.maps.LatLng(lat - 0.005, lon);
-			const infowindow = new kakao.maps.InfoWindow({
-				position: adjustedPosition,
-				content: content,
-				zIndex: 20,
-				removable: true
-			});
-
-			infowindow.open(map);
-			currentInfowindows.push(infowindow);
-		};
+            infowindow.open(map);
+            currentInfowindows.push(infowindow);
+        };
 
         window.closeInfowindow = function(event, element) {
             event.stopPropagation();
