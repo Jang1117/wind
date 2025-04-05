@@ -366,8 +366,10 @@
             `;
 
             const basePosition = new kakao.maps.LatLng(lat, lon);
-            // 마커 바로 아래에 고정된 위치로 설정
-            const adjustedPosition = new kakao.maps.LatLng(lat - 0.005, lon); // 마커 아래로 0.005 오프셋
+            // 줌 레벨에 따라 오프셋을 10으로 나눔
+            const zoomLevel = map.getLevel();
+            const offsetLat = 0.005 / Math.pow(10, zoomLevel - 1); // 줌 레벨이 1부터 시작하므로 -1
+            const adjustedPosition = new kakao.maps.LatLng(lat - offsetLat, lon); // 마커 아래로 표시
 
             const infowindow = new kakao.maps.InfoWindow({
                 position: adjustedPosition,
