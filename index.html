@@ -378,7 +378,7 @@ window.toggleFarmDetails = function(name, turbineId, type, completionDate, addre
     // 위치 설정
     const basePosition = new kakao.maps.LatLng(lat, lon);
     const zoomLevel = map.getLevel();
-    let offsetLat = 0.005; // 고정 오프셋으로 단순화
+    let offsetLat = 0.0005; // 고정 오프셋으로 단순화
     // 줌 레벨에 따라 조정 (필요 시 주석 해제)
     // let offsetLat = 0.005 / Math.pow(10, zoomLevel - 1);
     // offsetLat = Math.max(offsetLat, 0.0001); // 최소 0.0001로 설정
