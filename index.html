@@ -256,7 +256,7 @@
             // 커스텀 마커 이미지 정의
             const markerImage = new kakao.maps.MarkerImage(
                 'wind.png', // 같은 폴더에 있는 이미지 파일 경로
-                new kakao.maps.Size(48, 48), // 이미지 크기 (필요에 따라 조정)
+                new kakao.maps.Size(48, 48), // 이미지 크기
                 { offset: new kakao.maps.Point(16, 32) } // 이미지 중심점 설정 (하단 중앙)
             );
 
@@ -277,7 +277,7 @@
                         position: position,
                         title: `${complex} (${group.length}개 터빈)`,
                         clickable: true,
-                        image: markerImage // 커스텀 마커 이미지 적용
+                        image: markerImage
                     });
                     marker.setMap(map);
                     markers.push(marker);
@@ -313,7 +313,7 @@
                         position: position,
                         title: turbineName,
                         clickable: true,
-                        image: markerImage // 커스텀 마커 이미지 적용
+                        image: markerImage
                     });
                     marker.setMap(map);
                     markers.push(marker);
@@ -366,9 +366,9 @@
             `;
 
             const basePosition = new kakao.maps.LatLng(lat, lon);
-            // 줌 레벨에 따라 정보 창 위치 동적 조정
+            // 줌 레벨에 따라 정보 창 위치 동적 조정 (줌이 클수록 가까워짐)
             const zoomLevel = map.getLevel();
-            const offsetLat = 0.01 / Math.pow(2, zoomLevel - 3); // 줌 레벨에 따라 오프셋 조정
+            const offsetLat = 0.05 * Math.pow(2, 10 - zoomLevel); // 줌 레벨이 클수록 오프셋 감소
             const adjustedPosition = new kakao.maps.LatLng(lat + offsetLat, lon); // 마커 위쪽에 표시
 
             const infowindow = new kakao.maps.InfoWindow({
