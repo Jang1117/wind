@@ -244,7 +244,7 @@
             const avgLon = farmsInComplex.reduce((sum, farm) => sum + farm.lon, 0) / farmsInComplex.length;
 
             map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
-            map.setLevel(9);
+            map.setLevel(6);
             updateMarkers();
         }
 
