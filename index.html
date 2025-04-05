@@ -28,20 +28,36 @@
             background: rgba(255, 255, 255, 0.8);
             padding: 10px;
         }
-        #map-type-toggle, #name-toggle-button {
+        .control-button {
             position: absolute;
             right: 10px;
             z-index: 10;
-            padding: 5px 10px;
+            padding: 8px 12px;
+            width: 120px; /* 동일한 너비 */
             background: rgba(255, 255, 255, 0.8);
             border: 1px solid #ccc;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 14px;
+            text-align: center;
         }
         #map-type-toggle {
             top: 10px;
         }
         #name-toggle-button {
-            top: 40px;
+            top: 50px; /* 위 버튼과 간격 조정 */
+        }
+        #windfarm-dropdown {
+            position: absolute;
+            right: 10px;
+            top: 90px; /* 이름 감추기 버튼 아래 간격 조정 */
+            z-index: 10;
+            width: 120px; /* 버튼과 동일한 너비 */
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
         }
         .info-window {
             background: rgba(255, 255, 255, 0.8);
@@ -64,8 +80,11 @@
     <div id="map"></div>
     <div id="loading">지도 로딩 중...</div>
     <div id="error-message"></div>
-    <button id="map-type-toggle">기본 지도</button>
-    <button id="name-toggle-button">터빈 이름 끄기</button>
+    <button id="map-type-toggle" class="control-button">기본 지도</button>
+    <button id="name-toggle-button" class="control-button">터빈 이름 끄기</button>
+    <select id="windfarm-dropdown" class="control-button">
+        <option value="">풍력단지 선택</option>
+    </select>
 
     <script>
         let map;
@@ -75,7 +94,7 @@
         let allWindFarms = [];
         let isSatellite = true;
         let turbineCountByComplex = {};
-        let totalCapacityByComplex = {}; // 단지별 총 용량 저장
+        let totalCapacityByComplex = {};
         let myLocationMarker = null;
         let watchId = null;
         let areNamesVisible = true;
@@ -118,7 +137,8 @@
                         }).filter(row => row !== null);
                         console.log("파싱된 데이터:", allWindFarms);
 
-                        // 단지별 터빈 수와 총 용량 계산
+                        turbineCountByComplex = {};
+                        totalCapacityByComplex = {};
                         allWindFarms.forEach(farm => {
                             if (!turbineCountByComplex[farm.complexId]) {
                                 turbineCountByComplex[farm.complexId] = 0;
@@ -133,6 +153,7 @@
                         console.log("단지별 총 용량:", totalCapacityByComplex);
 
                         initMap();
+                        populateDropdown();
                     },
                     error: function(error) {
                         console.error('CSV 파싱 실패:', error);
@@ -148,7 +169,6 @@
         function initMap() {
             console.log("initMap 호출됨");
             const container = document.getElementById('map');
-            console.log("컨테이너:", container);
             const options = {
                 center: new kakao.maps.LatLng(36.41119125, 129.4146661),
                 level: 13
@@ -175,11 +195,9 @@
 
             document.getElementById('loading').style.display = 'none';
 
-            const toggleButton = document.getElementById('map-type-toggle');
-            toggleButton.addEventListener('click', toggleMapType);
-
-            const nameToggleButton = document.getElementById('name-toggle-button');
-            nameToggleButton.addEventListener('click', toggleNamesVisibility);
+            document.getElementById('map-type-toggle').addEventListener('click', toggleMapType);
+            document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
+            document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
         }
 
         function toggleMapType() {
@@ -198,6 +216,35 @@
         function toggleNamesVisibility() {
             areNamesVisible = !areNamesVisible;
             document.getElementById('name-toggle-button').textContent = areNamesVisible ? '터빈 이름 끄기' : '터빈 이름 켜기';
+            updateMarkers();
+        }
+
+        function populateDropdown() {
+            const dropdown = document.getElementById('windfarm-dropdown');
+            const uniqueComplexes = [...new Set(allWindFarms.map(farm => farm.complexId))].filter(id => id);
+            const complexNames = uniqueComplexes.map(id => {
+                const farm = allWindFarms.find(f => f.complexId === id);
+                return { id: id, name: farm.name };
+            }).sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+
+            complexNames.forEach(complex => {
+                const option = document.createElement('option');
+                option.value = complex.id;
+                option.textContent = complex.name;
+                dropdown.appendChild(option);
+            });
+        }
+
+        function handleDropdownChange(event) {
+            const complexId = event.target.value;
+            if (!complexId) return;
+
+            const farmsInComplex = allWindFarms.filter(farm => farm.complexId === complexId);
+            const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
+            const avgLon = farmsInComplex.reduce((sum, farm) => sum + farm.lon, 0) / farmsInComplex.length;
+
+            map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
+            map.setLevel(9); // 상세 보기를 위해 줌 레벨 조정
             updateMarkers();
         }
 
@@ -260,11 +307,10 @@
             const zoomLevel = map.getLevel();
             console.log("현재 줌 레벨:", zoomLevel);
 
-            // 커스텀 마커 이미지 정의
             const markerImage = new kakao.maps.MarkerImage(
-                'wind.png', // 같은 폴더에 있는 이미지 파일 경로
-                new kakao.maps.Size(48, 48), // 이미지 크기
-                { offset: new kakao.maps.Point(16, 32) } // 이미지 중심점 설정 (하단 중앙)
+                'wind.png',
+                new kakao.maps.Size(48, 48),
+                { offset: new kakao.maps.Point(16, 32) }
             );
 
             if (zoomLevel >= 10) {
@@ -279,7 +325,7 @@
                     const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
                     const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
                     const position = new kakao.maps.LatLng(avgLat, avgLon);
-                    const complexName = group[0].name; // 첫 번째 터빈의 단지명 사용
+                    const complexName = group[0].name;
 
                     const marker = new kakao.maps.Marker({
                         position: position,
@@ -348,61 +394,52 @@
             }
         }
 
-window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer, complexId) {
-    // 기존 정보 창 닫기
-    currentInfowindows.forEach(infowindow => infowindow.setMap(null));
-    currentInfowindows = [];
+        window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer, complexId) {
+            currentInfowindows.forEach(infowindow => infowindow.setMap(null));
+            currentInfowindows = [];
 
-    // 데이터 준비
-    const turbineName = name;
-    const totalTurbines = turbineCountByComplex[complexId] || 0;
-    const formattedCapacity = formatNumberWithCommas(capacity);
-    const totalComplexCapacity = totalCapacityByComplex[complexId] || 0;
-    const formattedTotalComplexCapacity = formatNumberWithCommas(totalComplexCapacity);
+            const turbineName = name;
+            const totalTurbines = turbineCountByComplex[complexId] || 0;
+            const formattedCapacity = formatNumberWithCommas(capacity);
+            const totalComplexCapacity = totalCapacityByComplex[complexId] || 0;
+            const formattedTotalComplexCapacity = formatNumberWithCommas(totalComplexCapacity);
 
-    const content = `
-        <div class="detail-window" onclick="window.closeInfowindow(event, this)">
-            <strong>${turbineName}</strong><br>
-            터빈 제조사: ${manufacturer || '정보 없음'}<br>
-            단일 터빈 용량(kW): ${formattedCapacity}<br>
-            단지 내 총 터빈 수: ${totalTurbines}<br>
-            단지 총 용량(kW): ${formattedTotalComplexCapacity}<br>
-            준공일: ${completionDate || '정보 없음'}<br>
-            주소: ${address || '정보 없음'}<br>                    
-        </div>
-    `;
+            const content = `
+                <div class="detail-window" onclick="window.closeInfowindow(event, this)">
+                    <strong>${turbineName}</strong><br>
+                    터빈 제조사: ${manufacturer || '정보 없음'}<br>
+                    단일 터빈 용량(kW): ${formattedCapacity}<br>
+                    단지 내 총 터빈 수: ${totalTurbines}<br>
+                    단지 총 용량(kW): ${formattedTotalComplexCapacity}<br>
+                    준공일: ${completionDate || '정보 없음'}<br>
+                    주소: ${address || '정보 없음'}<br>                    
+                </div>
+            `;
 
-    // 디버깅 로그 추가
-    console.log("toggleFarmDetails 호출됨:", { name, lat, lon, zoomLevel: map.getLevel() });
+            console.log("toggleFarmDetails 호출됨:", { name, lat, lon, zoomLevel: map.getLevel() });
 
-    // 위치 설정
-    const basePosition = new kakao.maps.LatLng(lat, lon);
-    const zoomLevel = map.getLevel();
-    let offsetLat = 0.0005; // 고정 오프셋으로 단순화
-    // 줌 레벨에 따라 조정 (필요 시 주석 해제)
-    // let offsetLat = 0.005 / Math.pow(10, zoomLevel - 1);
-    // offsetLat = Math.max(offsetLat, 0.0001); // 최소 0.0001로 설정
-    const adjustedPosition = new kakao.maps.LatLng(lat - offsetLat, lon);
+            const basePosition = new kakao.maps.LatLng(lat, lon);
+            const zoomLevel = map.getLevel();
+            let offsetLat = 0.0005;
+            const adjustedPosition = new kakao.maps.LatLng(lat - offsetLat, lon);
 
-    console.log("정보 창 위치:", { lat: lat - offsetLat, lon, offsetLat });
+            console.log("정보 창 위치:", { lat: lat - offsetLat, lon, offsetLat });
 
-    // 정보 창 생성
-    const infowindow = new kakao.maps.InfoWindow({
-        position: adjustedPosition,
-        content: content,
-        zIndex: 20,
-        removable: true
-    });
+            const infowindow = new kakao.maps.InfoWindow({
+                position: adjustedPosition,
+                content: content,
+                zIndex: 20,
+                removable: true
+            });
 
-    // 정보 창 열기
-    try {
-        infowindow.open(map);
-        currentInfowindows.push(infowindow);
-        console.log("정보 창 열림:", infowindow);
-    } catch (error) {
-        console.error("정보 창 열기 실패:", error);
-    }
-};
+            try {
+                infowindow.open(map);
+                currentInfowindows.push(infowindow);
+                console.log("정보 창 열림:", infowindow);
+            } catch (error) {
+                console.error("정보 창 열기 실패:", error);
+            }
+        };
 
         window.closeInfowindow = function(event, element) {
             event.stopPropagation();
