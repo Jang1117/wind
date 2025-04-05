@@ -374,6 +374,8 @@
             // 줌 레벨에 따라 오프셋을 10으로 나눔
             const zoomLevel = map.getLevel();
             const offsetLat = 0.005 / Math.pow(10, zoomLevel - 1); // 줌 레벨이 1부터 시작하므로 -1
+            // 최소 오프셋 설정 (줌 레벨 14에서도 보이도록)
+            offsetLat = Math.max(offsetLat, 0.00001); // 최소값 0.00001로 고정
             const adjustedPosition = new kakao.maps.LatLng(lat - offsetLat, lon); // 마커 아래로 표시
 
             const infowindow = new kakao.maps.InfoWindow({
