@@ -75,6 +75,7 @@
         let allWindFarms = [];
         let isSatellite = true;
         let turbineCountByComplex = {};
+        let totalCapacityByComplex = {}; // 단지별 총 용량 저장
         let myLocationMarker = null;
         let watchId = null;
         let areNamesVisible = true;
@@ -117,13 +118,19 @@
                         }).filter(row => row !== null);
                         console.log("파싱된 데이터:", allWindFarms);
 
+                        // 단지별 터빈 수와 총 용량 계산
                         allWindFarms.forEach(farm => {
-                            if (!turbineCountByComplex[farm.name]) {
-                                turbineCountByComplex[farm.name] = 0;
+                            if (!turbineCountByComplex[farm.complexId]) {
+                                turbineCountByComplex[farm.complexId] = 0;
+                                totalCapacityByComplex[farm.complexId] = 0;
                             }
-                            turbineCountByComplex[farm.name]++;
+                            turbineCountByComplex[farm.complexId]++;
+                            if (farm.capacity) {
+                                totalCapacityByComplex[farm.complexId] += farm.capacity;
+                            }
                         });
                         console.log("단지별 터빈 수:", turbineCountByComplex);
+                        console.log("단지별 총 용량:", totalCapacityByComplex);
 
                         initMap();
                     },
@@ -263,19 +270,20 @@
             if (zoomLevel >= 10) {
                 const farmsByComplex = {};
                 allWindFarms.forEach(farm => {
-                    if (!farmsByComplex[farm.name]) farmsByComplex[farm.name] = [];
-                    farmsByComplex[farm.name].push(farm);
+                    if (!farmsByComplex[farm.complexId]) farmsByComplex[farm.complexId] = [];
+                    farmsByComplex[farm.complexId].push(farm);
                 });
 
-                Object.keys(farmsByComplex).forEach(complex => {
-                    const group = farmsByComplex[complex];
+                Object.keys(farmsByComplex).forEach(complexId => {
+                    const group = farmsByComplex[complexId];
                     const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
                     const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
                     const position = new kakao.maps.LatLng(avgLat, avgLon);
+                    const complexName = group[0].name; // 첫 번째 터빈의 단지명 사용
 
                     const marker = new kakao.maps.Marker({
                         position: position,
-                        title: `${complex} (${group.length}개 터빈)`,
+                        title: `${complexName} (${group.length}개 터빈)`,
                         clickable: true,
                         image: markerImage
                     });
@@ -285,7 +293,7 @@
                     if (areNamesVisible) {
                         const overlay = new kakao.maps.CustomOverlay({
                             position: position,
-                            content: `<div class="info-window">${complex} (${group.length}개)</div>`,
+                            content: `<div class="info-window">${complexName} (${group.length}개)</div>`,
                             xAnchor: 0.5,
                             yAnchor: 2,
                             zIndex: 10
@@ -321,7 +329,7 @@
                     if (areNamesVisible) {
                         const overlay = new kakao.maps.CustomOverlay({
                             position: position,
-                            content: `<div class="info-window" onclick="toggleFarmDetails('${farm.name}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${farm.address}', ${farm.lat}, ${farm.lon}, '${farm.capacity}', '${farm.manufacturer}')">${turbineName}</div>`,
+                            content: `<div class="info-window" onclick="toggleFarmDetails('${farm.name}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${farm.address}', ${farm.lat}, ${farm.lon}, '${farm.capacity}', '${farm.manufacturer}', '${farm.complexId}')">${turbineName}</div>`,
                             xAnchor: 0.5,
                             yAnchor: 2,
                             zIndex: 10
@@ -330,7 +338,7 @@
                         overlays.push(overlay);
                     }
 
-                    kakao.maps.event.addListener(marker, 'click', () => toggleFarmDetails(farm.name, farm.turbineId, farm.type, farm.completionDate, farm.address, farm.lat, farm.lon, farm.capacity, farm.manufacturer));
+                    kakao.maps.event.addListener(marker, 'click', () => toggleFarmDetails(farm.name, farm.turbineId, farm.type, farm.completionDate, farm.address, farm.lat, farm.lon, farm.capacity, farm.manufacturer, farm.complexId));
                 });
             }
 
@@ -340,17 +348,14 @@
             }
         }
 
-        window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer) {
+        window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer, complexId) {
             currentInfowindows.forEach(infowindow => infowindow.setMap(null));
             currentInfowindows = [];
 
             const turbineName = name;
-            const totalTurbines = turbineCountByComplex[name] || 0;
+            const totalTurbines = turbineCountByComplex[complexId] || 0;
             const formattedCapacity = formatNumberWithCommas(capacity);
-
-            const a = capacity;
-            const b = totalTurbines;
-            const totalComplexCapacity = a * b;
+            const totalComplexCapacity = totalCapacityByComplex[complexId] || 0; // 단지 총 용량
             const formattedTotalComplexCapacity = formatNumberWithCommas(totalComplexCapacity);
 
             const content = `
