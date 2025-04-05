@@ -348,46 +348,61 @@
             }
         }
 
-        window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer, complexId) {
-            currentInfowindows.forEach(infowindow => infowindow.setMap(null));
-            currentInfowindows = [];
+window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer, complexId) {
+    // 기존 정보 창 닫기
+    currentInfowindows.forEach(infowindow => infowindow.setMap(null));
+    currentInfowindows = [];
 
-            const turbineName = name;
-            const totalTurbines = turbineCountByComplex[complexId] || 0;
-            const formattedCapacity = formatNumberWithCommas(capacity);
-            const totalComplexCapacity = totalCapacityByComplex[complexId] || 0; // 단지 총 용량
-            const formattedTotalComplexCapacity = formatNumberWithCommas(totalComplexCapacity);
+    // 데이터 준비
+    const turbineName = name;
+    const totalTurbines = turbineCountByComplex[complexId] || 0;
+    const formattedCapacity = formatNumberWithCommas(capacity);
+    const totalComplexCapacity = totalCapacityByComplex[complexId] || 0;
+    const formattedTotalComplexCapacity = formatNumberWithCommas(totalComplexCapacity);
 
-            const content = `
-                <div class="detail-window" onclick="window.closeInfowindow(event, this)">
-                    <strong>${turbineName}</strong><br>
-                    터빈 제조사: ${manufacturer || '정보 없음'}<br>
-                    단일 터빈 용량(kW): ${formattedCapacity}<br>
-                    단지 내 총 터빈 수: ${totalTurbines}<br>
-                    단지 총 용량(kW): ${formattedTotalComplexCapacity}<br>
-                    준공일: ${completionDate || '정보 없음'}<br>
-                    주소: ${address || '정보 없음'}<br>                    
-                </div>
-            `;
+    const content = `
+        <div class="detail-window" onclick="window.closeInfowindow(event, this)">
+            <strong>${turbineName}</strong><br>
+            터빈 제조사: ${manufacturer || '정보 없음'}<br>
+            단일 터빈 용량(kW): ${formattedCapacity}<br>
+            단지 내 총 터빈 수: ${totalTurbines}<br>
+            단지 총 용량(kW): ${formattedTotalComplexCapacity}<br>
+            준공일: ${completionDate || '정보 없음'}<br>
+            주소: ${address || '정보 없음'}<br>                    
+        </div>
+    `;
 
-            const basePosition = new kakao.maps.LatLng(lat, lon);
-            // 줌 레벨에 따라 오프셋을 10으로 나눔
-            const zoomLevel = map.getLevel();
-            const offsetLat = 0.005 / Math.pow(10, zoomLevel - 1); // 줌 레벨이 1부터 시작하므로 -1
-            // 최소 오프셋 설정 (줌 레벨 14에서도 보이도록)
-            offsetLat = Math.max(offsetLat, 0.00001); // 최소값 0.00001로 고정
-            const adjustedPosition = new kakao.maps.LatLng(lat - offsetLat, lon); // 마커 아래로 표시
+    // 디버깅 로그 추가
+    console.log("toggleFarmDetails 호출됨:", { name, lat, lon, zoomLevel: map.getLevel() });
 
-            const infowindow = new kakao.maps.InfoWindow({
-                position: adjustedPosition,
-                content: content,
-                zIndex: 20,
-                removable: true
-            });
+    // 위치 설정
+    const basePosition = new kakao.maps.LatLng(lat, lon);
+    const zoomLevel = map.getLevel();
+    let offsetLat = 0.005; // 고정 오프셋으로 단순화
+    // 줌 레벨에 따라 조정 (필요 시 주석 해제)
+    // let offsetLat = 0.005 / Math.pow(10, zoomLevel - 1);
+    // offsetLat = Math.max(offsetLat, 0.0001); // 최소 0.0001로 설정
+    const adjustedPosition = new kakao.maps.LatLng(lat - offsetLat, lon);
 
-            infowindow.open(map);
-            currentInfowindows.push(infowindow);
-        };
+    console.log("정보 창 위치:", { lat: lat - offsetLat, lon, offsetLat });
+
+    // 정보 창 생성
+    const infowindow = new kakao.maps.InfoWindow({
+        position: adjustedPosition,
+        content: content,
+        zIndex: 20,
+        removable: true
+    });
+
+    // 정보 창 열기
+    try {
+        infowindow.open(map);
+        currentInfowindows.push(infowindow);
+        console.log("정보 창 열림:", infowindow);
+    } catch (error) {
+        console.error("정보 창 열기 실패:", error);
+    }
+};
 
         window.closeInfowindow = function(event, element) {
             event.stopPropagation();
