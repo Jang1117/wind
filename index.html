@@ -286,7 +286,7 @@
                 clickable: false,
                 image: new kakao.maps.MarkerImage(
                     'me.png',
-                    new kakao.maps.Size(24, 35)
+                    new kakao.maps.Size(48, 48)
                 )
             });
             myLocationMarker.setMap(map);
@@ -350,7 +350,7 @@
 
                     kakao.maps.event.addListener(marker, 'click', () => {
                         map.setCenter(position);
-                        map.setLevel(9);
+                        map.setLevel(12);
                     });
                 });
             } else {
