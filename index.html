@@ -285,9 +285,8 @@
                 title: "내 위치",
                 clickable: false,
                 image: new kakao.maps.MarkerImage(
-                    'me.png', // 같은 폴더에 있는 me.png 사용
-                    new kakao.maps.Size(24, 35), // 이미지 크기 (필요에 따라 조정)
-                    { offset: new kakao.maps.Point(12, 35) } // 이미지 중심점 (하단 중앙)
+                    'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+                    new kakao.maps.Size(24, 35)
                 )
             });
             myLocationMarker.setMap(map);
@@ -371,7 +370,7 @@
                         image: markerImage
                     });
                     marker.setMap(map);
-                    markers.push(marker --
+                    markers.push(marker);
 
                     if (areNamesVisible) {
                         const overlay = new kakao.maps.CustomOverlay({
