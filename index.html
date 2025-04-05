@@ -366,10 +366,8 @@
             `;
 
             const basePosition = new kakao.maps.LatLng(lat, lon);
-            // 줌 레벨에 따라 정보 창 위치 동적 조정 (줌이 클수록 가까워짐)
-            const zoomLevel = map.getLevel();
-            const offsetLat = 0.05 * Math.pow(2, 10 - zoomLevel); // 줌 레벨이 클수록 오프셋 감소
-            const adjustedPosition = new kakao.maps.LatLng(lat + offsetLat, lon); // 마커 위쪽에 표시
+            // 마커 바로 아래에 고정된 위치로 설정
+            const adjustedPosition = new kakao.maps.LatLng(lat - 0.005, lon); // 마커 아래로 0.005 오프셋
 
             const infowindow = new kakao.maps.InfoWindow({
                 position: adjustedPosition,
