@@ -33,7 +33,7 @@
             right: 10px;
             z-index: 10;
             padding: 8px 12px;
-            width: 120px; /* 동일한 너비 */
+            width: 120px;
             background: rgba(255, 255, 255, 0.8);
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -45,14 +45,14 @@
             top: 10px;
         }
         #name-toggle-button {
-            top: 50px; /* 위 버튼과 간격 조정 */
+            top: 50px;
         }
         #windfarm-dropdown {
             position: absolute;
             right: 10px;
-            top: 90px; /* 이름 감추기 버튼 아래 간격 조정 */
+            top: 90px;
             z-index: 10;
-            width: 120px; /* 버튼과 동일한 너비 */
+            width: 120px;
             padding: 8px;
             background: rgba(255, 255, 255, 0.8);
             border: 1px solid #ccc;
@@ -244,7 +244,7 @@
             const avgLon = farmsInComplex.reduce((sum, farm) => sum + farm.lon, 0) / farmsInComplex.length;
 
             map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
-            map.setLevel(9); // 상세 보기를 위해 줌 레벨 조정
+            map.setLevel(9);
             updateMarkers();
         }
 
@@ -404,13 +404,27 @@
             const totalComplexCapacity = totalCapacityByComplex[complexId] || 0;
             const formattedTotalComplexCapacity = formatNumberWithCommas(totalComplexCapacity);
 
+            // 단지 내 터빈 용량별 개수 계산
+            const farmsInComplex = allWindFarms.filter(farm => farm.complexId === complexId);
+            const capacityCount = {};
+            farmsInComplex.forEach(farm => {
+                if (farm.capacity) {
+                    capacityCount[farm.capacity] = (capacityCount[farm.capacity] || 0) + 1;
+                }
+            });
+
+            // 용량 * 개수 형식으로 문자열 생성
+            const capacityBreakdown = Object.entries(capacityCount)
+                .map(([cap, count]) => `${formatNumberWithCommas(cap)}kW * ${count}기`)
+                .join(", ");
+
             const content = `
                 <div class="detail-window" onclick="window.closeInfowindow(event, this)">
                     <strong>${turbineName}</strong><br>
                     터빈 제조사: ${manufacturer || '정보 없음'}<br>
                     단일 터빈 용량(kW): ${formattedCapacity}<br>
                     단지 내 총 터빈 수: ${totalTurbines}<br>
-                    단지 총 용량(kW): ${formattedTotalComplexCapacity}<br>
+                    단지 총 용량(kW): ${formattedTotalComplexCapacity} (${capacityBreakdown})<br>
                     준공일: ${completionDate || '정보 없음'}<br>
                     주소: ${address || '정보 없음'}<br>                    
                 </div>
