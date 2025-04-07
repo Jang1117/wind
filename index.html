@@ -432,10 +432,10 @@
                 <div class="detail-window" onclick="window.closeInfowindow(event, this)">
                     <strong>${truncateText(turbineName, 20)}</strong><br>
                     터빈 제조사: ${truncateText(manufacturer || '정보 없음', 15)}<br>
-                    터빈 용량(kW): ${formattedCapacity}<br>
+                    터빈 용량: ${formattedCapacity} kW<br>
                     단지 내 총 터빈 수: ${totalTurbines}<br>
-                    단지 용량(kW): ${truncateText(formattedTotalComplexCapacity, 25)}<br>
-                    <span style="color: transparent;">단지 용량(kW): </span> (${truncateText(capacityBreakdown, 25)})<br>
+                    단지 용량: ${truncateText(formattedTotalComplexCapacity, 25)} kW<br>
+                    <span style="color: transparent;">단지 용량: </span> (${truncateText(capacityBreakdown, 25)})<br>
                     준공일: ${truncateText(completionDate || '정보 없음', 15)}<br>
                     주소: ${truncateText(address || '정보 없음', 20)}<br>                    
                 </div>
