@@ -356,7 +356,7 @@
                     kakao.maps.event.addListener(marker, 'click', () => {
                         map.setCenter(position);
                         const currentLevel = map.getLevel();
-                        map.setLevel(currentLevel - 2); // 줌 레벨 2단계 축소
+                        map.setLevel(currentLevel - 5); // 줌 레벨 2단계 축소
                     });
                 });
             } else {
@@ -435,7 +435,7 @@
                     터빈 용량(kW): ${formattedCapacity}<br>
                     단지 내 총 터빈 수: ${totalTurbines}<br>
                     단지 용량(kW): ${truncateText(formattedTotalComplexCapacity, 25)}<br>
-                               (${truncateText(capacityBreakdown, 25)})<br>
+                    <span style="color: transparent;">단지 용량(kW): </span> (${truncateText(capacityBreakdown, 25)})<br>
                     준공일: ${truncateText(completionDate || '정보 없음', 15)}<br>
                     주소: ${truncateText(address || '정보 없음', 20)}<br>                    
                 </div>
