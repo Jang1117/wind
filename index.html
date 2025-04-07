@@ -310,27 +310,27 @@
             clearMap();
             const zoomLevel = map.getLevel();
             console.log("현재 줌 레벨:", zoomLevel);
-
+        
             const markerImage = new kakao.maps.MarkerImage(
                 'wind.png',
                 new kakao.maps.Size(48, 48),
                 { offset: new kakao.maps.Point(16, 32) }
             );
-
+        
             if (zoomLevel >= 10) {
                 const farmsByComplex = {};
                 allWindFarms.forEach(farm => {
                     if (!farmsByComplex[farm.complexId]) farmsByComplex[farm.complexId] = [];
                     farmsByComplex[farm.complexId].push(farm);
                 });
-
+        
                 Object.keys(farmsByComplex).forEach(complexId => {
                     const group = farmsByComplex[complexId];
                     const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
                     const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
                     const position = new kakao.maps.LatLng(avgLat, avgLon);
                     const complexName = group[0].name;
-
+        
                     const marker = new kakao.maps.Marker({
                         position: position,
                         title: `${complexName} (${group.length}개 터빈)`,
@@ -339,7 +339,7 @@
                     });
                     marker.setMap(map);
                     markers.push(marker);
-
+        
                     if (areNamesVisible) {
                         const overlay = new kakao.maps.CustomOverlay({
                             position: position,
@@ -351,10 +351,12 @@
                         overlay.setMap(map);
                         overlays.push(overlay);
                     }
-
+        
+                    // 클릭 시 현재 줌 레벨에서 2단계 축소
                     kakao.maps.event.addListener(marker, 'click', () => {
                         map.setCenter(position);
-                        map.setLevel(12);
+                        const currentLevel = map.getLevel();
+                        map.setLevel(currentLevel - 2); // 줌 레벨 2단계 축소
                     });
                 });
             } else {
@@ -432,7 +434,8 @@
                     터빈 제조사: ${truncateText(manufacturer || '정보 없음', 15)}<br>
                     터빈 용량(kW): ${formattedCapacity}<br>
                     단지 내 총 터빈 수: ${totalTurbines}<br>
-                    단지 용량(kW): ${truncateText(formattedTotalComplexCapacity + ' (' + capacityBreakdown + ')', 25)}<br>
+                    단지 용량(kW): ${truncateText(formattedTotalComplexCapacity, 25)}<br>
+                               (${truncateText(capacityBreakdown, 25)})<br>
                     준공일: ${truncateText(completionDate || '정보 없음', 15)}<br>
                     주소: ${truncateText(address || '정보 없음', 20)}<br>                    
                 </div>
