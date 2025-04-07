@@ -174,31 +174,36 @@
             console.log("initMap 호출됨");
             const container = document.getElementById('map');
             const options = {
-                center: new kakao.maps.LatLng(35.68466926, 127.724382),
+                center: new kakao.maps.LatLng(35.68466926, 127.724382), // 기본값
                 level: 13
             };
             map = new kakao.maps.Map(container, options);
             map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
             console.log("지도 생성됨:", map);
-
+        
             setTimeout(() => {
                 map.relayout();
-                map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
+                // 데이터가 로드된 후 중심을 풍력 단지 평균 위치로 조정
+                if (allWindFarms.length > 0) {
+                    const avgLat = allWindFarms.reduce((sum, farm) => sum + farm.lat, 0) / allWindFarms.length;
+                    const avgLon = allWindFarms.reduce((sum, farm) => sum + farm.lon, 0) / allWindFarms.length;
+                    map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
+                }
                 console.log("지도 렌더링 완료");
                 updateMarkers();
                 startTrackingLocation();
             }, 100);
-
+        
             kakao.maps.event.addListener(map, 'click', () => {
                 currentInfowindows.forEach(infowindow => infowindow.setMap(null));
                 currentInfowindows = [];
             });
-
+        
             kakao.maps.event.addListener(map, 'zoom_changed', updateMarkers);
             kakao.maps.event.addListener(map, 'idle', updateMarkers);
-
+        
             document.getElementById('loading').style.display = 'none';
-
+        
             document.getElementById('map-type-toggle').addEventListener('click', toggleMapType);
             document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
             document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
