@@ -53,6 +53,21 @@
         #manufacturer-dropdown {
             top: 130px;
         }
+        #manufacturer-info {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1referrer: none;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 14px;
+            text-align: center;
+            display: none; /* 기본적으로 숨김 */
+            max-width: 90%;
+        }
         .info-window {
             background: rgba(255, 255, 255, 0.8);
             padding: 5px;
@@ -81,11 +96,17 @@
     <button id="map-type-toggle" class="control-button">기본 지도</button>
     <button id="name-toggle-button" class="control-button">터빈 이름 끄기</button>
     <select id="windfarm-dropdown" class="control-button">
-        <option value="">풍력단지</option>
+        <option value="">풍력단지 선택</option>
     </select>
     <select id="manufacturer-dropdown" class="control-button">
-        <option value="">제조사</option>
+        <option value="">제조사 선택</option>
     </select>
+    <div id="manufacturer-info">
+        <span id="info-manufacturer"></span><br>
+        총 용량: <span id="info-total-capacity"></span> kW<br>
+        단지 수: <span id="info-complex-count"></span><br>
+        터빈 수: <span id="info-turbine-count"></span>
+    </div>
 
     <script>
         let map;
@@ -278,17 +299,43 @@
                 filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
             }
 
+            // 제조사 정보 표시
+            const infoContainer = document.getElementById('manufacturer-info');
+            const infoManufacturer = document.getElementById('info-manufacturer');
+            const infoTotalCapacity = document.getElementById('info-total-capacity');
+            const infoComplexCount = document.getElementById('info-complex-count');
+            const infoTurbineCount = document.getElementById('info-turbine-count');
+
+            if (selectedManufacturer) {
+                // 총 용량 계산
+                const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
+                // 단지 수 계산
+                const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
+                // 터빈 수 계산
+                const turbineCount = filteredFarms.length;
+
+                // 정보 업데이트
+                infoManufacturer.textContent = selectedManufacturer;
+                infoTotalCapacity.textContent = formatNumberWithCommas(totalCapacity);
+                infoComplexCount.textContent = complexCount;
+                infoTurbineCount.textContent = turbineCount;
+
+                // 정보 표시
+                infoContainer.style.display = 'block';
+            } else {
+                // 정보 숨김
+                infoContainer.style.display = 'none';
+            }
+
+            // 지도 조정
             if (filteredFarms.length === 0) {
-                // 터빈이 없는 경우 기본 위치로 복원
                 map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
                 map.setLevel(13);
             } else if (filteredFarms.length === 1) {
-                // 터빈이 하나인 경우 해당 위치로 이동
                 const farm = filteredFarms[0];
                 map.setCenter(new kakao.maps.LatLng(farm.lat, farm.lon));
                 map.setLevel(6);
             } else {
-                // 터빈이 여러 개인 경우 모든 터빈이 보이도록 Bounds 설정
                 const bounds = new kakao.maps.LatLngBounds();
                 filteredFarms.forEach(farm => {
                     if (farm.lat && farm.lon) {
