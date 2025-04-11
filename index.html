@@ -53,19 +53,19 @@
         #manufacturer-dropdown {
             top: 130px;
         }
-        #manufacturer-info {
+        #manufacturer-info, #complex-info {
             position: absolute;
             top: 10px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
             background: rgba(255, 255, 255, 0.8);
-            border: 1referrer: none;
+            border: 1px solid #ccc;
             border-radius: 4px;
             padding: 10px;
             font-size: 14px;
             text-align: center;
-            display: none; /* 기본적으로 숨김 */
+            display: none;
             max-width: 90%;
         }
         .info-window {
@@ -107,6 +107,14 @@
         단지 수: <span id="info-complex-count"></span><br>
         터빈 수: <span id="info-turbine-count"></span>
     </div>
+    <div id="complex-info">
+        단지명: <span id="info-complex-name"></span><br>
+        단지 용량: <span id="info-complex-capacity"></span> kW<br>
+        <span style="color: transparent;">단지 용량: </span> <span id="info-complex-capacity-breakdown"></span><br>
+        터빈 제조사: <span id="info-complex-manufacturers"></span><br>
+        단지 내 총 터빈 수: <span id="info-complex-turbine-count"></span><br>
+        준공일: <span id="info-complex-completion"></span>
+    </div>
 
     <script>
         let map;
@@ -121,6 +129,7 @@
         let watchId = null;
         let areNamesVisible = true;
         let selectedManufacturer = '';
+        let selectedComplex = '';
 
         function formatNumberWithCommas(number) {
             if (!number) return "정보 없음";
@@ -277,34 +286,73 @@
         }
 
         function handleDropdownChange(event) {
-            const complexId = event.target.value;
-            if (!complexId) return;
+            selectedComplex = event.target.value;
+            selectedManufacturer = ''; // 제조사 리셋
+            document.getElementById('manufacturer-dropdown').value = ''; // 제조사 드랍다운 리셋
 
-            const farmsInComplex = allWindFarms.filter(farm => farm.complexId === complexId);
-            const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
-            const avgLon = farmsInComplex.reduce((sum, farm) => sum + farm.lon, 0) / farmsInComplex.length;
+            // 정보 창 관리
+            const manufacturerInfo = document.getElementById('manufacturer-info');
+            const complexInfo = document.getElementById('complex-info');
+            manufacturerInfo.style.display = 'none';
 
-            map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
-            map.setLevel(6);
+            if (selectedComplex) {
+                const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
+                const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
+                const avgLon = farmsInComplex.reduce((sum, farm) => sum + farm.lon, 0) / farmsInComplex.length;
+
+                // 단지 정보 계산
+                const complexName = farmsInComplex[0].name;
+                const totalCapacity = farmsInComplex.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
+                const capacityCount = {};
+                farmsInComplex.forEach(farm => {
+                    if (farm.capacity) {
+                        capacityCount[farm.capacity] = (capacityCount[farm.capacity] || 0) + 1;
+                    }
+                });
+                const capacityBreakdown = Object.entries(capacityCount)
+                    .map(([cap, count]) => `${formatNumberWithCommas(cap)}kW * ${count}기`)
+                    .join(", ");
+                const manufacturers = [...new Set(farmsInComplex.map(farm => farm.manufacturer).filter(m => m))].join(", ") || "정보 없음";
+                const turbineCount = farmsInComplex.length;
+                const completionDates = farmsInComplex.map(farm => farm.completionDate).filter(date => date);
+                const completionDate = completionDates.length > 0 ? completionDates.sort()[0] : "정보 없음";
+
+                // 단지 정보 표시
+                document.getElementById('info-complex-name').textContent = complexName;
+                document.getElementById('info-complex-capacity').textContent = formatNumberWithCommas(totalCapacity);
+                document.getElementById('info-complex-capacity-breakdown').textContent = `(${capacityBreakdown})`;
+                document.getElementById('info-complex-manufacturers').textContent = manufacturers;
+                document.getElementById('info-complex-turbine-count').textContent = turbineCount;
+                document.getElementById('info-complex-completion').textContent = completionDate;
+                complexInfo.style.display = 'block';
+
+                // 지도 조정
+                map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
+                map.setLevel(6);
+            } else {
+                complexInfo.style.display = 'none';
+                map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
+                map.setLevel(13);
+            }
+
             updateMarkers();
         }
 
         function handleManufacturerChange(event) {
             selectedManufacturer = event.target.value;
-            console.log("선택된 제조사:", selectedManufacturer);
+            selectedComplex = ''; // 풍력 단지 리셋
+            document.getElementById('windfarm-dropdown').value = ''; // 풍력 단지 드랍다운 리셋
+
+            // 정보 창 관리
+            const manufacturerInfo = document.getElementById('manufacturer-info');
+            const complexInfo = document.getElementById('complex-info');
+            complexInfo.style.display = 'none';
 
             // 제조사에 따른 터빈 필터링
             let filteredFarms = allWindFarms;
             if (selectedManufacturer) {
                 filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
             }
-
-            // 제조사 정보 표시
-            const infoContainer = document.getElementById('manufacturer-info');
-            const infoManufacturer = document.getElementById('info-manufacturer');
-            const infoTotalCapacity = document.getElementById('info-total-capacity');
-            const infoComplexCount = document.getElementById('info-complex-count');
-            const infoTurbineCount = document.getElementById('info-turbine-count');
 
             if (selectedManufacturer) {
                 // 총 용량 계산
@@ -315,16 +363,16 @@
                 const turbineCount = filteredFarms.length;
 
                 // 정보 업데이트
-                infoManufacturer.textContent = selectedManufacturer;
-                infoTotalCapacity.textContent = formatNumberWithCommas(totalCapacity);
-                infoComplexCount.textContent = complexCount;
-                infoTurbineCount.textContent = turbineCount;
+                document.getElementById('info-manufacturer').textContent = selectedManufacturer;
+                document.getElementById('info-total-capacity').textContent = formatNumberWithCommas(totalCapacity);
+                document.getElementById('info-complex-count').textContent = complexCount;
+                document.getElementById('info-turbine-count').textContent = turbineCount;
 
                 // 정보 표시
-                infoContainer.style.display = 'block';
+                manufacturerInfo.style.display = 'block';
             } else {
                 // 정보 숨김
-                infoContainer.style.display = 'none';
+                manufacturerInfo.style.display = 'none';
             }
 
             // 지도 조정
@@ -413,10 +461,12 @@
                 { offset: new kakao.maps.Point(16, 32) }
             );
 
-            // 제조사 필터링
+            // 필터링된 터빈 목록
             let filteredFarms = allWindFarms;
             if (selectedManufacturer) {
                 filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
+            } else if (selectedComplex) {
+                filteredFarms = allWindFarms.filter(farm => farm.complexId === selectedComplex);
             }
             console.log("필터링된 터빈 수:", filteredFarms.length);
 
