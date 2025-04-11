@@ -55,9 +55,6 @@
         }
         #all-info, #manufacturer-info, #complex-info {
             position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
             z-index: 10;
             background: rgba(255, 255, 255, 0.8);
             border: 1px solid #ccc;
@@ -67,6 +64,24 @@
             text-align: center;
             display: none;
             max-width: 90%;
+        }
+        /* PC 환경: 가운데 정렬 */
+        @media screen and (min-width: 768px) {
+            #all-info, #manufacturer-info, #complex-info {
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+        /* 모바일 환경: 왼쪽 상단 정렬 */
+        @media screen and (max-width: 767px) {
+            #all-info, #manufacturer-info, #complex-info {
+                top: 10px;
+                left: 10px;
+                transform: none;
+                text-align: left; /* 모바일에서 가독성을 위해 왼쪽 정렬 */
+                max-width: 80%; /* 모바일에서 너무 넓지 않도록 조정 */
+            }
         }
         .info-window {
             background: rgba(255, 255, 255, 0.8);
