@@ -81,10 +81,10 @@
     <button id="map-type-toggle" class="control-button">기본 지도</button>
     <button id="name-toggle-button" class="control-button">터빈 이름 끄기</button>
     <select id="windfarm-dropdown" class="control-button">
-        <option value="">풍력단지 선택</option>
+        <option value="">풍력단지</option>
     </select>
     <select id="manufacturer-dropdown" class="control-button">
-        <option value="">제조사 선택</option>
+        <option value="">제조사</option>
     </select>
 
     <script>
@@ -271,6 +271,33 @@
         function handleManufacturerChange(event) {
             selectedManufacturer = event.target.value;
             console.log("선택된 제조사:", selectedManufacturer);
+
+            // 제조사에 따른 터빈 필터링
+            let filteredFarms = allWindFarms;
+            if (selectedManufacturer) {
+                filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
+            }
+
+            if (filteredFarms.length === 0) {
+                // 터빈이 없는 경우 기본 위치로 복원
+                map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
+                map.setLevel(13);
+            } else if (filteredFarms.length === 1) {
+                // 터빈이 하나인 경우 해당 위치로 이동
+                const farm = filteredFarms[0];
+                map.setCenter(new kakao.maps.LatLng(farm.lat, farm.lon));
+                map.setLevel(6);
+            } else {
+                // 터빈이 여러 개인 경우 모든 터빈이 보이도록 Bounds 설정
+                const bounds = new kakao.maps.LatLngBounds();
+                filteredFarms.forEach(farm => {
+                    if (farm.lat && farm.lon) {
+                        bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
+                    }
+                });
+                map.setBounds(bounds);
+            }
+
             updateMarkers();
         }
 
