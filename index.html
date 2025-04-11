@@ -53,7 +53,7 @@
         #manufacturer-dropdown {
             top: 130px;
         }
-        #manufacturer-info, #complex-info {
+        #all-info, #manufacturer-info, #complex-info {
             position: absolute;
             top: 10px;
             left: 50%;
@@ -101,6 +101,11 @@
     <select id="manufacturer-dropdown" class="control-button">
         <option value="">제조사 선택</option>
     </select>
+    <div id="all-info">
+        총 용량: <span id="info-all-capacity"></span> kW<br>
+        단지 수: <span id="info-all-complex-count"></span><br>
+        터빈 수: <span id="info-all-turbine-count"></span>
+    </div>
     <div id="manufacturer-info">
         <span id="info-manufacturer"></span><br>
         총 용량: <span id="info-total-capacity"></span> kW<br>
@@ -216,6 +221,16 @@
                     const avgLat = allWindFarms.reduce((sum, farm) => sum + farm.lat, 0) / allWindFarms.length;
                     const avgLon = allWindFarms.reduce((sum, farm) => sum + farm.lon, 0) / allWindFarms.length;
                     map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
+
+                    // 전체 터빈 정보 설정
+                    const totalCapacity = allWindFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
+                    const complexCount = [...new Set(allWindFarms.map(farm => farm.complexId))].length;
+                    const turbineCount = allWindFarms.length;
+
+                    document.getElementById('info-all-capacity').textContent = formatNumberWithCommas(totalCapacity);
+                    document.getElementById('info-all-complex-count').textContent = complexCount;
+                    document.getElementById('info-all-turbine-count').textContent = turbineCount;
+                    document.getElementById('all-info').style.display = 'block'; // 초기 상태 표시
                 }
                 console.log("지도 렌더링 완료");
                 updateMarkers();
@@ -291,8 +306,10 @@
             document.getElementById('manufacturer-dropdown').value = ''; // 제조사 드랍다운 리셋
 
             // 정보 창 관리
+            const allInfo = document.getElementById('all-info');
             const manufacturerInfo = document.getElementById('manufacturer-info');
             const complexInfo = document.getElementById('complex-info');
+            allInfo.style.display = 'none';
             manufacturerInfo.style.display = 'none';
 
             if (selectedComplex) {
@@ -331,6 +348,7 @@
                 map.setLevel(6);
             } else {
                 complexInfo.style.display = 'none';
+                allInfo.style.display = 'block'; // 전체 정보 표시
                 map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
                 map.setLevel(13);
             }
@@ -344,8 +362,10 @@
             document.getElementById('windfarm-dropdown').value = ''; // 풍력 단지 드랍다운 리셋
 
             // 정보 창 관리
+            const allInfo = document.getElementById('all-info');
             const manufacturerInfo = document.getElementById('manufacturer-info');
             const complexInfo = document.getElementById('complex-info');
+            allInfo.style.display = 'none';
             complexInfo.style.display = 'none';
 
             // 제조사에 따른 터빈 필터링
@@ -371,8 +391,8 @@
                 // 정보 표시
                 manufacturerInfo.style.display = 'block';
             } else {
-                // 정보 숨김
                 manufacturerInfo.style.display = 'none';
+                allInfo.style.display = 'block'; // 전체 정보 표시
             }
 
             // 지도 조정
