@@ -162,7 +162,7 @@
         let isEnglish = false;
         let translations = {};
         let siteTranslations = [];
-        let manufacturerData = null;  // manufacturer.json의 데이터를 저장할 변수
+        let manufacturerData = null;  // manufacturers.json의 데이터를 저장할 변수
 
         translations = {
             "ko": {
@@ -274,8 +274,8 @@
         // 제조사 JSON 파일을 로드하여 manufacturerData에 저장
         async function loadManufacturers() {
             try {
-                console.log("manufacturer.json 요청 중: /wind/manufacturer.json");
-                const response = await fetch('/wind/manufacturer.json?t=' + new Date().getTime());
+                console.log("manufacturers.json 요청 중: /wind/manufacturers.json");
+                const response = await fetch('/wind/manufacturers.json?t=' + new Date().getTime());
                 if (!response.ok) {
                     throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
                 }
@@ -303,7 +303,7 @@
             }
         }
 
-        // CSV 파일에 없는 제조사 데이터는 manufacturer.json을 사용하므로, CSV에서 제조사 관련 코드는 사용하지 않습니다.
+        // CSV 파일에 없는 제조사 데이터는 manufacturers.json을 사용하므로, CSV에서 제조사 관련 코드는 사용하지 않습니다.
         // 단지 드롭다운 및 표시 시, 필요한 경우 manufacturerData를 사용합니다.
 
         function getTranslatedSiteInfo(complexId, field) {
@@ -538,7 +538,7 @@
             });
         }
 
-        // CSV 대신 manufacturer.json에 있는 데이터를 사용하여 제조사 드롭다운 옵션을 생성합니다.
+        // CSV 대신 manufacturers.json에 있는 데이터를 사용하여 제조사 드롭다운 옵션을 생성합니다.
         function populateManufacturerDropdown() {
             const dropdown = document.getElementById('manufacturer-dropdown');
             while (dropdown.options.length > 1) dropdown.remove(1);
