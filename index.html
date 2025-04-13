@@ -68,14 +68,15 @@
         #advanced-settings {
           position: absolute;
           right: 10px;
-          top: 240px;
-          z-index: 1000;        /* 충분히 높은 z-index로 지정 */
-          background-color: #fff;  /* 흰색 배경 */
-          border: 1px solid #ccc;
-          padding: 5px;
-          min-width: 140px;     /* 최소 너비 지정 */
-          min-height: 100px;    /* 최소 높이 지정 */
-          display: none;        /* 기본은 숨김 */
+          top: 100px;         /* 임시로 100px로 조정 */
+          z-index: 9999;      /* z-index를 크게 설정 */
+          background-color: red; /* 눈에 확 띄도록 빨간색 배경 */
+          color: white;       /* 텍스트 색상 흰색 */
+          border: 2px solid black;
+          padding: 10px;
+          min-width: 140px;
+          min-height: 100px;
+          display: none;
         }
         #advanced-settings .control-button {
             /* 개별 버튼 간의 간격 등 필요 시 조정 */
