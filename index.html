@@ -41,7 +41,7 @@
       border-radius: 4px;
       display: none;
     }
-    /* 컨트롤 전체를 감싸는 영역 */
+    /* 컨트롤 컨테이너 (우측 상단에 고정) */
     #controls {
       position: fixed;
       right: 10px;
@@ -49,7 +49,7 @@
       z-index: 10000;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 8px; /* 각 버튼 사이 간격 */
     }
     /* 모든 컨트롤 버튼 및 드롭다운에 동일한 스타일 */
     .control-button {
@@ -71,11 +71,20 @@
          -moz-appearance: none;
               appearance: none;
     }
-    /* advanced 컨테이너: 기본 옵션인 기본 지도, 이름 끄기, English */
-    #advanced-controls {
+    /* 설정 컨테이너 */
+    #settings-container {
       display: none; /* 처음에는 숨김 */
       flex-direction: column;
-      gap: 8px;
+      gap: 8px; /* 다른 컨트롤과 동일한 간격 */
+      margin-top: 8px; /* 설정 버튼과의 간격 */
+      background: rgba(255, 255, 255, 0.8); /* 컨트롤 배경과 동일 */
+      padding: 8px; /* 내부 여백 */
+      border: 1px solid #ccc; /* 컨트롤 테두리와 동일 */
+      border-radius: 4px; /* 컨트롤 모서리와 동일 */
+    }
+    /* 설정 버튼 스타일 */
+    #settings-button {
+      width: 120px; /* 다른 컨트롤 버튼과 동일 */
     }
     /* 정보 패널 */
     #all-info, #manufacturer-info, #complex-info {
@@ -117,7 +126,7 @@
       background: white;
       padding: 10px;
       border: 1px solid #ccc;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
       cursor: pointer;
       white-space: nowrap;
       max-width: 90vw;
@@ -133,7 +142,7 @@
   <div id="loading">지도 로딩 중...</div>
   <div id="error-message"></div>
   
-  <!-- 컨트롤 영역 -->
+  <!-- 컨트롤 컨테이너 -->
   <div id="controls">
     <button id="initial-reset" class="control-button">처음으로</button>
     <button id="reset-button" class="control-button">초기화</button>
@@ -144,8 +153,7 @@
       <option value="">제조사</option>
     </select>
     <button id="settings-button" class="control-button">설정</button>
-    <!-- 설정 버튼을 누르면 보이는 advanced 컨테이너 -->
-    <div id="advanced-controls">
+    <div id="settings-container" style="display: none;">
       <button id="map-type-toggle" class="control-button">기본 지도</button>
       <button id="name-toggle-button" class="control-button">이름 끄기</button>
       <button id="translate-button" class="control-button">English</button>
@@ -174,12 +182,7 @@
     <span id="info-complex-completion"></span>
   </div>
   
-  <!-- 자바스크립트 -->
   <script>
-    // (생략된 기존의 데이터 로드, CSV 파싱, 지도 초기화, 마커 업데이트 등 함수들은 그대로 유지)
-    // 여기서는 advanced-controls 토글 관련 부분만 추가합니다.
-    
-    // 전역 변수 등 (생략, 기존 코드와 동일)
     let map;
     let markers = [];
     let overlays = [];
@@ -199,7 +202,6 @@
     let manufacturerData = null;
 
     translations = {
-      /* 기존 translations 객체 (ko와 en) 그대로 사용 */
       "ko": {
         "title": "한국 풍력 발전소 지도",
         "loading": "지도 로딩 중...",
@@ -211,6 +213,7 @@
         "translate": "English",
         "windfarmDropdown": "풍력단지",
         "manufacturerDropdown": "제조사",
+        "settings": "설정",
         "allInfo": {
           "totalCapacity": "총 용량: {{value}} kW",
           "totalCapacityGW": "총 용량: {{value}} GW",
@@ -263,6 +266,7 @@
         "translate": "한국어",
         "windfarmDropdown": "Wind Farm",
         "manufacturerDropdown": "Manufacturer",
+        "settings": "Settings",
         "allInfo": {
           "totalCapacity": "Total Capacity: {{value}} kW",
           "totalCapacityGW": "Total Capacity: {{value}} GW",
@@ -384,21 +388,22 @@
       document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
       document.getElementById('translate-button').textContent = translations[lang].translate;
       document.getElementById('reset-button').textContent = translations[lang].reset;
+      document.getElementById('settings-button').textContent = translations[lang].settings;
       document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
       document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
-      
+
       const windfarmDropdown = document.getElementById('windfarm-dropdown');
       const selectedValue = windfarmDropdown.value;
       while (windfarmDropdown.options.length > 1) windfarmDropdown.remove(1);
       populateDropdown();
       windfarmDropdown.value = selectedValue;
-      
+
       const manufacturerDropdown = document.getElementById('manufacturer-dropdown');
       const selectedManufacturer = manufacturerDropdown.value;
       while (manufacturerDropdown.options.length > 1) manufacturerDropdown.remove(1);
       populateManufacturerDropdown();
       manufacturerDropdown.value = selectedManufacturer;
-      
+
       updateInfoPanels();
       updateMarkers();
     }
@@ -532,6 +537,11 @@
       document.getElementById('map-type-toggle').addEventListener('click', toggleMapType);
       document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
       document.getElementById('translate-button').addEventListener('click', toggleLanguage);
+      document.getElementById('settings-button').addEventListener('click', () => {
+        const settingsContainer = document.getElementById('settings-container');
+        settingsContainer.style.display = settingsContainer.style.display === 'none' ? 'flex' : 'none';
+        console.log("설정 컨테이너 표시 상태:", settingsContainer.style.display);
+      });
       document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
       document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
     }
@@ -552,33 +562,6 @@
     function toggleNamesVisibility() {
       areNamesVisible = !areNamesVisible;
       document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[isEnglish ? 'en' : 'ko'].nameToggle : translations[isEnglish ? 'en' : 'ko'].nameToggleOn;
-      updateMarkers();
-    }
-
-    function resetToInitial() {
-      selectedComplex = '';
-      selectedManufacturer = '';
-      document.getElementById('windfarm-dropdown').value = '';
-      document.getElementById('manufacturer-dropdown').value = '';
-      const allInfo = document.getElementById('all-info');
-      const manufacturerInfo = document.getElementById('manufacturer-info');
-      const complexInfo = document.getElementById('complex-info');
-      allInfo.style.display = 'block';
-      manufacturerInfo.style.display = 'none';
-      complexInfo.style.display = 'none';
-      map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
-      map.setLevel(13);
-      map.relayout();
-      updateMarkers();
-      updateInfoPanels();
-    }
-
-    function resetSelectionsOnly() {
-      selectedComplex = '';
-      selectedManufacturer = '';
-      document.getElementById('windfarm-dropdown').value = '';
-      document.getElementById('manufacturer-dropdown').value = '';
-      updateInfoPanels();
       updateMarkers();
     }
 
