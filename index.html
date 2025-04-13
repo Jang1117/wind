@@ -66,17 +66,17 @@
         #manufacturer-dropdown { top: 190px; }
         /* 추가(설정) 옵션: 기본 지도, 이름 끄기, 언어선택 – 기본 숨김 */
         #advanced-settings {
-          position: absolute;
+          position: fixed;      /* fixed로 변경 */
           right: 10px;
-          top: 100px;         /* 임시로 100px로 조정 */
-          z-index: 9999;      /* z-index를 크게 설정 */
-          background-color: red; /* 눈에 확 띄도록 빨간색 배경 */
-          color: white;       /* 텍스트 색상 흰색 */
+          top: 100px;           /* 원하는 위치(예: 100px)로 조정 */
+          z-index: 9999;        /* 충분히 높은 z-index 지정 */
+          background-color: red; /* 디버깅용 빨간 배경—나중에 원하는 색으로 변경 */
+          color: white;
           border: 2px solid black;
           padding: 10px;
           min-width: 140px;
           min-height: 100px;
-          display: none;
+          display: none;        /* 기본은 숨김 */
         }
         #advanced-settings .control-button {
             /* 개별 버튼 간의 간격 등 필요 시 조정 */
