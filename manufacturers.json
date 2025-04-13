@@ -1,0 +1,76 @@
+{
+  "manufacturers": [
+    {
+      "manufacturer": "Acciona",
+      "manufacturer_en": "Acciona"
+    },
+    {
+      "manufacturer": "Alstom(GE)",
+      "manufacturer_en": "Alstom (GE)"
+    },
+    {
+      "manufacturer": "DMS",
+      "manufacturer_en": "DMS"
+    },
+    {
+      "manufacturer": "Enercon",
+      "manufacturer_en": "Enercon"
+    },
+    {
+      "manufacturer": "Mitsubishi",
+      "manufacturer_en": "Mitsubishi"
+    },
+    {
+      "manufacturer": "NPS",
+      "manufacturer_en": "NPS"
+    },
+    {
+      "manufacturer": "SGRE",
+      "manufacturer_en": "Sgre"
+    },
+    {
+      "manufacturer": "STX중공업",
+      "manufacturer_en": "STX Heavy Industries"
+    },
+    {
+      "manufacturer": "Siemens",
+      "manufacturer_en": "Siemens"
+    },
+    {
+      "manufacturer": "Siva",
+      "manufacturer_en": "Siva"
+    },
+    {
+      "manufacturer": "Vestas",
+      "manufacturer_en": "Vestas"
+    },
+    {
+      "manufacturer": "대우조선해양",
+      "manufacturer_en": "Daewoo Shipbuilding & Marine Engineering"
+    },
+    {
+      "manufacturer": "두산에너빌리티",
+      "manufacturer_en": "Doosan Enerbility"
+    },
+    {
+      "manufacturer": "삼성중공업",
+      "manufacturer_en": "Samsung Heavy Industries"
+    },
+    {
+      "manufacturer": "유니슨",
+      "manufacturer_en": "Unison"
+    },
+    {
+      "manufacturer": "한진산업",
+      "manufacturer_en": "Hanjin Industrial"
+    },
+    {
+      "manufacturer": "현대일렉트릭",
+      "manufacturer_en": "Hyundai Electric"
+    },
+    {
+      "manufacturer": "효성",
+      "manufacturer_en": "Hyosung"
+    }
+  ]
+}
