@@ -4,7 +4,9 @@
     <title id="page-title">한국 풍력 발전소 지도</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Kakao Maps SDK -->
     <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b8113591f35c3409335bdb4b5ee5613&libraries=clusterer&autoload=false" defer></script>
+    <!-- PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         html, body {
@@ -39,6 +41,7 @@
             border-radius: 4px;
             display: none;
         }
+        /* 컨트롤 버튼 스타일 – 필요에 따라 위치를 조정 */
         .control-button {
             position: absolute;
             right: 10px;
@@ -55,12 +58,16 @@
             height: 34px;
             line-height: 1.5;
         }
-        #map-type-toggle { top: 10px; }
-        #name-toggle-button { top: 45px; }
-        #reset-button { top: 80px; }
-        #translate-button { top: 115px; }
-        #windfarm-dropdown { top: 150px; }
-        #manufacturer-dropdown { top: 185px; }
+        /* 버튼 위치 (아래 순서로 위에서부터 배치 – 원하는 순서대로 재배열 가능) */
+        #initial-reset { top: 10px; }       /* '처음으로' 버튼 – 전체 초기화 */
+        #map-type-toggle { top: 55px; }
+        #name-toggle-button { top: 100px; }
+        #reset-button { top: 145px; }        /* '초기화' 버튼 – 선택만 리셋 */
+        #translate-button { top: 190px; }
+        #windfarm-dropdown { top: 235px; }
+        #manufacturer-dropdown { top: 280px; }
+
+        /* 정보 패널 스타일 */
         #all-info, #manufacturer-info, #complex-info {
             position: absolute;
             z-index: 10;
@@ -111,9 +118,13 @@
     </style>
 </head>
 <body>
+    <!-- 지도 -->
     <div id="map"></div>
     <div id="loading">지도 로딩 중...</div>
     <div id="error-message"></div>
+    
+    <!-- 컨트롤 버튼들 (위쪽에 배치) -->
+    <button id="initial-reset" class="control-button">처음으로</button>
     <button id="map-type-toggle" class="control-button">기본 지도</button>
     <button id="name-toggle-button" class="control-button">이름 끄기</button>
     <button id="reset-button" class="control-button">초기화</button>
@@ -124,6 +135,8 @@
     <select id="manufacturer-dropdown" class="control-button">
         <option value="">제조사</option>
     </select>
+
+    <!-- 정보 패널 -->
     <div id="all-info">
         <span id="info-all-capacity"></span><br>
         <span id="info-all-capacity-gw"></span><br>
@@ -271,7 +284,7 @@
             }
         };
 
-        // 제조사 JSON 파일을 로드하여 manufacturerData에 저장
+        // manufacturers.json 데이터를 로드하여 manufacturerData에 저장
         async function loadManufacturers() {
             try {
                 console.log("manufacturers.json 요청 중: /wind/manufacturers.json");
@@ -303,8 +316,7 @@
             }
         }
 
-        // CSV 파일에 없는 제조사 데이터는 manufacturers.json을 사용하므로, CSV에서 제조사 관련 코드는 사용하지 않습니다.
-        // 단지 드롭다운 및 표시 시, 필요한 경우 manufacturerData를 사용합니다.
+        // CSV 파일에 없는 제조사 데이터는 manufacturers.json을 사용합니다.
 
         function getTranslatedSiteInfo(complexId, field) {
             const site = siteTranslations.find(s => s.site_number == complexId);
@@ -318,12 +330,44 @@
             return farm ? (field === 'name' ? farm.name : farm.address) : null;
         }
 
+        // "처음으로" 버튼: 전체 초기화 – 모든 선택 리셋, 지도 중심 및 줌 레벨 기본값으로 재설정
+        function resetToInitial() {
+            selectedComplex = '';
+            selectedManufacturer = '';
+            document.getElementById('windfarm-dropdown').value = '';
+            document.getElementById('manufacturer-dropdown').value = '';
+            const allInfo = document.getElementById('all-info');
+            const manufacturerInfo = document.getElementById('manufacturer-info');
+            const complexInfo = document.getElementById('complex-info');
+            allInfo.style.display = 'block';
+            manufacturerInfo.style.display = 'none';
+            complexInfo.style.display = 'none';
+            // 기본 지도 중심과 줌 레벨 (원하는 값으로 설정 – 여기선 초기값 사용)
+            map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
+            map.setLevel(13);
+            map.relayout();
+            updateMarkers();
+            updateInfoPanels();
+        }
+
+        // "초기화" 버튼: 선택값만 리셋 – 현재 지도 중심과 줌 레벨은 유지
+        function resetSelectionsOnly() {
+            selectedComplex = '';
+            selectedManufacturer = '';
+            document.getElementById('windfarm-dropdown').value = '';
+            document.getElementById('manufacturer-dropdown').value = '';
+            // 지도 중심, 줌 레벨은 그대로 유지
+            updateInfoPanels();
+            updateMarkers();
+        }
+
         function updateUILanguage() {
             const lang = isEnglish ? 'en' : 'ko';
             document.getElementById('page-title').textContent = translations[lang].title;
             document.getElementById('loading').textContent = translations[lang].loading;
             document.getElementById('map-type-toggle').textContent = isSatellite ? translations[lang].mapTypeToggle : translations[lang].mapTypeToggleSatellite;
             document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
+            // "처음으로" 버튼은 보통 기본 텍스트 그대로 사용 (원한다면 번역도 적용 가능)
             document.getElementById('reset-button').textContent = translations[lang].reset;
             document.getElementById('translate-button').textContent = translations[lang].translate;
             document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
@@ -455,7 +499,8 @@
                     const avgLat = allWindFarms.reduce((sum, farm) => sum + farm.lat, 0) / allWindFarms.length;
                     const avgLon = allWindFarms.reduce((sum, farm) => sum + farm.lon, 0) / allWindFarms.length;
                     map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
-                    document.getElementById('all-info').style.display = 'block'; // 먼저 display를 block으로 설정
+                    // 초기 로드시 정보 패널이 바로 업데이트되도록 block 처리
+                    document.getElementById('all-info').style.display = 'block';
                     updateInfoPanels();
                 }
                 console.log("지도 렌더링 완료");
@@ -469,12 +514,14 @@
             kakao.maps.event.addListener(map, 'zoom_changed', updateMarkers);
             kakao.maps.event.addListener(map, 'idle', updateMarkers);
             document.getElementById('loading').style.display = 'none';
+            // 버튼 이벤트 등록: "처음으로"와 "초기화" 별도 처리
+            document.getElementById('initial-reset').addEventListener('click', resetToInitial);
             document.getElementById('map-type-toggle').addEventListener('click', toggleMapType);
             document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
-            document.getElementById('reset-button').addEventListener('click', resetSelections);
+            document.getElementById('reset-button').addEventListener('click', resetSelectionsOnly);
+            document.getElementById('translate-button').addEventListener('click', toggleLanguage);
             document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
             document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
-            document.getElementById('translate-button').addEventListener('click', toggleLanguage);
         }
 
         function toggleMapType() {
@@ -496,7 +543,8 @@
             updateMarkers();
         }
 
-        function resetSelections() {
+        // "처음으로" – 전체 초기화 (모든 선택 리셋, 지도 중심/줌 재설정)
+        function resetToInitial() {
             selectedComplex = '';
             selectedManufacturer = '';
             document.getElementById('windfarm-dropdown').value = '';
@@ -507,19 +555,21 @@
             allInfo.style.display = 'block';
             manufacturerInfo.style.display = 'none';
             complexInfo.style.display = 'none';
-            setTimeout(() => {
-                if (allWindFarms.length > 0) {
-                    const avgLat = allWindFarms.reduce((sum, farm) => sum + farm.lat, 0) / allWindFarms.length;
-                    const avgLon = allWindFarms.reduce((sum, farm) => sum + farm.lon, 0) / allWindFarms.length;
-                    map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
-                } else {
-                    map.setCenter(new kakao.maps.LatLng(37.5, 127.5));
-                }
-                map.setLevel(13);
-                map.relayout();
-                updateMarkers();
-                updateInfoPanels();
-            }, 50);
+            map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
+            map.setLevel(13);
+            map.relayout();
+            updateMarkers();
+            updateInfoPanels();
+        }
+
+        // "초기화" – 선택값만 리셋 (현재 지도 중심/줌 유지)
+        function resetSelectionsOnly() {
+            selectedComplex = '';
+            selectedManufacturer = '';
+            document.getElementById('windfarm-dropdown').value = '';
+            document.getElementById('manufacturer-dropdown').value = '';
+            updateInfoPanels();
+            updateMarkers();
         }
 
         function populateDropdown() {
@@ -538,7 +588,7 @@
             });
         }
 
-        // CSV 대신 manufacturers.json에 있는 데이터를 사용하여 제조사 드롭다운 옵션을 생성합니다.
+        // manufacturers.json 기반 제조사 드롭다운 생성
         function populateManufacturerDropdown() {
             const dropdown = document.getElementById('manufacturer-dropdown');
             while (dropdown.options.length > 1) dropdown.remove(1);
@@ -658,7 +708,8 @@
 
         function updateInfoPanels() {
             const lang = isEnglish ? 'en' : 'ko';
-            if (allWindFarms.length > 0 && document.getElementById('all-info').style.display === 'block') {
+            // 항상 업데이트하도록 조건에서 display 검사 제거
+            if (allWindFarms.length > 0) {
                 const totalCapacity = allWindFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
                 const complexCount = [...new Set(allWindFarms.map(farm => farm.complexId))].length;
                 const turbineCount = allWindFarms.length;
