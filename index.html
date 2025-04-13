@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b8113591f35c3409335bdb4b5ee5613&libraries=clusterer&autoload=false" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <!-- 구글 번역 스크립트 추가 -->
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <style>
         html, body {
@@ -49,9 +48,9 @@
         #map-type-toggle { top: 10px; }
         #name-toggle-button { top: 45px; }
         #reset-button { top: 80px; }
-        #translate-button { top: 115px; } /* 새 버튼 위치 */
-        #windfarm-dropdown { top: 150px; } /* 기존 버튼 위치 조정 */
-        #manufacturer-dropdown { top: 185px; } /* 기존 버튼 위치 조정 */
+        #translate-button { top: 115px; }
+        #windfarm-dropdown { top: 150px; }
+        #manufacturer-dropdown { top: 185px; }
         #all-info, #manufacturer-info, #complex-info {
             position: absolute;
             z-index: 10;
@@ -108,7 +107,6 @@
     <button id="map-type-toggle" class="control-button">기본 지도</button>
     <button id="name-toggle-button" class="control-button">이름 끄기</button>
     <button id="reset-button" class="control-button">초기화</button>
-    <!-- 번역 버튼 추가 -->
     <button id="translate-button" class="control-button">English</button>
     <select id="windfarm-dropdown" class="control-button">
         <option value="">풍력단지</option>
@@ -150,18 +148,16 @@
         let areNamesVisible = true;
         let selectedManufacturer = '';
         let selectedComplex = '';
-        let isEnglish = false; // 번역 상태 변수
+        let isEnglish = false;
 
-        // 구글 번역 초기화 함수
         function googleTranslateElementInit() {
             new google.translate.TranslateElement({
-                pageLanguage: 'ko', // 기본 언어 한국어
-                includedLanguages: 'ko,en', // 한국어와 영어만 포함
-                layout: google.translate.TranslateElement.InlineLayout.NONE // UI 숨김
+                pageLanguage: 'ko',
+                includedLanguages: 'ko,en',
+                layout: google.translate.TranslateElement.InlineLayout.NONE
             }, 'google_translate_element');
         }
 
-        // 언어 토글 함수
         function toggleLanguage() {
             const translateButton = document.getElementById('translate-button');
             const select = document.getElementsByClassName('goog-te-combo')[0];
@@ -171,16 +167,15 @@
             }
 
             if (isEnglish) {
-                select.value = 'ko'; // 한국어로 변경
+                select.value = 'ko';
                 translateButton.textContent = 'English';
                 isEnglish = false;
             } else {
-                select.value = 'en'; // 영어로 변경
+                select.value = 'en';
                 translateButton.textContent = '한국어';
                 isEnglish = true;
             }
 
-            // 언어 변경 이벤트 트리거
             const event = new Event('change');
             select.dispatchEvent(event);
         }
@@ -306,7 +301,6 @@
             document.getElementById('reset-button').addEventListener('click', resetSelections);
             document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
             document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
-            // 번역 버튼 이벤트 리스너 추가
             document.getElementById('translate-button').addEventListener('click', toggleLanguage);
         }
 
@@ -334,19 +328,19 @@
             selectedManufacturer = '';
             document.getElementById('windfarm-dropdown').value = '';
             document.getElementById('manufacturer-dropdown').value = '';
-        
+
             const allInfo = document.getElementById('all-info');
             const manufacturerInfo = document.getElementById('manufacturer-info');
             const complexInfo = document.getElementById('complex-info');
             allInfo.style.display = 'block';
             manufacturerInfo.style.display = 'none';
             complexInfo.style.display = 'none';
-        
+
             setTimeout(() => {
                 if (allWindFarms.length > 0) {
                     const avgLat = allWindFarms.reduce((sum, farm) => sum + farm.lat, 0) / allWindFarms.length;
                     const avgLon = allWindFarms.reduce((sum, farm) => sum + farm.lon, 0) / allWindFarms.length;
-                    map  map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
+                    map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
                 } else {
                     map.setCenter(new kakao.maps.LatLng(37.5, 127.5));
                 }
@@ -355,7 +349,7 @@
                 updateMarkers();
             }, 50);
         }
-        
+
         function populateDropdown() {
             const dropdown = document.getElementById('windfarm-dropdown');
             const uniqueComplexes = [...new Set(allWindFarms.map(farm => farm.complexId))].filter(id => id);
@@ -698,7 +692,7 @@
                     단지 용량: ${truncateText(formattedTotalComplexCapacity, 25)} kW<br>
                     <span style="color: transparent;">단지 용량: </span> (${truncateText(capacityBreakdown, 25)})<br>
                     준공일: ${truncateText(completionDate || '정보 없음', 15)}<br>
-                    주소: ${truncateText(address || '정보 없음', 20)}<br>                    
+                    주소: ${truncateText(address || '정보 없음', 20)}<br>
                 </div>
             `;
 
@@ -729,7 +723,7 @@
 
         window.closeInfowindow = function(event, element) {
             event.stopPropagation();
-            const infowindowToClose = currentInfowindows.find(infowindow => 
+            const infowindowToClose = currentInfowindows.find(infowindow =>
                 infowindow.getContent().includes(element.innerHTML)
             );
             if (infowindowToClose) {
