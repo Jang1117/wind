@@ -47,11 +47,14 @@
         #name-toggle-button {
             top: 50px;
         }
+        #reset-button {
+            top: 90px; /* name-toggle-button 아래, windfarm-dropdown 위 */
+        }
         #windfarm-dropdown {
-            top: 90px;
+            top: 130px;
         }
         #manufacturer-dropdown {
-            top: 130px;
+            top: 170px;
         }
         #all-info, #manufacturer-info, #complex-info {
             position: absolute;
@@ -109,7 +112,8 @@
     <div id="loading">지도 로딩 중...</div>
     <div id="error-message"></div>
     <button id="map-type-toggle" class="control-button">기본 지도</button>
-    <button id="name-toggle-button" class="control-button">터빈 이름 끄기</button>
+    <button id="name-toggle-button" class="control-button">이름 끄기</button>
+    <button id="reset-button" class="control-button">초기화</button> <!-- 추가 -->
     <select id="windfarm-dropdown" class="control-button">
         <option value="">풍력단지</option>
     </select>
@@ -270,8 +274,11 @@
 
             document.getElementById('map-type-toggle').addEventListener('click', toggleMapType);
             document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
+            document.getElementById('reset-button').addEventListener('click', resetSelections);
             document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
             document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
+            
+            
         }
 
         function toggleMapType() {
@@ -289,10 +296,29 @@
 
         function toggleNamesVisibility() {
             areNamesVisible = !areNamesVisible;
-            document.getElementById('name-toggle-button').textContent = areNamesVisible ? '터빈 이름 끄기' : '터빈 이름 켜기';
+            document.getElementById('name-toggle-button').textContent = areNamesVisible ? '이름 끄기' : '이름 켜기';
             updateMarkers();
         }
 
+        function resetSelections() {
+            selectedComplex = '';
+            selectedManufacturer = '';
+            document.getElementById('windfarm-dropdown').value = '';
+            document.getElementById('manufacturer-dropdown').value = '';
+        
+            const allInfo = document.getElementById('all-info');
+            const manufacturerInfo = document.getElementById('manufacturer-info');
+            const complexInfo = document.getElementById('complex-info');
+            allInfo.style.display = 'block';
+            manufacturerInfo.style.display = 'none';
+            complexInfo.style.display = 'none';
+        
+            map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
+            map.setLevel(13);
+        
+            updateMarkers();
+        }
+        
         function populateDropdown() {
             const dropdown = document.getElementById('windfarm-dropdown');
             const uniqueComplexes = [...new Set(allWindFarms.map(farm => farm.complexId))].filter(id => id);
