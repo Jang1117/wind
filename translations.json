@@ -1,1368 +1,275 @@
-{
-  "complexes": [
-    {
-      "complex_id": 1,
-      "names": {
-        "ko": "행원",
-        "en": "Haengwon"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 제주시 구좌읍 해맞이해안로 712-3 (제주대 660)",
-        "en": "Jeju Teukbyeoljachi-do Jeju-si Guzwa-eup Haemajihaean-ro 712-3 (Jeju Dae 660)"
-      }
-    },
-    {
-      "complex_id": 2,
-      "names": {
-        "ko": "전북",
-        "en": "Jeonbuk"
-      },
-      "addresses": {
-        "ko": "전라북도 부안군",
-        "en": "Jeollabuk-do Buan-gun"
-      }
-    },
-    {
-      "complex_id": 3,
-      "names": {
-        "ko": "영덕",
-        "en": "Yeongdeok"
-      },
-      "addresses": {
-        "ko": "경상북도 영덕군 영덕읍 화수리",
-        "en": "Gyeongsangbuk-do Yeongdeok-gun Yeongdeok-eup Hwasu-ri"
-      }
-    },
-    {
-      "complex_id": 4,
-      "names": {
-        "ko": "한경",
-        "en": "Hangyeong"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 제주시 한경면 용수리 3879-5",
-        "en": "Jeju Teukbyeoljachi-do Jeju-si Hangyeong-myeon Yongsu-ri 3879-5"
-      }
-    },
-    {
-      "complex_id": 5,
-      "names": {
-        "ko": "강원",
-        "en": "Gangwon"
-      },
-      "addresses": {
-        "ko": "강원도 평창군 대관령면 횡계리",
-        "en": "Gangwon-do Pyeongchang-gun Daegwallyeong-myeon Hoenggye-ri"
-      }
-    },
-    {
-      "complex_id": 6,
-      "names": {
-        "ko": "신창",
-        "en": "Sinchang"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 제주시",
-        "en": "Jeju Teukbyeoljachi-do Jeju-si"
-      }
-    },
-    {
-      "complex_id": 7,
-      "names": {
-        "ko": "양양",
-        "en": "Yangyang"
-      },
-      "addresses": {
-        "ko": "강원도 양양군 서면 영덕리",
-        "en": "Gangwon-do Yangyang-gun Seomyeon Yeongdeok-ri"
-      }
-    },
-    {
-      "complex_id": 8,
-      "names": {
-        "ko": "월정",
-        "en": "Woljeong"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 제주시",
-        "en": "Jeju Teukbyeoljachi-do Jeju-si"
-      }
-    },
-    {
-      "complex_id": 10,
-      "names": {
-        "ko": "고리",
-        "en": "Gori"
-      },
-      "addresses": {
-        "ko": "부산광역시 기장군 장안읍 효암리 258번지",
-        "en": "Busan Gwangyeoksi Gijang-gun Jangan-eup Hyoam-ri 258-beonji"
-      }
-    },
-    {
-      "complex_id": 11,
-      "names": {
-        "ko": "태기산",
-        "en": "Taegisan"
-      },
-      "addresses": {
-        "ko": "강원도 횡성군 둔내면 태기리 산1-5번지",
-        "en": "Gangwon-do Hoengseong-gun Dunnai-myeon Taegi-ri San1-5-beonji"
-      }
-    },
-    {
-      "complex_id": 12,
-      "names": {
-        "ko": "신안",
-        "en": "Sinan"
-      },
-      "addresses": {
-        "ko": "전라남도 신안군 비금면 구림리 산1-1",
-        "en": "Jeollanam-do Sinan-gun Bigeum-myeon Gurim-ri San1-1"
-      }
-    },
-    {
-      "complex_id": 13,
-      "names": {
-        "ko": "영양",
-        "en": "Yeongyang"
-      },
-      "addresses": {
-        "ko": "경상북도 영양군 석보면 맹동산길 284-40",
-        "en": "Gyeongsangbuk-do Yeongyang-gun Seokbo-myeon Maengdongsan-gil 284-40"
-      }
-    },
-    {
-      "complex_id": 14,
-      "names": {
-        "ko": "삼달",
-        "en": "Samdal"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 서귀포시 성산읍 삼달리 2004번지",
-        "en": "Jeju Teukbyeoljachi-do Seogwipo-si Seongsan-eup Samdal-ri 2004-beonji"
-      }
-    },
-    {
-      "complex_id": 15,
-      "names": {
-        "ko": "누에섬",
-        "en": "Nue-seom"
-      },
-      "addresses": {
-        "ko": "경기도 안산시",
-        "en": "Gyeonggi-do Ansan-si"
-      }
-    },
-    {
-      "complex_id": 16,
-      "names": {
-        "ko": "성산1",
-        "en": "Seongsan1"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 서귀포시 성산읍 수산리 4403-3",
-        "en": "Jeju Teukbyeoljachi-do Seogwipo-si Seongsan-eup Susan-ri 4403-3"
-      }
-    },
-    {
-      "complex_id": 17,
-      "names": {
-        "ko": "서광",
-        "en": "Seogwang"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 서귀포시 안덕면 서광리 산6번지",
-        "en": "Jeju Teukbyeoljachi-do Seogwipo-si Andeok-myeon Seogwang-ri San6-beonji"
-      }
-    },
-    {
-      "complex_id": 18,
-      "names": {
-        "ko": "성산2",
-        "en": "Seongsan2"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 서귀포시 성산읍 고성리 산 123-1번지",
-        "en": "Jeju Teukbyeoljachi-do Seogwipo-si Seongsan-eup Goseong-ri San123-1-beonji"
-      }
-    },
-    {
-      "complex_id": 19,
-      "names": {
-        "ko": "동복",
-        "en": "Dongbok"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 제주시 구좌읍 동복리 산 31번지",
-        "en": "Jeju Teukbyeoljachi-do Jeju-si Guzwa-eup Dongbok-ri San31-beonji"
-      }
-    },
-    {
-      "complex_id": 20,
-      "names": {
-        "ko": "김녕",
-        "en": "Gimnyeong"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 제주시 구좌읍 김녕리 산 30-3번지",
-        "en": "Jeju Teukbyeoljachi-do Jeju-si Guzwa-eup Gimnyeong-ri San30-3-beonji"
-      }
-    },
-    {
-      "complex_id": 21,
-      "names": {
-        "ko": "가시리",
-        "en": "Gasiri"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 서귀포시 표선면 가시리 3725번지",
-        "en": "Jeju Teukbyeoljachi-do Seogwipo-si Pyoseon-myeon Gasiri 3725-beonji"
-      }
-    },
-    {
-      "complex_id": 22,
-      "names": {
-        "ko": "강정",
-        "en": "Gangjeong"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 서귀포시 강정동 5296번지",
-        "en": "Jeju Teukbyeoljachi-do Seogwipo-si Gangjeong-dong 5296-beonji"
-      }
-    },
-    {
-      "complex_id": 23,
-      "names": {
-        "ko": "동광",
-        "en": "Donggwang"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 제주시 한림읍 동광리 산 21-1번지",
-        "en": "Jeju Teukbyeoljachi-do Jeju-si Hallim-eup Donggwang-ri San21-1-beonji"
-      }
-    },
-    {
-      "complex_id": 24,
-      "names": {
-        "ko": "수산",
-        "en": "Susan"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 서귀포시 성산읍 수산리 3854번지",
-        "en": "Jeju Teukbyeoljachi-do Seogwipo-si Seongsan-eup Susan-ri 3854-beonji"
-      }
-    },
-    {
-      "complex_id": 25,
-      "names": {
-        "ko": "덕천",
-        "en": "Deokcheon"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 서귀포시 안덕면 덕수리 산 1번지",
-        "en": "Jeju Teukbyeoljachi-do Seogwipo-si Andeok-myeon Deoksu-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 26,
-      "names": {
-        "ko": "탐라해상",
-        "en": "Tamna Haesang"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 제주시 한경면 일대",
-        "en": "Jeju Teukbyeoljachi-do Jeju-si Hangyeong-myeon Ildae"
-      }
-    },
-    {
-      "complex_id": 27,
-      "names": {
-        "ko": "상명",
-        "en": "Sangmyeong"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 서귀포시 남원읍 상명리 산 88번지",
-        "en": "Jeju Teukbyeoljachi-do Seogwipo-si Namwon-eup Sangmyeong-ri San88-beonji"
-      }
-    },
-    {
-      "complex_id": 28,
-      "names": {
-        "ko": "제주화북",
-        "en": "Jeju Hwabuk"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 제주시 화북일동 1048번지",
-        "en": "Jeju Teukbyeoljachi-do Jeju-si Hwabukildong 1048-beonji"
-      }
-    },
-    {
-      "complex_id": 29,
-      "names": {
-        "ko": "봉개",
-        "en": "Bonggae"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 제주시 봉개동 산 73번지",
-        "en": "Jeju Teukbyeoljachi-do Jeju-si Bonggae-dong San73-beonji"
-      }
-    },
-    {
-      "complex_id": 30,
-      "names": {
-        "ko": "영흥",
-        "en": "Yeongheung"
-      },
-      "addresses": {
-        "ko": "인천광역시 옹진군 영흥면 내리 산 24번지",
-        "en": "Incheon Gwangyeoksi Ongjin-gun Yeongheung-myeon Nae-ri San24-beonji"
-      }
-    },
-    {
-      "complex_id": 31,
-      "names": {
-        "ko": "영광",
-        "en": "Yeonggwang"
-      },
-      "addresses": {
-        "ko": "전라남도 영광군 백수읍 대신리 산 27번지",
-        "en": "Jeollanam-do Yeonggwang-gun Baeksu-eup Daesin-ri San27-beonji"
-      }
-    },
-    {
-      "complex_id": 32,
-      "names": {
-        "ko": "포항",
-        "en": "Pohang"
-      },
-      "addresses": {
-        "ko": "경상북도 포항시 북구 흥해읍 덕성리 산 1번지",
-        "en": "Gyeongsangbuk-do Pohang-si Buk-gu Heunghae-eup Deokseong-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 33,
-      "names": {
-        "ko": "울진",
-        "en": "Uljin"
-      },
-      "addresses": {
-        "ko": "경상북도 울진군 북면 덕구리 산 136번지",
-        "en": "Gyeongsangbuk-do Uljin-gun Buk-myeon Deokgu-ri San136-beonji"
-      }
-    },
-    {
-      "complex_id": 34,
-      "names": {
-        "ko": "평창",
-        "en": "Pyeongchang"
-      },
-      "addresses": {
-        "ko": "강원도 평창군 봉평면 면온리 산 10번지",
-        "en": "Gangwon-do Pyeongchang-gun Bongpyeong-myeon Myeonon-ri San10-beonji"
-      }
-    },
-    {
-      "complex_id": 35,
-      "names": {
-        "ko": "태백1",
-        "en": "Taebaek1"
-      },
-      "addresses": {
-        "ko": "강원도 태백시 황지동 산 65번지",
-        "en": "Gangwon-do Taebaek-si Hwangji-dong San65-beonji"
-      }
-    },
-    {
-      "complex_id": 36,
-      "names": {
-        "ko": "강릉",
-        "en": "Gangneung"
-      },
-      "addresses": {
-        "ko": "강원도 강릉시 강동면 안인리 산 1번지",
-        "en": "Gangwon-do Gangneung-si Gangdong-myeon Anin-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 37,
-      "names": {
-        "ko": "삼척",
-        "en": "Samcheok"
-      },
-      "addresses": {
-        "ko": "강원도 삼척시 근덕면 덕산리 산 1번지",
-        "en": "Gangwon-do Samcheok-si Geundeok-myeon Deoksan-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 38,
-      "names": {
-        "ko": "영월",
-        "en": "Yeongwol"
-      },
-      "addresses": {
-        "ko": "강원도 영월군 영월읍 덕구리 산 76번지",
-        "en": "Gangwon-do Yeongwol-gun Yeongwol-eup Deokgu-ri San76-beonji"
-      }
-    },
-    {
-      "complex_id": 39,
-      "names": {
-        "ko": "정선",
-        "en": "Jeongseon"
-      },
-      "addresses": {
-        "ko": "강원도 정선군 정선읍 북평리 산 1번지",
-        "en": "Gangwon-do Jeongseon-gun Jeongseon-eup Bukpyeong-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 40,
-      "names": {
-        "ko": "홍천",
-        "en": "Hongcheon"
-      },
-      "addresses": {
-        "ko": "강원도 홍천군 홍천읍 장전평리 산 1번지",
-        "en": "Gangwon-do Hongcheon-gun Hongcheon-eup Jangjeonpyeong-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 41,
-      "names": {
-        "ko": "철원",
-        "en": "Cheorwon"
-      },
-      "addresses": {
-        "ko": "강원도 철원군 갈말읍 지포리 산 1번지",
-        "en": "Gangwon-do Cheorwon-gun Galmal-eup Jipo-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 42,
-      "names": {
-        "ko": "화천",
-        "en": "Hwacheon"
-      },
-      "addresses": {
-        "ko": "강원도 화천군 화천읍 동촌리 산 1번지",
-        "en": "Gangwon-do Hwacheon-gun Hwacheon-eup Dongchon-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 43,
-      "names": {
-        "ko": "인제",
-        "en": "Inje"
-      },
-      "addresses": {
-        "ko": "강원도 인제군 인제읍 원대리 산 1번지",
-        "en": "Gangwon-do Inje-gun Inje-eup Wondae-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 44,
-      "names": {
-        "ko": "고성",
-        "en": "Goseong"
-      },
-      "addresses": {
-        "ko": "강원도 고성군 간성읍 간성리 산 1번지",
-        "en": "Gangwon-do Goseong-gun Ganseong-eup Ganseong-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 45,
-      "names": {
-        "ko": "속초",
-        "en": "Sokcho"
-      },
-      "addresses": {
-        "ko": "강원도 속초시 설악동 산 1번지",
-        "en": "Gangwon-do Sokcho-si Seorak-dong San1-beonji"
-      }
-    },
-    {
-      "complex_id": 46,
-      "names": {
-        "ko": "춘천",
-        "en": "Chuncheon"
-      },
-      "addresses": {
-        "ko": "강원도 춘천시 남산면 방하리 산 1번지",
-        "en": "Gangwon-do Chuncheon-si Namsan-myeon Bangha-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 47,
-      "names": {
-        "ko": "원주",
-        "en": "Wonju"
-      },
-      "addresses": {
-        "ko": "강원도 원주시 판부면 금대리 산 1번지",
-        "en": "Gangwon-do Wonju-si Panbu-myeon Geumdae-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 48,
-      "names": {
-        "ko": "태백2",
-        "en": "Taebaek2"
-      },
-      "addresses": {
-        "ko": "강원도 태백시 창죽동 산 1번지",
-        "en": "Gangwon-do Taebaek-si Changjuk-dong San1-beonji"
-      }
-    },
-    {
-      "complex_id": 49,
-      "names": {
-        "ko": "청송",
-        "en": "Cheongsong"
-      },
-      "addresses": {
-        "ko": "경상북도 청송군 청송읍 송생리 산 1번지",
-        "en": "Gyeongsangbuk-do Cheongsong-gun Cheongsong-eup Songsaeng-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 50,
-      "names": {
-        "ko": "안동",
-        "en": "Andong"
-      },
-      "addresses": {
-        "ko": "경상북도 안동시 풍천면 가곡리 산 1번지",
-        "en": "Gyeongsangbuk-do Andong-si Pungcheon-myeon Gagok-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 51,
-      "names": {
-        "ko": "문경",
-        "en": "Mungyeong"
-      },
-      "addresses": {
-        "ko": "경상북도 문경시 문경읍 상초리 산 1번지",
-        "en": "Gyeongsangbuk-do Mungyeong-si Mungyeong-eup Sangcho-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 52,
-      "names": {
-        "ko": "봉화",
-        "en": "Bonghwa"
-      },
-      "addresses": {
-        "ko": "경상북도 봉화군 봉화읍 내성리 산 1번지",
-        "en": "Gyeongsangbuk-do Bonghwa-gun Bonghwa-eup Naeseong-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 53,
-      "names": {
-        "ko": "의성",
-        "en": "Uiseong"
-      },
-      "addresses": {
-        "ko": "경상북도 의성군 의성읍 중리리 산 1번지",
-        "en": "Gyeongsangbuk-do Uiseong-gun Uiseong-eup Jungni-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 54,
-      "names": {
-        "ko": "군위",
-        "en": "Gunwi"
-      },
-      "addresses": {
-        "ko": "경상북도 군위군 군위읍 동부리 산 1번지",
-        "en": "Gyeongsangbuk-do Gunwi-gun Gunwi-eup Dongbu-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 55,
-      "names": {
-        "ko": "영천",
-        "en": "Yeongcheon"
-      },
-      "addresses": {
-        "ko": "경상북도 영천시 화북면 정각리 산 1번지",
-        "en": "Gyeongsangbuk-do Yeongcheon-si Hwabuk-myeon Jeonggak-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 56,
-      "names": {
-        "ko": "경주",
-        "en": "Gyeongju"
-      },
-      "addresses": {
-        "ko": "경상북도 경주시 강동면 유금리 산 1번지",
-        "en": "Gyeongsangbuk-do Gyeongju-si Gangdong-myeon Yugeum-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 57,
-      "names": {
-        "ko": "김천",
-        "en": "Gimcheon"
-      },
-      "addresses": {
-        "ko": "경상북도 김천시 구성면 광명리 산 1번지",
-        "en": "Gyeongsangbuk-do Gimcheon-si Guseong-myeon Gwangmyeong-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 58,
-      "names": {
-        "ko": "칠곡",
-        "en": "Chilgok"
-      },
-      "addresses": {
-        "ko": "경상북도 칠곡군 왜관읍 매원리 산 1번지",
-        "en": "Gyeongsangbuk-do Chilgok-gun Waegwan-eup Maewon-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 59,
-      "names": {
-        "ko": "성주",
-        "en": "Seongju"
-      },
-      "addresses": {
-        "ko": "경상북도 성주군 성주읍 학산리 산 1번지",
-        "en": "Gyeongsangbuk-do Seongju-gun Seongju-eup Haksan-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 60,
-      "names": {
-        "ko": "고령",
-        "en": "Goryeong"
-      },
-      "addresses": {
-        "ko": "경상북도 고령군 덕곡면 옥계리 산 1번지",
-        "en": "Gyeongsangbuk-do Goryeong-gun Deokgok-myeon Okgye-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 61,
-      "names": {
-        "ko": "대구",
-        "en": "Daegu"
-      },
-      "addresses": {
-        "ko": "대구광역시 달성군 화원읍 본리리 산 1번지",
-        "en": "Daegu Gwangyeoksi Dalseong-gun Hwawon-eup Bonni-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 62,
-      "names": {
-        "ko": "창녕",
-        "en": "Changnyeong"
-      },
-      "addresses": {
-        "ko": "경상남도 창녕군 창녕읍 교리 산 1번지",
-        "en": "Gyeongsangnam-do Changnyeong-gun Changnyeong-eup Gyori San1-beonji"
-      }
-    },
-    {
-      "complex_id": 63,
-      "names": {
-        "ko": "고성2",
-        "en": "Goseong2"
-      },
-      "addresses": {
-        "ko": "경상남도 고성군 고성읍 덕선리 산 1번지",
-        "en": "Gyeongsangnam-do Goseong-gun Goseong-eup Deokseon-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 64,
-      "names": {
-        "ko": "통영",
-        "en": "Tongyeong"
-      },
-      "addresses": {
-        "ko": "경상남도 통영시 산양읍 신전리 산 1번지",
-        "en": "Gyeongsangnam-do Tongyeong-si Sanyang-eup Sinjeon-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 65,
-      "names": {
-        "ko": "사천",
-        "en": "Sacheon"
-      },
-      "addresses": {
-        "ko": "경상남도 사천시 사천읍 구암리 산 1번지",
-        "en": "Gyeongsangnam-do Sacheon-si Sacheon-eup Guam-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 66,
-      "names": {
-        "ko": "김해",
-        "en": "Gimhae"
-      },
-      "addresses": {
-        "ko": "경상남도 김해시 진영읍 본산리 산 1번지",
-        "en": "Gyeongsangnam-do Gimhae-si Jinyeong-eup Bonsan-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 67,
-      "names": {
-        "ko": "밀양",
-        "en": "Miryang"
-      },
-      "addresses": {
-        "ko": "경상남도 밀양시 단장면 고례리 산 1번지",
-        "en": "Gyeongsangnam-do Miryang-si Danjang-myeon Gorye-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 68,
-      "names": {
-        "ko": "양산",
-        "en": "Yangsan"
-      },
-      "addresses": {
-        "ko": "경상남도 양산시 동면 금산리 산 1번지",
-        "en": "Gyeongsangnam-do Yangsan-si Dong-myeon Geumsan-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 69,
-      "names": {
-        "ko": "의령",
-        "en": "Uiryeong"
-      },
-      "addresses": {
-        "ko": "경상남도 의령군 의령읍 무전리 산 1번지",
-        "en": "Gyeongsangnam-do Uiryeong-gun Uiryeong-eup Mujeon-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 70,
-      "names": {
-        "ko": "함안",
-        "en": "Haman"
-      },
-      "addresses": {
-        "ko": "경상남도 함안군 군북면 사도리 산 1번지",
-        "en": "Gyeongsangnam-do Haman-gun Gunbuk-myeon Sado-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 71,
-      "names": {
-        "ko": "함양",
-        "en": "Hamyang"
-      },
-      "addresses": {
-        "ko": "경상남도 함양군 함양읍 삼봉리 산 1번지",
-        "en": "Gyeongsangnam-do Hamyang-gun Hamyang-eup Sambong-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 72,
-      "names": {
-        "ko": "거창",
-        "en": "Geochang"
-      },
-      "addresses": {
-        "ko": "경상남도 거창군 거창읍 대평리 산 1번지",
-        "en": "Gyeongsangnam-do Geochang-gun Geochang-eup Daepyeong-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 73,
-      "names": {
-        "ko": "합천",
-        "en": "Hapcheon"
-      },
-      "addresses": {
-        "ko": "경상남도 합천군 합천읍 서산리 산 1번지",
-        "en": "Gyeongsangnam-do Hapcheon-gun Hapcheon-eup Seosan-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 74,
-      "names": {
-        "ko": "진주",
-        "en": "Jinju"
-      },
-      "addresses": {
-        "ko": "경상남도 진주시 문산읍 두문리 산 1번지",
-        "en": "Gyeongsangnam-do Jinju-si Munsan-eup Dumun-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 75,
-      "names": {
-        "ko": "산청",
-        "en": "Sancheong"
-      },
-      "addresses": {
-        "ko": "경상남도 산청군 산청읍 내리 산 1번지",
-        "en": "Gyeongsangnam-do Sancheong-gun Sancheong-eup Nae-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 76,
-      "names": {
-        "ko": "광양",
-        "en": "Gwangyang"
-      },
-      "addresses": {
-        "ko": "전라남도 광양시 옥곡면 대치리 산 1번지",
-        "en": "Jeollanam-do Gwangyang-si Okkok-myeon Daechi-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 77,
-      "names": {
-        "ko": "고흥",
-        "en": "Goheung"
-      },
-      "addresses": {
-        "ko": "전라남도 고흥군 고흥읍 남계리 산 1번지",
-        "en": "Jeollanam-do Goheung-gun Goheung-eup Namgye-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 78,
-      "names": {
-        "ko": "보성",
-        "en": "Boseong"
-      },
-      "addresses": {
-        "ko": "전라남도 보성군 보성읍 우산리 산 1번지",
-        "en": "Jeollanam-do Boseong-gun Boseong-eup Usan-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 79,
-      "names": {
-        "ko": "화순",
-        "en": "Hwasun"
-      },
-      "addresses": {
-        "ko": "전라남도 화순군 화순읍 서양리 산 1번지",
-        "en": "Jeollanam-do Hwasun-gun Hwasun-eup Seoyang-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 80,
-      "names": {
-        "ko": "장흥",
-        "en": "Jangheung"
-      },
-      "addresses": {
-        "ko": "전라남도 장흥군 장흥읍 건산리 산 1번지",
-        "en": "Jeollanam-do Jangheung-gun Jangheung-eup Geonsan-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 81,
-      "names": {
-        "ko": "강진",
-        "en": "Gangjin"
-      },
-      "addresses": {
-        "ko": "전라남도 강진군 강진읍 남당리 산 1번지",
-        "en": "Jeollanam-do Gangjin-gun Gangjin-eup Namdang-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 82,
-      "names": {
-        "ko": "해남",
-        "en": "Haenam"
-      },
-      "addresses": {
-        "ko": "전라남도 해남군 해남읍 해리 산 1번지",
-        "en": "Jeollanam-do Haenam-gun Haenam-eup Hae-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 83,
-      "names": {
-        "ko": "영암",
-        "en": "Yeongam"
-      },
-      "addresses": {
-        "ko": "전라남도 영암군 영암읍 회문리 산 1번지",
-        "en": "Jeollanam-do Yeongam-gun Yeongam-eup Hoemun-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 84,
-      "names": {
-        "ko": "무안",
-        "en": "Muan"
-      },
-      "addresses": {
-        "ko": "전라남도 무안군 무안읍 성남리 산 1번지",
-        "en": "Jeollanam-do Muan-gun Muan-eup Seongnam-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 85,
-      "names": {
-        "ko": "함평",
-        "en": "Hampyeong"
-      },
-      "addresses": {
-        "ko": "전라남도 함평군 함평읍 기각리 산 1번지",
-        "en": "Jeollanam-do Hampyeong-gun Hampyeong-eup Giak-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 86,
-      "names": {
-        "ko": "장성",
-        "en": "Jangseong"
-      },
-      "addresses": {
-        "ko": "전라남도 장성군 장성읍 영천리 산 1번지",
-        "en": "Jeollanam-do Jangseong-gun Jangseong-eup Yeongcheon-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 87,
-      "names": {
-        "ko": "곡성",
-        "en": "Gokseong"
-      },
-      "addresses": {
-        "ko": "전라남도 곡성군 곡성읍 읍내리 산 1번지",
-        "en": "Jeollanam-do Gokseong-gun Gokseong-eup Eupnae-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 88,
-      "names": {
-        "ko": "구례",
-        "en": "Gurye"
-      },
-      "addresses": {
-        "ko": "전라남도 구례군 구례읍 봉성리 산 1번지",
-        "en": "Jeollanam-do Gurye-gun Gurye-eup Bongseong-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 89,
-      "names": {
-        "ko": "완도",
-        "en": "Wando"
-      },
-      "addresses": {
-        "ko": "전라남도 완도군 완도읍 장보고대로 351번지",
-        "en": "Jeollanam-do Wando-gun Wando-eup Jangbogo-daero 351-beonji"
-      }
-    },
-    {
-      "complex_id": 90,
-      "names": {
-        "ko": "진도",
-        "en": "Jindo"
-      },
-      "addresses": {
-        "ko": "전라남도 진도군 진도읍 동외리 산 1번지",
-        "en": "Jeollanam-do Jindo-gun Jindo-eup Dongoe-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 91,
-      "names": {
-        "ko": "완도해상",
-        "en": "Wando Haesang"
-      },
-      "addresses": {
-        "ko": "전라남도 완도군 완도읍 일대",
-        "en": "Jeollanam-do Wando-gun Wando-eup Ildae"
-      }
-    },
-    {
-      "complex_id": 92,
-      "names": {
-        "ko": "대산",
-        "en": "Daesan"
-      },
-      "addresses": {
-        "ko": "충청남도 서산시 대산읍 독곶리 산 1번지",
-        "en": "Chungcheongnam-do Seosan-si Daesan-eup Dokgot-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 93,
-      "names": {
-        "ko": "태안",
-        "en": "Taean"
-      },
-      "addresses": {
-        "ko": "충청남도 태안군 태안읍 동문리 산 1번지",
-        "en": "Chungcheongnam-do Taean-gun Taean-eup Dongmun-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 94,
-      "names": {
-        "ko": "보령",
-        "en": "Boryeong"
-      },
-      "addresses": {
-        "ko": "충청남도 보령시 천북면 장은리 산 1번지",
-        "en": "Chungcheongnam-do Boryeong-si Cheonbuk-myeon Jangeun-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 95,
-      "names": {
-        "ko": "서산",
-        "en": "Seosan"
-      },
-      "addresses": {
-        "ko": "충청남도 서산시 성연면 왕정리 산 1번지",
-        "en": "Chungcheongnam-do Seosan-si Seongyeon-myeon Wangjeong-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 96,
-      "names": {
-        "ko": "당진",
-        "en": "Dangjin"
-      },
-      "addresses": {
-        "ko": "충청남도 당진시 석문면 통정리 산 1번지",
-        "en": "Chungcheongnam-do Dangjin-si Seokmun-myeon Tongjeong-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 97,
-      "names": {
-        "ko": "예산",
-        "en": "Yesan"
-      },
-      "addresses": {
-        "ko": "충청남도 예산군 예산읍 산성리 산 1번지",
-        "en": "Chungcheongnam-do Yesan-gun Yesan-eup Sanseong-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 98,
-      "names": {
-        "ko": "홍성",
-        "en": "Hongseong"
-      },
-      "addresses": {
-        "ko": "충청남도 홍성군 홍성읍 남당리 산 1번지",
-        "en": "Chungcheongnam-do Hongseong-gun Hongseong-eup Namdang-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 99,
-      "names": {
-        "ko": "청양",
-        "en": "Cheongyang"
-      },
-      "addresses": {
-        "ko": "충청남도 청양군 청양읍 읍내리 산 1번지",
-        "en": "Chungcheongnam-do Cheongyang-gun Cheongyang-eup Eupnae-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 100,
-      "names": {
-        "ko": "공주",
-        "en": "Gongju"
-      },
-      "addresses": {
-        "ko": "충청남도 공주시 유구읍 석남리 산 1번지",
-        "en": "Chungcheongnam-do Gongju-si Yugu-eup Seoknam-ri San1-beonji"
-      }
-    },
-    {
-      "complex_id": 101,
-      "names": {
-        "ko": "완도2",
-        "en": "Wando2"
-      },
-      "addresses": {
-        "ko": "전라남도 완도군 약산면 약산리 산 1-2",
-        "en": "Jeollanam-do Wando-gun Yaksan-myeon Yaksan-ri San1-2"
-      }
-    },
-    {
-      "complex_id": 102,
-      "names": {
-        "ko": "제주수망",
-        "en": "Jeju Sumang"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 서귀포시 제주도 서귀포시",
-        "en": "Jeju Teukbyeoljachi-do Seogwipo-si Jeju-do Seogwipo-si"
-      }
-    },
-    {
-      "complex_id": 103,
-      "names": {
-        "ko": "영양양구",
-        "en": "Yeongyang Yanggu"
-      },
-      "addresses": {
-        "ko": "경상북도 영양군 석보면 홍계길 449-7",
-        "en": "Gyeongsangbuk-do Yeongyang-gun Seokbo-myeon Honggye-gil 449-7"
-      }
-    },
-    {
-      "complex_id": 104,
-      "names": {
-        "ko": "태백 귀네미",
-        "en": "Taebaek Gwineni"
-      },
-      "addresses": {
-        "ko": "강원도 태백시 하사미동 산220-3 일원",
-        "en": "Gangwon-do Taebaek-si Hasami-dong San220-3 Ilwon"
-      }
-    },
-    {
-      "complex_id": 105,
-      "names": {
-        "ko": "군위 화산",
-        "en": "Gunwi Hwasan"
-      },
-      "addresses": {
-        "ko": "경상북도 군위군 영천시 신녕면 화남리 산64, 군위군 고로면 화북리 산229-1번지 외 3필지",
-        "en": "Gyeongsangbuk-do Gunwi-gun Yeongcheon-si Sinnyeong-myeon Hwanam-ri San64, Gunwi-gun Goro-myeon Hwabuk-ri San229-1-beonji Oe 3 Pilji"
-      }
-    },
-    {
-      "complex_id": 106,
-      "names": {
-        "ko": "청송 노래산",
-        "en": "Cheongsong Noraesan"
-      },
-      "addresses": {
-        "ko": "경상북도 청송군 안덕면 노래리 산68-1번지 일원",
-        "en": "Gyeongsangbuk-do Cheongsong-gun Andeok-myeon Norae-ri San68-1-beonji Ilwon"
-      }
-    },
-    {
-      "complex_id": 107,
-      "names": {
-        "ko": "북촌 서모",
-        "en": "Bukchon Seomo"
-      },
-      "addresses": {
-        "ko": "제주특별자치도 제주시 구좌읍 북흘로 255",
-        "en": "Jeju Teukbyeoljachi-do Jeju-si Guzwa-eup Bukheul-ro 255"
-      }
-    },
-    {
-      "complex_id": 108,
-      "names": {
-        "ko": "서남해(실증단지)",
-        "en": "Seonamhae (Siljeungdanji)"
-      },
-      "addresses": {
-        "ko": "전라북도 부안군 위도 및 전남 영광군 안마도 해상 일원",
-        "en": "Jeollabuk-do Buan-gun Wido Mit Jeollanam-do Yeonggwang-gun Anma-do Haesang Ilwon"
-      }
-    },
-    {
-      "complex_id": 109,
-      "names": {
-        "ko": "태백 가덕산",
-        "en": "Taebaek Gadeoksan"
-      },
-      "addresses": {
-        "ko": "강원도 태백시 원동 산97, 산13-1일원",
-        "en": "Gangwon-do Taebaek-si Wondong San97, San13-1 Ilwon"
-      }
-    },
-    {
-      "complex_id": 110,
-      "names": {
-        "ko": "태백 삼수",
-        "en": "Taebaek Samsu"
-      },
-      "addresses": {
-        "ko": "강원도 태백시 창죽동 산1-172번지",
-        "en": "Gangwon-do Taebaek-si Changjuk-dong San1-172-beonji"
-      }
-    },
-    {
-      "complex_id": 111,
-      "names": {
-        "ko": "전남4",
-        "en": "Jeonnam4"
-      },
-      "addresses": {
-        "ko": "전남 영광군 백수읍 백수로3길 338-26",
-        "en": "Jeollanam-do Yeonggwang-gun Baeksu-eup Baeksuro3-gil 338-26"
-      }
-    },
-    {
-      "complex_id": 112,
-      "names": {
-        "ko": "양산원동",
-        "en": "Yangsan Wondong"
-      },
-      "addresses": {
-        "ko": "경남 양산시 원동면 영포리 산21-3(늘밭로방향)",
-        "en": "Gyeongsangnam-do Yangsan-si Wondong-myeon Yeongpo-ri San21-3 (Neulbat-ro Banghyang)"
-      }
-    },
-    {
-      "complex_id": 113,
-      "names": {
-        "ko": "경주호림",
-        "en": "Gyeongju Horim"
-      },
-      "addresses": {
-        "ko": "경상북도 경주시 강동면 강동산단로 43-3",
-        "en": "Gyeongsangbuk-do Gyeongju-si Gangdong-myeon Gangdongsandan-ro 43-3"
-      }
-    },
-    {
-      "complex_id": 114,
-      "names": {
-        "ko": "태백원동",
-        "en": "Taebaek Wondong"
-      },
-      "addresses": {
-        "ko": "강원특별자치도 태백시 원동 산 13-7",
-        "en": "Gangwon Teukbyeoljachi-do Taebaek-si Wondong San13-7"
-      }
-    },
-    {
-      "complex_id": 115,
-      "names": {
-        "ko": "신흥",
-        "en": "Sinheung"
-      },
-      "addresses": {
-        "ko": "전남 무안군 운남면 내리 607-9",
-        "en": "Jeollanam-do Muan-gun Unnam-myeon Nae-ri 607-9"
-      }
-    },
-    {
-      "complex_id": 116,
-      "names": {
-        "ko": "평창청산",
-        "en": "Pyeongchang Cheongsan"
-      },
-      "addresses": {
-        "ko": "강원특별자치도 평창군 봉평면 진조리 산 80-5",
-        "en": "Gangwon Teukbyeoljachi-do Pyeongchang-gun Bongpyeong-myeon Jinjo-ri San80-5"
-      }
-    },
-    {
-      "complex_id": 117,
-      "names": {
-        "ko": "장흥",
-        "en": "Jangheung"
-      },
-      "addresses": {
-        "ko": "전남 장흥군 유치면 송정리 산 3-7",
-        "en": "Jeollanam-do Jangheung-gun Yuchi-myeon Songjeong-ri San3-7"
-      }
-    },
-    {
-      "complex_id": 118,
-      "names": {
-        "ko": "태백금봉",
-        "en": "Taebaek Geumbong"
-      },
-      "addresses": {
-        "ko": "강원특별자치도 태백시 황지동 287-75",
-        "en": "Gangwon Teukbyeoljachi-do Taebaek-si Hwangji-dong 287-75"
-      }
-    },
-    {
-      "complex_id": 119,
-      "names": {
-        "ko": "해맞이",
-        "en": "Haemaji"
-      },
-      "addresses": {
-        "ko": "경상북도 영덕군 영덕읍 삼계리 산25",
-        "en": "Gyeongsangbuk-do Yeongdeok-gun Yeongdeok-eup Samgye-ri San25"
-      }
-    },
-    {
-      "complex_id": 120,
-      "names": {
-        "ko": "GS영양2",
-        "en": "GS Yeongyang2"
-      },
-      "addresses": {
-        "ko": "경상북도 영양군 석보면 삼의리 일대",
-        "en": "Gyeongsangbuk-do Yeongyang-gun Seokbo-myeon Samui-ri Ildae"
-      }
-    },
-    {
-      "complex_id": 121,
-      "names": {
-        "ko": "화순금성산",
-        "en": "Hwasun Geumseongsan"
-      },
-      "addresses": {
-        "ko": "전남 화순군 청풍면 일대",
-        "en": "Jeollanam-do Hwasun-gun Cheongpung-myeon Ildae"
-      }
-    },
-    {
-      "complex_id": 122,
-      "names": {
-        "ko": "제주어음",
-        "en": "Jeju Eoeum"
-      },
-      "addresses": {
-        "ko": "제주도 제주시 애월읍",
-        "en": "Jeju-do Jeju-si Aewol-eup"
-      }
-    },
-    {
-      "complex_id": 123,
-      "names": {
-        "ko": "양양2",
-        "en": "Yangyang2"
-      },
-      "addresses": {
-        "ko": "강원도 양양군 현남면",
-        "en": "Gangwon-do Yangyang-gun Hyeonnam-myeon"
-      }
-    },
-    {
-      "complex_id": 124,
-      "names": {
-        "ko": "영월구래주민",
-        "en": "Yeongwol Gurae Jumin"
-      },
-      "addresses": {
-        "ko": "강원도 영월군 상동읍",
-        "en": "Gangwon-do Yeongwol-gun Sangdong-eup"
-      }
-    },
-    {
-      "complex_id": 125,
-      "names": {
-        "ko": "영월에코윈드",
-        "en": "Yeongwol Ecowind"
-      },
-      "addresses": {
-        "ko": "강원도 영월군 상동읍",
-        "en": "Gangwon-do Yeongwol-gun Sangdong-eup"
-      }
-    }
-  ]
-}
+[
+  {
+    "site_number": 1,
+    "site_name_kr": "행원",
+    "site_name_roman": "Haengwon",
+    "address_kr": "제주특별자치도 제주시 구좌읍 해맞이해안로 712-3 (제주대 660)",
+    "address_roman": "Jeju-teukbyeoljachido Jejusi Guzwaeup Haemajihaean-ro 712-3 (Jejudae 660)"
+  },
+  {
+    "site_number": 2,
+    "site_name_kr": "전북",
+    "site_name_roman": "Jeonbuk",
+    "address_kr": "전라북도 부안군",
+    "address_roman": "Jeollabuk-do Buangun"
+  },
+  {
+    "site_number": 3,
+    "site_name_kr": "영덕",
+    "site_name_roman": "Yeongdeok",
+    "address_kr": "경상북도 영덕군 영덕읍 화수리",
+    "address_roman": "Gyeongsangbuk-do Yeongdeokgun Yeongdeok-eup Hwasuri"
+  },
+  {
+    "site_number": 4,
+    "site_name_kr": "한경",
+    "site_name_roman": "Hangyeong",
+    "address_kr": "제주특별자치도 제주시 한경면 용수리 3879-5",
+    "address_roman": "Jeju-teukbyeoljachido Jejusi Hangyeongmyeon Yongsuri 3879-5"
+  },
+  {
+    "site_number": 5,
+    "site_name_kr": "강원",
+    "site_name_roman": "Gangwon",
+    "address_kr": "강원도 평창군 대관령면 횡계리",
+    "address_roman": "Gangwondo Pyeongchanggun Daegwallyeongmyeon Hoenggyeri"
+  },
+  {
+    "site_number": 6,
+    "site_name_kr": "신창",
+    "site_name_roman": "Sinchang",
+    "address_kr": "제주특별자치도 제주시",
+    "address_roman": "Jeju-teukbyeoljachido Jejusi"
+  },
+  {
+    "site_number": 7,
+    "site_name_kr": "양양",
+    "site_name_roman": "Yangyang",
+    "address_kr": "강원도 양양군 서면 영덕리",
+    "address_roman": "Gangwondo Yangyanggun Seomyeon Yeongdeokri"
+  },
+  {
+    "site_number": 8,
+    "site_name_kr": "월정",
+    "site_name_roman": "Woljeong",
+    "address_kr": "제주특별자치도 제주시",
+    "address_roman": "Jeju-teukbyeoljachido Jejusi"
+  },
+  {
+    "site_number": 10,
+    "site_name_kr": "고리",
+    "site_name_roman": "Gori",
+    "address_kr": "부산광역시 기장군 장안읍 효암리 258번지",
+    "address_roman": "Busangwangyeoksi Gijanggun Janganeup Hyoamri 258beonji"
+  },
+  {
+    "site_number": 11,
+    "site_name_kr": "태기산",
+    "site_name_roman": "Taegisan",
+    "address_kr": "강원도 횡성군 둔내면 태기리 산1-5번지",
+    "address_roman": "Gangwondo Hoengseonggun Dunnemyeon Taegiri san1-5beonji"
+  },
+  {
+    "site_number": 12,
+    "site_name_kr": "신안",
+    "site_name_roman": "Sinan",
+    "address_kr": "전라남도 신안군 비금면 구림리 산1-1",
+    "address_roman": "Jeollanam-do Sinangun Bigeummyeon Gurimri san1-1"
+  },
+  {
+    "site_number": 13,
+    "site_name_kr": "영양",
+    "site_name_roman": "Yeongyang",
+    "address_kr": "경상북도 영양군 석보면 맹동산길 284-40",
+    "address_roman": "Gyeongsangbuk-do Yeongyanggun Seokbomyeon Maengdongsangil 284-40"
+  },
+  {
+    "site_number": 14,
+    "site_name_kr": "삼달",
+    "site_name_roman": "Samdal",
+    "address_kr": "제주특별자치도 서귀포시 성산읍 삼달리 2004번지",
+    "address_roman": "Jeju-teukbyeoljachido Seogwiposi Seongsaneup Samdalli 2004beonji"
+  },
+  {
+    "site_number": 15,
+    "site_name_kr": "누에섬",
+    "site_name_roman": "Nuesseom",
+    "address_kr": "경기도 안산시",
+    "address_roman": "Gyeonggido Ansansi"
+  },
+  {
+    "site_number": 16,
+    "site_name_kr": "성산1",
+    "site_name_roman": "Seongsan1",
+    "address_kr": "제주특별자치도 서귀포시 성산읍 수산리 4403-3",
+    "address_roman": "Jeju-teukbyeoljachido Seogwiposi Seongsaneup Susanri 4403-3"
+  },
+  {
+    "site_number": 102,
+    "site_name_kr": "제주수망",
+    "site_name_roman": "Jejusumang",
+    "address_kr": "제주특별자치도 서귀포시 제주도 서귀포시",
+    "address_roman": "Jeju-teukbyeoljachido Seogwiposi Jejudo Seogwiposi"
+  },
+  {
+    "site_number": 103,
+    "site_name_kr": "영양양구",
+    "site_name_roman": "Yeongyangyanggu",
+    "address_kr": "경상북도 영양군 석보면 홍계길 449-7",
+    "address_roman": "Gyeongsangbuk-do Yeongyanggun Seokbomyeon Honggyegil 449-7"
+  },
+  {
+    "site_number": 104,
+    "site_name_kr": "태백 귀네미",
+    "site_name_roman": "Taebaek Gwinaemi",
+    "address_kr": "강원도 태백시 하사미동 산220-3 일원",
+    "address_roman": "Gangwondo Taebaeksi Hasamidong san220-3 ilwon"
+  },
+  {
+    "site_number": 105,
+    "site_name_kr": "군위 화산",
+    "site_name_roman": "Gunwi Hwasan",
+    "address_kr": "경상북도 군위군 영천시 신녕면 화남리 산64, 군위군 고로면 화북리 산229-1번지 외 3필지",
+    "address_roman": "Gyeongsangbuk-do Gunwigun Yeongcheonsi Sinnyeongmyeon Hwanamri san64, Gunwigun Goromyeon Hwabukri san229-1beonji oe 3pilji"
+  },
+  {
+    "site_number": 106,
+    "site_name_kr": "청송 노래산",
+    "site_name_roman": "Cheongsong Noraesan",
+    "address_kr": "경상북도 청송군 안덕면 노래리 산68-1번지 일원",
+    "address_roman": "Gyeongsangbuk-do Cheongsonggun Andeokmyeon Noraeri san68-1beonji ilwon"
+  },
+  {
+    "site_number": 107,
+    "site_name_kr": "북촌 서모",
+    "site_name_roman": "Bukchon Seomo",
+    "address_kr": "제주특별자치도 제주시 구좌읍 북흘로 255",
+    "address_roman": "Jeju-teukbyeoljachido Jejusi Guzwaeup Bukheulro 255"
+  },
+  {
+    "site_number": 108,
+    "site_name_kr": "서남해(실증단지)",
+    "site_name_roman": "Seonamhae (Siljeungdanji)",
+    "address_kr": "전라북도 부안군 위도 및 전남 영광군 안마도 해상 일원",
+    "address_roman": "Jeollabuk-do Buangun Wido mit Jeollanam-do Yeonggwanggun Anmado haesang ilwon"
+  },
+  {
+    "site_number": 109,
+    "site_name_kr": "태백 가덕산",
+    "site_name_roman": "Taebaek Gadeoksan",
+    "address_kr": "강원도 태백시 원동 산97, 산13-1일원",
+    "address_roman": "Gangwondo Taebaeksi Wondong san97, san13-1ilwon"
+  },
+  {
+    "site_number": 110,
+    "site_name_kr": "태백 삼수",
+    "site_name_roman": "Taebaek Samsu",
+    "address_kr": "강원도 태백시 창죽동 산1-172번지",
+    "address_roman": "Gangwondo Taebaeksi Changjukdong san1-172beonji"
+  },
+  {
+    "site_number": 111,
+    "site_name_kr": "전남4",
+    "site_name_roman": "Jeonnam4",
+    "address_kr": "전남 영광군 백수읍 백수로3길 338-26",
+    "address_roman": "Jeollanam-do Yeonggwanggun Baeksueup Baeksuro3gil 338-26"
+  },
+  {
+    "site_number": 112,
+    "site_name_kr": "양산원동",
+    "site_name_roman": "Yangsanwondong",
+    "address_kr": "경남 양산시 원동면 영포리 산21-3(늘밭로방향)",
+    "address_roman": "Gyeongnam Yangsansi Wondongmyeon Yeongpori san21-3(Neulbatrobanghyang)"
+  },
+  {
+    "site_number": 113,
+    "site_name_kr": "경주호림",
+    "site_name_roman": "Gyeongjuhorim",
+    "address_kr": "경상북도 경주시 강동면 강동산단로 43-3",
+    "address_roman": "Gyeongsangbuk-do Gyeongjusi Gangdongmyeon Gangdongsandanro 43-3"
+  },
+  {
+    "site_number": 114,
+    "site_name_kr": "태백원동",
+    "site_name_roman": "Taebaekwondong",
+    "address_kr": "강원특별자치도 태백시 원동 산 13-7",
+    "address_roman": "Gangwon-teukbyeoljachido Taebaeksi Wondong san 13-7"
+  },
+  {
+    "site_number": 115,
+    "site_name_kr": "신흥",
+    "site_name_roman": "Sinheung",
+    "address_kr": "전남 무안군 운남면 내리 607-9",
+    "address_roman": "Jeollanam-do Muangun Unnammyeon Naeri 607-9"
+  },
+  {
+    "site_number": 116,
+    "site_name_kr": "평창청산",
+    "site_name_roman": "Pyeongchangcheongsan",
+    "address_kr": "강원특별자치도 평창군 봉평면 진조리 산 80-5",
+    "address_roman": "Gangwon-teukbyeoljachido Pyeongchanggun Bongpyeongmyeon Jinjori san 80-5"
+  },
+  {
+    "site_number": 117,
+    "site_name_kr": "장흥",
+    "site_name_roman": "Jangheung",
+    "address_kr": "전남 장흥군 유치면 송정리 산 3-7",
+    "address_roman": "Jeollanam-do Jangheunggun Yuchimyeon Songjeongri san 3-7"
+  },
+  {
+    "site_number": 118,
+    "site_name_kr": "태백금봉1",
+    "site_name_roman": "Taebaekgeumbong1",
+    "address_kr": "강원특별자치도 태백시 황지동 287-75",
+    "address_roman": "Gangwon-teukbyeoljachido Taebaeksi Hwangjidong 287-75"
+  },
+  {
+    "site_number": 119,
+    "site_name_kr": "해맞이",
+    "site_name_roman": "Haemaji",
+    "address_kr": "경상북도 영덕군 영덕읍 삼계리 산25",
+    "address_roman": "Gyeongsangbuk-do Yeongdeokgun Yeongdeok-eup Samgyeri san25"
+  },
+  {
+    "site_number": 120,
+    "site_name_kr": "GS영양2",
+    "site_name_roman": "GSYeongyang2",
+    "address_kr": "경상북도 영양군 석보면 삼의리 일대",
+    "address_roman": "Gyeongsangbuk-do Yeongyanggun Seokbomyeon Samuiri ildae"
+  },
+  {
+    "site_number": 121,
+    "site_name_kr": "화순금성산",
+    "site_name_roman": "Hwasungeumseongsan",
+    "address_kr": "전남 화순군 청풍면 일대",
+    "address_roman": "Jeollanam-do Hwasungun Cheongpungmyeon ildae"
+  },
+  {
+    "site_number": 122,
+    "site_name_kr": "제주어음",
+    "site_name_roman": "Jejueoeum",
+    "address_kr": "제주도 제주시 애월읍",
+    "address_roman": "Jejudo Jejusi Aewoleup"
+  },
+  {
+    "site_number": 123,
+    "site_name_kr": "양양2",
+    "site_name_roman": "Yangyang2",
+    "address_kr": "강원도 양양군 현남면",
+    "address_roman": "Gangwondo Yangyanggun Hyeonnam-myeon"
+  },
+  {
+    "site_number": 124,
+    "site_name_kr": "영월구래주민",
+    "site_name_roman": "Yeongwolguraejumin",
+    "address_kr": "강원도 영월군 상동읍",
+    "address_roman": "Gangwondo Yeongwolgun Sangdongeup"
+  },
+  {
+    "site_number": 125,
+    "site_name_kr": "영월에코윈드",
+    "site_name_roman": "Yeongwolekowindeu",
+    "address_kr": "강원도 영월군 상동읍",
+    "address_roman": "Gangwondo Yeongwolgun Sangdongeup"
+  }
+]
