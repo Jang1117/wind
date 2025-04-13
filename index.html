@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b8113591f35c3409335bdb4b5ee5613&libraries=clusterer&autoload=false" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <!-- 구글 번역 스크립트 -->
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <style>
         html, body {
             margin: 0;
@@ -133,6 +134,8 @@
         단지 내 총 터빈 수: <span id="info-complex-turbine-count"></span><br>
         준공일: <span id="info-complex-completion"></span>
     </div>
+    <!-- 구글 번역 요소를 위한 숨겨진 div -->
+    <div id="google_translate_element" style="display: none;"></div>
 
     <script>
         let map;
@@ -150,27 +153,50 @@
         let selectedComplex = '';
         let isEnglish = false;
 
+        // 구글 번역 초기화
         function googleTranslateElementInit() {
+            console.log("구글 번역 초기화 시작");
             new google.translate.TranslateElement({
                 pageLanguage: 'ko',
                 includedLanguages: 'ko,en',
                 layout: google.translate.TranslateElement.InlineLayout.NONE
             }, 'google_translate_element');
+            // 번역 요소 로드 확인
+            setTimeout(checkTranslateElement, 1000);
         }
 
+        function checkTranslateElement() {
+            const select = document.getElementsByClassName('goog-te-combo')[0];
+            if (select) {
+                console.log("구글 번역 요소 로드 성공");
+                select.value = 'ko'; // 초기 한국어 설정
+                const event = new Event('change');
+                select.dispatchEvent(event);
+            } else {
+                console.error("구글 번역 요소 로드 실패");
+                document.getElementById('error-message').innerText = "번역 기능을 로드할 수 없습니다.";
+            }
+        }
+
+        // 언어 토글 함수
         function toggleLanguage() {
+            console.log("toggleLanguage 호출됨");
             const translateButton = document.getElementById('translate-button');
             const select = document.getElementsByClassName('goog-te-combo')[0];
+
             if (!select) {
-                console.error('구글 번역 요소를 찾을 수 없습니다.');
+                console.error("구글 번역 요소를 찾을 수 없습니다.");
+                document.getElementById('error-message').innerText = "번역 기능을 로드할 수 없습니다.";
                 return;
             }
 
             if (isEnglish) {
+                console.log("한국어로 변경");
                 select.value = 'ko';
                 translateButton.textContent = 'English';
                 isEnglish = false;
             } else {
+                console.log("영어로 변경");
                 select.value = 'en';
                 translateButton.textContent = '한국어';
                 isEnglish = true;
@@ -617,7 +643,7 @@
                 });
             } else {
                 const bounds = map.getBounds();
-                const visibleFarms = filteredFarms.filter(farm => 
+                const visibleFarms = filteredFarms.filter(farm =>
                     farm.lat && farm.lon && bounds.contain(new kakao.maps.LatLng(farm.lat, farm.lon))
                 );
                 console.log("표시될 터빈 수:", visibleFarms.length);
