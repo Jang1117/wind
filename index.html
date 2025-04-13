@@ -41,13 +41,20 @@
       border-radius: 4px;
       display: none;
     }
-    /* 전역 컨트롤 버튼 스타일 */
-    .control-button {
-      position: absolute;
+    /* 컨트롤 컨테이너 (우측 상단에 고정) */
+    #controls {
+      position: fixed;
       right: 10px;
-      z-index: 10;
-      padding: 8px 12px;
+      top: 10px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px; /* 각 버튼 사이 간격 */
+    }
+    /* 모든 컨트롤 버튼 및 드롭다운에 동일한 스타일 */
+    .control-button {
       width: 120px;
+      padding: 8px 12px;
       background: rgba(255, 255, 255, 0.8);
       border: 1px solid #ccc;
       border-radius: 4px;
@@ -58,31 +65,12 @@
       height: 34px;
       line-height: 1.5;
     }
-    /* advanced-settings 영역 – 상단에 항상 보이도록, fixed 사용 */
-    #advanced-settings {
-      position: fixed;
-      right: 10px;
-      top: 10px;
-      z-index: 9999;
-      background-color: #fff;
-      border: 1px solid #ccc;
-      padding: 5px;
-      min-width: 140px;
-      /* 항상 보이도록 display 설정 (block) */
-      display: block;
+    /* 드롭다운에도 버튼 스타일 적용 */
+    select.control-button {
+      -webkit-appearance: none;
+         -moz-appearance: none;
+              appearance: none;
     }
-    /* advanced-settings 내부의 버튼은 문서 흐름에 따라 수직 정렬 */
-    #advanced-settings .control-button {
-      position: static;  /* 기본 스타일 재설정 */
-      width: 100%;
-      margin-top: 5px;
-    }
-    /* 나머지 기본 컨트롤 버튼들 위치 (advanced-settings 아래로 배치) */
-    #initial-reset { top: 140px; }       /* "처음으로" 버튼 */
-    #reset-button { top: 185px; }          /* "초기화" 버튼 */
-    #windfarm-dropdown { top: 230px; }
-    #manufacturer-dropdown { top: 275px; }
-    
     /* 정보 패널 */
     #all-info, #manufacturer-info, #complex-info {
       position: absolute;
@@ -123,7 +111,7 @@
       background: white;
       padding: 10px;
       border: 1px solid #ccc;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
       cursor: pointer;
       white-space: nowrap;
       max-width: 90vw;
@@ -139,22 +127,20 @@
   <div id="loading">지도 로딩 중...</div>
   <div id="error-message"></div>
   
-  <!-- advanced-settings: 기본 지도, 이름 끄기, 언어선택 (항상 보임) -->
-  <div id="advanced-settings">
+  <!-- 컨트롤 컨테이너 -->
+  <div id="controls">
+    <button id="initial-reset" class="control-button">처음으로</button>
+    <button id="reset-button" class="control-button">초기화</button>
+    <select id="windfarm-dropdown" class="control-button">
+      <option value="">풍력단지</option>
+    </select>
+    <select id="manufacturer-dropdown" class="control-button">
+      <option value="">제조사</option>
+    </select>
     <button id="map-type-toggle" class="control-button">기본 지도</button>
     <button id="name-toggle-button" class="control-button">이름 끄기</button>
     <button id="translate-button" class="control-button">English</button>
   </div>
-  
-  <!-- 기본 컨트롤 버튼들 -->
-  <button id="initial-reset" class="control-button">처음으로</button>
-  <button id="reset-button" class="control-button">초기화</button>
-  <select id="windfarm-dropdown" class="control-button">
-    <option value="">풍력단지</option>
-  </select>
-  <select id="manufacturer-dropdown" class="control-button">
-    <option value="">제조사</option>
-  </select>
   
   <!-- 정보 패널 -->
   <div id="all-info">
@@ -178,7 +164,6 @@
     <span id="info-complex-completion"></span>
   </div>
   
-  <!-- 자바스크립트 -->
   <script>
     let map;
     let markers = [];
@@ -305,7 +290,6 @@
       }
     };
 
-    // manufacturers.json 데이터를 로드하여 manufacturerData에 저장
     async function loadManufacturers() {
       try {
         console.log("manufacturers.json 요청 중: /wind/manufacturers.json");
@@ -337,7 +321,6 @@
       }
     }
 
-    // CSV 파일에 없는 제조사 데이터는 manufacturers.json을 사용합니다.
     function getTranslatedSiteInfo(complexId, field) {
       const site = siteTranslations.find(s => s.site_number == complexId);
       if (site) {
@@ -350,7 +333,6 @@
       return farm ? (field === 'name' ? farm.name : farm.address) : null;
     }
 
-    // "처음으로" 버튼: 전체 초기화 – 모든 선택 리셋, 지도 중심 및 줌 레벨 재설정
     function resetToInitial() {
       selectedComplex = '';
       selectedManufacturer = '';
@@ -369,7 +351,6 @@
       updateInfoPanels();
     }
 
-    // "초기화" 버튼: 선택값만 리셋 – 현재 지도 중심/줌 유지
     function resetSelectionsOnly() {
       selectedComplex = '';
       selectedManufacturer = '';
@@ -383,11 +364,9 @@
       const lang = isEnglish ? 'en' : 'ko';
       document.getElementById('page-title').textContent = translations[lang].title;
       document.getElementById('loading').textContent = translations[lang].loading;
-      // advanced 설정 버튼 텍스트 업데이트
       document.getElementById('map-type-toggle').textContent = isSatellite ? translations[lang].mapTypeToggle : translations[lang].mapTypeToggleSatellite;
       document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
       document.getElementById('translate-button').textContent = translations[lang].translate;
-      // "초기화" 버튼과 드롭다운 기본 옵션 업데이트
       document.getElementById('reset-button').textContent = translations[lang].reset;
       document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
       document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
@@ -518,7 +497,6 @@
           const avgLat = allWindFarms.reduce((sum, farm) => sum + farm.lat, 0) / allWindFarms.length;
           const avgLon = allWindFarms.reduce((sum, farm) => sum + farm.lon, 0) / allWindFarms.length;
           map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
-          // 초기 로드시 정보 패널을 보이게 한 후 업데이트 수행
           document.getElementById('all-info').style.display = 'block';
           updateInfoPanels();
         }
@@ -533,7 +511,6 @@
       kakao.maps.event.addListener(map, 'zoom_changed', updateMarkers);
       kakao.maps.event.addListener(map, 'idle', updateMarkers);
       document.getElementById('loading').style.display = 'none';
-      // 기본 컨트롤 버튼 이벤트 등록
       document.getElementById('initial-reset').addEventListener('click', resetToInitial);
       document.getElementById('reset-button').addEventListener('click', resetSelectionsOnly);
       document.getElementById('map-type-toggle').addEventListener('click', toggleMapType);
@@ -605,7 +582,6 @@
       });
     }
 
-    // manufacturers.json 기반 제조사 드롭다운 생성
     function populateManufacturerDropdown() {
       const dropdown = document.getElementById('manufacturer-dropdown');
       while (dropdown.options.length > 1) dropdown.remove(1);
