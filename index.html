@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title id="page-title">한국 풍력 발전소 지도</title>
+  <title id="page-title">한국 풍력 발전소 지도(Korea Wind Power Plant Map) by Seungho Jang</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Kakao Maps SDK -->
@@ -54,7 +54,7 @@
     /* 모든 컨트롤 버튼 및 드롭다운에 동일한 스타일 */
     .control-button {
       width: 120px;
-      /*padding: 8px 12px; *//* 버튼 내부 여백 복원 */
+      padding: 8px 12px; /* 버튼 내부 여백 */
       background: rgba(255, 255, 255, 0.8);
       border: 1px solid #ccc;
       border-radius: 4px;
@@ -76,14 +76,14 @@
       display: none; /* 처음에는 숨김 */
       flex-direction: column;
       gap: 8px; /* 다른 컨트롤과 동일한 간격 */
-      /*margin-top: 8px; *//* 설정 버튼과의 간격 복원 */
+      margin-top: 8px; /* 설정 버튼과의 간격 */
       background: rgba(255, 255, 255, 0.8); /* 컨트롤 배경과 동일 */
       padding: 5px; /* 내부 여백 */
       border: 1px solid #ccc; /* 컨트롤 테두리와 동일 */
       border-radius: 4px; /* 컨트롤 모서리와 동일 */
       right: 0; /* 우측 정렬 */
       align-items: center; /* 내부 버튼들을 중앙 정렬 */
-      /* width: 120px; */ /* 설정 버튼과 동일한 가로 길이 복원 */
+      width: 120px; /* 설정 버튼과 동일한 가로 길이 */
     }
     /* 설정 컨테이너 내부 버튼 스타일 */
     #settings-container .control-button {
@@ -317,10 +317,24 @@
       }
     };
 
+    // 타임아웃을 포함한 fetch 래퍼
+    async function fetchWithTimeout(url, options = {}, timeout = 10000) {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeout);
+      try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        clearTimeout(id);
+        return response;
+      } catch (error) {
+        clearTimeout(id);
+        throw error;
+      }
+    }
+
     async function loadManufacturers() {
       try {
         console.log("manufacturers.json 요청 중: /wind/manufacturers.json");
-        const response = await fetch('/wind/manufacturers.json?t=' + new Date().getTime());
+        const response = await fetchWithTimeout('/wind/manufacturers.json?t=' + new Date().getTime());
         if (!response.ok) {
           throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
         }
@@ -335,7 +349,7 @@
     async function loadTranslations() {
       try {
         console.log("translations.json 요청 중: /wind/translations.json");
-        const response = await fetch('/wind/translations.json?t=' + new Date().getTime());
+        const response = await fetchWithTimeout('/wind/translations.json?t=' + new Date().getTime());
         if (!response.ok) {
           throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
         }
@@ -345,6 +359,83 @@
         console.error("번역 데이터 로드 실패:", error);
         showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.translationsLoad.replace('{{message}}', error.message));
         siteTranslations = [];
+      }
+    }
+
+    async function loadCSVData() {
+      try {
+        console.log("windfarm_data.csv 요청 중: /wind/windfarm_data.csv");
+        const response = await fetchWithTimeout('/wind/windfarm_data.csv');
+        if (!response.ok) {
+          throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
+        }
+        const text = await response.text();
+        console.log("CSV 데이터:", text.substring(0, 200) + "...");
+        Papa.parse(text, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            allWindFarms = results.data.map(row => {
+              const name = row['단지명'] ? row['단지명'].trim() : null;
+              if (!name) return null;
+              return {
+                complexId: row['단지번호'] ? row['단지번호'].trim() : null,
+                name: name,
+                turbineId: row['풍력기번호(임시)'] ? row['풍력기번호(임시)'].trim() : null,
+                completionDate: row['준공일'] ? row['준공일'].trim() : null,
+                type: row['분류'] ? row['분류'].trim() : null,
+                address: row['주소'] ? row['주소'].trim() : null,
+                xCoord: row['엑스좌표(GRS80_C_x)'] ? parseFloat(row['엑스좌표(GRS80_C_x)']) : null,
+                yCoord: row['와이좌표(GRS80_C_y)'] ? parseFloat(row['와이좌표(GRS80_C_y)']) : null,
+                lat: row['위도(lat)'] ? parseFloat(row['위도(lat)']) : null,
+                lon: row['경도(lon)'] ? parseFloat(row['경도(lon)']) : null,
+                capacity: row['용량(kW)'] ? parseFloat(row['용량(kW)']) : null,
+                manufacturer: row['제조사'] ? row['제조사'].trim() : null
+              };
+            }).filter(row => row !== null);
+            console.log("파싱된 데이터:", allWindFarms);
+            turbineCountByComplex = {};
+            totalCapacityByComplex = {};
+            allWindFarms.forEach(farm => {
+              if (!turbineCountByComplex[farm.complexId]) {
+                turbineCountByComplex[farm.complexId] = 0;
+                totalCapacityByComplex[farm.complexId] = 0;
+              }
+              turbineCountByComplex[farm.complexId]++;
+              if (farm.capacity) {
+                totalCapacityByComplex[farm.complexId] += farm.capacity;
+              }
+            });
+            console.log("단지별 터빈 수:", turbineCountByComplex);
+            console.log("단지별 총 용량:", totalCapacityByComplex);
+            initMap();
+            populateDropdown();
+            populateManufacturerDropdown();
+          },
+          error: function(error) {
+            console.error('CSV 파싱 실패:', error);
+            showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvParse.replace('{{message}}', error.message));
+          }
+        });
+      } catch (error) {
+        console.error('CSV 로드 실패:', error);
+        showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvLoad.replace('{{message}}', error.message));
+      }
+    }
+
+    async function initializeApp() {
+      console.log("앱 초기화 시작");
+      try {
+        // 병렬로 데이터 로드하여 지연 감소
+        await Promise.all([
+          loadTranslations(),
+          loadManufacturers(),
+          loadCSVData()
+        ]);
+        console.log("앱 초기화 완료");
+      } catch (error) {
+        console.error("앱 초기화 중 오류:", error);
+        showError("앱 초기화 실패: " + error.message);
       }
     }
 
@@ -440,75 +531,6 @@
       return (kw / 1000000).toFixed(2);
     }
 
-    async function loadCSVData() {
-      try {
-        console.log("windfarm_data.csv 요청 중: /wind/windfarm_data.csv");
-        const response = await fetch('/wind/windfarm_data.csv');
-        if (!response.ok) {
-          throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
-        }
-        const text = await response.text();
-        console.log("CSV 데이터:", text.substring(0, 200) + "...");
-        Papa.parse(text, {
-          header: true,
-          skipEmptyLines: true,
-          complete: function(results) {
-            allWindFarms = results.data.map(row => {
-              const name = row['단지명'] ? row['단지명'].trim() : null;
-              if (!name) return null;
-              return {
-                complexId: row['단지번호'] ? row['단지번호'].trim() : null,
-                name: name,
-                turbineId: row['풍력기번호(임시)'] ? row['풍력기번호(임시)'].trim() : null,
-                completionDate: row['준공일'] ? row['준공일'].trim() : null,
-                type: row['분류'] ? row['분류'].trim() : null,
-                address: row['주소'] ? row['주소'].trim() : null,
-                xCoord: row['엑스좌표(GRS80_C_x)'] ? parseFloat(row['엑스좌표(GRS80_C_x)']) : null,
-                yCoord: row['와이좌표(GRS80_C_y)'] ? parseFloat(row['와이좌표(GRS80_C_y)']) : null,
-                lat: row['위도(lat)'] ? parseFloat(row['위도(lat)']) : null,
-                lon: row['경도(lon)'] ? parseFloat(row['경도(lon)']) : null,
-                capacity: row['용량(kW)'] ? parseFloat(row['용량(kW)']) : null,
-                manufacturer: row['제조사'] ? row['제조사'].trim() : null
-              };
-            }).filter(row => row !== null);
-            console.log("파싱된 데이터:", allWindFarms);
-            turbineCountByComplex = {};
-            totalCapacityByComplex = {};
-            allWindFarms.forEach(farm => {
-              if (!turbineCountByComplex[farm.complexId]) {
-                turbineCountByComplex[farm.complexId] = 0;
-                totalCapacityByComplex[farm.complexId] = 0;
-              }
-              turbineCountByComplex[farm.complexId]++;
-              if (farm.capacity) {
-                totalCapacityByComplex[farm.complexId] += farm.capacity;
-              }
-            });
-            console.log("단지별 터빈 수:", turbineCountByComplex);
-            console.log("단지별 총 용량:", totalCapacityByComplex);
-            initMap();
-            populateDropdown();
-            populateManufacturerDropdown();
-          },
-          error: function(error) {
-            console.error('CSV 파싱 실패:', error);
-            showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvParse.replace('{{message}}', error.message));
-          }
-        });
-      } catch (error) {
-        console.error('CSV 로드 실패:', error);
-        showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvLoad.replace('{{message}}', error.message));
-      }
-    }
-
-    async function initializeApp() {
-      console.log("앱 초기화 시작");
-      await loadTranslations();
-      await loadManufacturers();
-      await loadCSVData();
-      console.log("앱 초기화 완료");
-    }
-
     function initMap() {
       console.log("initMap 호출됨");
       const container = document.getElementById('map');
@@ -563,7 +585,7 @@
 
     function toggleNamesVisibility() {
       areNamesVisible = !areNamesVisible;
-      const lang = isEnglish ? 'en' : 'ko'; // lang 변수 정의
+      const lang = isEnglish ? 'en' : 'ko';
       document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
       updateMarkers();
     }
@@ -951,6 +973,12 @@
         console.log("정보 창 닫힘");
       }
     };
+
+    // 전역 오류 핸들러 추가
+    window.addEventListener('unhandledrejection', event => {
+      console.warn('처리되지 않은 Promise 거부:', event.reason);
+      // 사용자에게 표시하지 않음 (동작에 영향 없으므로)
+    });
 
     document.addEventListener('DOMContentLoaded', function() {
       kakao.maps.load(() => {
