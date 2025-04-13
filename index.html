@@ -40,21 +40,24 @@
             cursor: pointer;
             font-size: 14px;
             text-align: center;
+            box-sizing: border-box;
+            height: 34px; /* 선택적: 높이 통일 */
+            line-height: 1.5; /* 선택적: 텍스트 정렬 */
         }
         #map-type-toggle {
             top: 10px;
         }
         #name-toggle-button {
-            top: 50px;
+            top: 40px;
         }
         #reset-button {
-            top: 90px; /* name-toggle-button 아래, windfarm-dropdown 위 */
+            top: 70px;
         }
         #windfarm-dropdown {
-            top: 130px;
+            top: 100px;
         }
         #manufacturer-dropdown {
-            top: 170px;
+            top: 130px;
         }
         #all-info, #manufacturer-info, #complex-info {
             position: absolute;
@@ -82,8 +85,8 @@
                 top: 10px;
                 left: 10px;
                 transform: none;
-                text-align: left; /* 모바일에서 가독성을 위해 왼쪽 정렬 */
-                max-width: 80%; /* 모바일에서 너무 넓지 않도록 조정 */
+                text-align: left;
+                max-width: 80%;
             }
         }
         .info-window {
