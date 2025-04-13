@@ -316,10 +316,18 @@
             manufacturerInfo.style.display = 'none';
             complexInfo.style.display = 'none';
         
-            map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
-            map.setLevel(13);
-        
-            updateMarkers();
+            setTimeout(() => {
+                if (allWindFarms.length > 0) {
+                    const avgLat = allWindFarms.reduce((sum, farm) => sum + farm.lat, 0) / allWindFarms.length;
+                    const avgLon = allWindFarms.reduce((sum, farm) => sum + farm.lon, 0) / allWindFarms.length;
+                    map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
+                } else {
+                    map.setCenter(new kakao.maps.LatLng(37.5, 127.5)); // 대체 좌표
+                }
+                map.setLevel(13);
+                map.relayout();
+                updateMarkers();
+            }, 50);
         }
         
         function populateDropdown() {
