@@ -30,6 +30,17 @@
             background: rgba(255, 255, 255, 0.8);
             padding: 10px;
         }
+        #error-message {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
         .control-button {
             position: absolute;
             right: 10px;
@@ -103,12 +114,12 @@
 </head>
 <body>
     <div id="map"></div>
-    <div id="loading">지도 로딩 중...</div>
+    <div id="loading">지도 로딩ING...</div>
     <div id="error-message"></div>
     <button id="map-type-toggle" class="control-button">기본 지도</button>
     <button id="name-toggle-button" class="control-button">이름 끄기</button>
     <button id="reset-button" class="control-button">초기화</button>
-    <button id="translate-button" class="control-button">English</button>
+    <button id="translate-button" class="control-button" disabled>번역 로딩...</button>
     <select id="windfarm-dropdown" class="control-button">
         <option value="">풍력단지</option>
     </select>
@@ -134,7 +145,6 @@
         단지 내 총 터빈 수: <span id="info-complex-turbine-count"></span><br>
         준공일: <span id="info-complex-completion"></span>
     </div>
-    <!-- 구글 번역 요소를 위한 숨겨진 div -->
     <div id="google_translate_element" style="display: none;"></div>
 
     <script>
@@ -156,26 +166,58 @@
         // 구글 번역 초기화
         function googleTranslateElementInit() {
             console.log("구글 번역 초기화 시작");
-            new google.translate.TranslateElement({
-                pageLanguage: 'ko',
-                includedLanguages: 'ko,en',
-                layout: google.translate.TranslateElement.InlineLayout.NONE
-            }, 'google_translate_element');
-            // 번역 요소 로드 확인
-            setTimeout(checkTranslateElement, 1000);
+            try {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'ko',
+                    includedLanguages: 'ko,en',
+                    layout: google.translate.TranslateElement.InlineLayout.NONE
+                }, 'google_translate_element');
+                console.log("구글 번역 초기화 완료");
+                // 번역 요소 로드 대기
+                waitForTranslateElement();
+            } catch (error) {
+                console.error("구글 번역 초기화 실패:", error);
+                showError("번역 기능을 초기화할 수 없습니다.");
+            }
         }
 
-        function checkTranslateElement() {
-            const select = document.getElementsByClassName('goog-te-combo')[0];
-            if (select) {
-                console.log("구글 번역 요소 로드 성공");
-                select.value = 'ko'; // 초기 한국어 설정
-                const event = new Event('change');
-                select.dispatchEvent(event);
-            } else {
-                console.error("구글 번역 요소 로드 실패");
-                document.getElementById('error-message').innerText = "번역 기능을 로드할 수 없습니다.";
+        // 번역 요소 로드 대기
+        function waitForTranslateElement(attempts = 10, interval = 1000) {
+            const translateButton = document.getElementById('translate-button');
+            let attempt = 0;
+
+            function check() {
+                const select = document.getElementsByClassName('goog-te-combo')[0];
+                if (select) {
+                    console.log("구글 번역 요소 로드 성공");
+                    select.value = 'ko';
+                    const event = new Event('change');
+                    select.dispatchEvent(event);
+                    translateButton.textContent = 'English';
+                    translateButton.disabled = false;
+                } else if (attempt < attempts) {
+                    attempt++;
+                    console.log(`구글 번역 요소 대기 중... (${attempt}/${attempts})`);
+                    setTimeout(check, interval);
+                } else {
+                    console.error("구글 번역 요소 로드 실패");
+                    showError("번역 기능을 로드할 수 없습니다. 인터넷 연결을 확인하세요.");
+                    translateButton.textContent = '번역 실패';
+                    translateButton.disabled = true;
+                }
             }
+
+            check();
+        }
+
+        // 오류 메시지 표시
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.innerText = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
         }
 
         // 언어 토글 함수
@@ -186,7 +228,7 @@
 
             if (!select) {
                 console.error("구글 번역 요소를 찾을 수 없습니다.");
-                document.getElementById('error-message').innerText = "번역 기능을 로드할 수 없습니다.";
+                showError("번역 기능을 사용할 수 없습니다.");
                 return;
             }
 
@@ -270,12 +312,12 @@
                     },
                     error: function(error) {
                         console.error('CSV 파싱 실패:', error);
-                        document.getElementById('error-message').innerText = `CSV 파싱 실패: ${error.message}`;
+                        showError(`CSV 파싱 실패: ${error.message}`);
                     }
                 });
             } catch (error) {
                 console.error('CSV 로드 실패:', error);
-                document.getElementById('error-message').innerText = `데이터를 로드할 수 없습니다: ${error.message}`;
+                showError(`데이터를 로드할 수 없습니다: ${error.message}`);
             }
         }
 
@@ -523,7 +565,7 @@
                     },
                     error => {
                         console.error("위치 가져오기 실패:", error);
-                        document.getElementById('error-message').innerText = "위치 정보를 가져올 수 없습니다.";
+                        showError("위치 정보를 가져올 수 없습니다.");
                     },
                     {
                         enableHighAccuracy: true,
@@ -533,7 +575,7 @@
                 );
             } else {
                 console.error("Geolocation 지원 안 됨");
-                document.getElementById('error-message').innerText = "브라우저가 Geolocation을 지원하지 않습니다.";
+                showError("브라우저가 Geolocation을 지원하지 않습니다.");
             }
         }
 
@@ -758,6 +800,12 @@
                 console.log("정보 창 닫힘");
             }
         };
+
+        // 로컬 환경 경고
+        if (window.location.protocol === 'file:') {
+            console.warn("로컬 파일(file://)로 실행 중입니다. 구글 번역은 HTTP/HTTPS 환경에서만 작동합니다.");
+            showError("로컬 파일로는 번역이 작동하지 않습니다. HTTP 서버를 사용하세요.");
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
             kakao.maps.load(() => {
