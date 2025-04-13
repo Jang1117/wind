@@ -66,11 +66,16 @@
         #manufacturer-dropdown { top: 190px; }
         /* 추가(설정) 옵션: 기본 지도, 이름 끄기, 언어선택 – 기본 숨김 */
         #advanced-settings {
-            position: absolute;
-            right: 10px;
-            top: 240px;
-            z-index: 10;
-            display: none;
+          position: absolute;
+          right: 10px;
+          top: 240px;
+          z-index: 1000;        /* 충분히 높은 z-index로 지정 */
+          background-color: #fff;  /* 흰색 배경 */
+          border: 1px solid #ccc;
+          padding: 5px;
+          min-width: 140px;     /* 최소 너비 지정 */
+          min-height: 100px;    /* 최소 높이 지정 */
+          display: none;        /* 기본은 숨김 */
         }
         #advanced-settings .control-button {
             /* 개별 버튼 간의 간격 등 필요 시 조정 */
