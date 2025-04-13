@@ -8,129 +8,132 @@
     <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b8113591f35c3409335bdb4b5ee5613&libraries=clusterer&autoload=false" defer></script>
     <!-- PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-        }
-        #map {
-            width: 100%;
-            height: 100%;
-            background: #f0f0f0;
-            position: relative;
-        }
-        #loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-        }
-        #error-message {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 10;
-            background: rgba(255, 0, 0, 0.8);
-            color: white;
-            padding: 10px;
-            border-radius: 4px;
-            display: none;
-        }
-        /* 기본 컨트롤 버튼들 (초기 상태에 보이는 버튼들) */
-        .control-button {
-            position: absolute;
-            right: 10px;
-            z-index: 10;
-            padding: 8px 12px;
-            width: 120px;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            text-align: center;
-            box-sizing: border-box;
-            height: 34px;
-            line-height: 1.5;
-        }
-        /* 위치 조정 (원하는 순서대로 배치) */
-        #initial-reset { top: 10px; }         /* 전체 초기화 (처음으로) */
-        #settings-button { top: 55px; }         /* 설정 버튼 */
-        #reset-button { top: 100px; }            /* 선택만 초기화 */
-        #windfarm-dropdown { top: 145px; }
-        #manufacturer-dropdown { top: 190px; }
-        /* 추가(설정) 옵션: 기본 지도, 이름 끄기, 언어선택 – 기본 숨김 */
-        #advanced-settings {
-          position: fixed;      /* fixed로 변경 */
-          right: 10px;
-          top: 100px;           /* 원하는 위치(예: 100px)로 조정 */
-          z-index: 9999;        /* 충분히 높은 z-index 지정 */
-          background-color: red; /* 디버깅용 빨간 배경—나중에 원하는 색으로 변경 */
-          color: white;
-          border: 2px solid black;
+<style>
+      html, body {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          overflow: hidden;
+      }
+      #map {
+          width: 100%;
+          height: 100%;
+          background: #f0f0f0;
+          position: relative;
+      }
+      #loading {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 10;
+          background: rgba(255, 255, 255, 0.8);
           padding: 10px;
-          min-width: 140px;
-          min-height: 100px;
-          display: none;        /* 기본은 숨김 */
-        }
-        #advanced-settings .control-button {
-            /* 개별 버튼 간의 간격 등 필요 시 조정 */
-            margin-top: 5px;
-        }
-        /* 정보 패널 */
-        #all-info, #manufacturer-info, #complex-info {
-            position: absolute;
-            z-index: 10;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 10px;
-            font-size: 14px;
-            text-align: center;
-            display: none;
-            max-width: 90%;
-        }
-        @media screen and (min-width: 768px) {
-            #all-info, #manufacturer-info, #complex-info {
-                top: 10px;
-                left: 50%;
-                transform: translateX(-50%);
-            }
-        }
-        @media screen and (max-width: 767px) {
-            #all-info, #manufacturer-info, #complex-info {
-                top: 10px;
-                left: 10px;
-                transform: none;
-                text-align: left;
-                max-width: 80%;
-            }
-        }
-        .info-window {
-            background: rgba(255, 255, 255, 0.8);
-            padding: 5px;
-            border: 1px solid #ccc;
-            font-size: 12px;
-            pointer-events: auto;
-        }
-        .detail-window {
-            background: white;
-            padding: 10px;
-            border: 1px solid #ccc;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            cursor: pointer;
-            white-space: nowrap;
-            max-width: 90vw;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-height: 80vh;
-        }
+      }
+      #error-message {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          z-index: 10;
+          background: rgba(255, 0, 0, 0.8);
+          color: white;
+          padding: 10px;
+          border-radius: 4px;
+          display: none;
+      }
+      /* 전역 컨트롤 버튼 스타일 */
+      .control-button {
+          position: absolute;
+          right: 10px;
+          z-index: 10;
+          padding: 8px 12px;
+          width: 120px;
+          background: rgba(255, 255, 255, 0.8);
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+          text-align: center;
+          box-sizing: border-box;
+          height: 34px;
+          line-height: 1.5;
+      }
+      /* 위치 조정 (각 버튼의 절대 위치) */
+      #initial-reset { top: 10px; }         /* 전체 초기화 (처음으로) */
+      #settings-button { top: 55px; }         /* 설정 버튼 */
+      #reset-button { top: 100px; }            /* 선택만 초기화 */
+      #windfarm-dropdown { top: 145px; }
+      #manufacturer-dropdown { top: 190px; }
+      /* 추가(설정) 옵션: advanced-settings (기본 숨김) */
+      #advanced-settings {
+        position: fixed;    /* fixed로 하여 화면에 고정 */
+        right: 10px;
+        top: 240px;
+        z-index: 9999;
+        background-color: #fff;  /* 흰색 배경 */
+        border: 1px solid #ccc;
+        padding: 10px;
+        min-width: 140px;
+        min-height: 100px;
+        display: none;
+      }
+      /* advanced-settings 내부의 컨트롤 버튼은 전역 스타일을 덮어쓰도록 */
+      #advanced-settings .control-button {
+        position: static;   /* 일반적인 문서 흐름 */
+        width: 100%;        /* 전체 너비 활용 */
+        margin-top: 5px;    /* 버튼 간 간격 */
+        /* 상단의 오른쪽, top 위치값은 무시 */
+      }
+      /* 정보 패널 */
+      #all-info, #manufacturer-info, #complex-info {
+          position: absolute;
+          z-index: 10;
+          background: rgba(255, 255, 255, 0.8);
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          padding: 10px;
+          font-size: 14px;
+          text-align: center;
+          display: none;
+          max-width: 90%;
+      }
+      @media screen and (min-width: 768px) {
+          #all-info, #manufacturer-info, #complex-info {
+              top: 10px;
+              left: 50%;
+              transform: translateX(-50%);
+          }
+      }
+      @media screen and (max-width: 767px) {
+          #all-info, #manufacturer-info, #complex-info {
+              top: 10px;
+              left: 10px;
+              transform: none;
+              text-align: left;
+              max-width: 80%;
+          }
+      }
+      .info-window {
+          background: rgba(255, 255, 255, 0.8);
+          padding: 5px;
+          border: 1px solid #ccc;
+          font-size: 12px;
+          pointer-events: auto;
+      }
+      .detail-window {
+          background: white;
+          padding: 10px;
+          border: 1px solid #ccc;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+          cursor: pointer;
+          white-space: nowrap;
+          max-width: 90vw;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-height: 80vh;
+      }
     </style>
+
 </head>
 <body>
     <!-- 지도 영역 -->
