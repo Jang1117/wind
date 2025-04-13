@@ -81,6 +81,8 @@
       padding: 8px; /* 내부 여백 */
       border: 1px solid #ccc; /* 컨트롤 테두리와 동일 */
       border-radius: 4px; /* 컨트롤 모서리와 동일 */
+      right: 0; /* 우측 정렬 */
+      align-items: flex-end; /* 내부 버튼들을 우측 정렬 */
     }
     /* 설정 버튼 스타일 */
     #settings-button {
@@ -152,7 +154,7 @@
     <select id="manufacturer-dropdown" class="control-button">
       <option value="">제조사</option>
     </select>
-    <button id="settings-button" class="control-button">설정</button>
+    <button id="settings-button" class="control-button">설정/Setting</button>
     <div id="settings-container" style="display: none;">
       <button id="map-type-toggle" class="control-button">기본 지도</button>
       <button id="name-toggle-button" class="control-button">이름 끄기</button>
@@ -213,7 +215,7 @@
         "translate": "English",
         "windfarmDropdown": "풍력단지",
         "manufacturerDropdown": "제조사",
-        "settings": "설정",
+        "settings": "설정/Setting",
         "allInfo": {
           "totalCapacity": "총 용량: {{value}} kW",
           "totalCapacityGW": "총 용량: {{value}} GW",
@@ -266,7 +268,7 @@
         "translate": "한국어",
         "windfarmDropdown": "Wind Farm",
         "manufacturerDropdown": "Manufacturer",
-        "settings": "Settings",
+        "settings": "설정/Setting",
         "allInfo": {
           "totalCapacity": "Total Capacity: {{value}} kW",
           "totalCapacityGW": "Total Capacity: {{value}} GW",
