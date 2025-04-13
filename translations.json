@@ -1,0 +1,102 @@
+{
+  "ko": {
+    "title": "한국 풍력 발전소 지도",
+    "loading": "지도 로딩 중...",
+    "errorMessage": {
+      "csvLoad": "데이터를 로드할 수 없습니다: {{message}}",
+      "csvParse": "CSV 파싱 실패: {{message}}",
+      "geolocation": "위치 정보를 가져올 수 없습니다.",
+      "geolocationUnsupported": "브라우저가 Geolocation을 지원하지 않습니다."
+    },
+    "mapTypeToggle": "기본 지도",
+    "mapTypeToggleSatellite": "위성 지도",
+    "nameToggle": "이름 끄기",
+    "nameToggleOn": "이름 켜기",
+    "reset": "초기화",
+    "translate": "English",
+    "windfarmDropdown": "풍력단지",
+    "manufacturerDropdown": "제조사",
+    "noInfo": "정보 없음",
+    "allInfo": {
+      "totalCapacity": "총 용량: {{value}} kW",
+      "totalCapacityGW": "({{value}} GW)",
+      "complexCount": "단지 수: {{value}}",
+      "turbineCount": "터빈 수: {{value}}"
+    },
+    "manufacturerInfo": {
+      "manufacturer": "{{value}}",
+      "totalCapacity": "총 용량: {{value}} kW",
+      "complexCount": "단지 수: {{value}}",
+      "turbineCount": "터빈 수: {{value}}"
+    },
+    "complexInfo": {
+      "name": "단지명: {{value}}",
+      "capacity": "단지 용량: {{value}} kW",
+      "capacityBreakdown": "{{value}}",
+      "manufacturers": "터빈 제조사: {{value}}",
+      "turbineCount": "단지 내 총 터빈 수: {{value}}",
+      "completion": "준공일: {{value}}"
+    },
+    "infoWindow": "{{name}} ({{count}}개)",
+    "detailWindow": {
+      "name": "<strong>{{value}}</strong>",
+      "manufacturer": "터빈 제조사: {{value}}",
+      "capacity": "터빈 용량: {{value}} kW",
+      "turbineCount": "단지 내 총 터빈 수: {{value}}",
+      "complexCapacity": "단지 용량: {{value}} kW",
+      "capacityBreakdown": "({{value}})",
+      "completion": "준공일: {{value}}",
+      "address": "주소: {{value}}"
+    }
+  },
+  "en": {
+    "title": "Korea Wind Power Plant Map",
+    "loading": "Loading map...",
+    "errorMessage": {
+      "csvLoad": "Failed to load data: {{message}}",
+      "csvParse": "Failed to parse CSV: {{message}}",
+      "geolocation": "Unable to retrieve location.",
+      "geolocationUnsupported": "Browser does not support Geolocation."
+    },
+    "mapTypeToggle": "Default Map",
+    "mapTypeToggleSatellite": "Satellite Map",
+    "nameToggle": "Hide Names",
+    "nameToggleOn": "Show Names",
+    "reset": "Reset",
+    "translate": "한국어",
+    "windfarmDropdown": "Wind Farm",
+    "manufacturerDropdown": "Manufacturer",
+    "noInfo": "No information",
+    "allInfo": {
+      "totalCapacity": "Total Capacity: {{value}} kW",
+      "totalCapacityGW": "({{value}} GW)",
+      "complexCount": "Complex Count: {{value}}",
+      "turbineCount": "Turbine Count: {{value}}"
+    },
+    "manufacturerInfo": {
+      "manufacturer": "{{value}}",
+      "totalCapacity": "Total Capacity: {{value}} kW",
+      "complexCount": "Complex Count: {{value}}",
+      "turbineCount": "Turbine Count: {{value}}"
+    },
+    "complexInfo": {
+      "name": "Complex Name: {{value}}",
+      "capacity": "Complex Capacity: {{value}} kW",
+      "capacityBreakdown": "{{value}}",
+      "manufacturers": "Turbine Manufacturers: {{value}}",
+      "turbineCount": "Total Turbines in Complex: {{value}}",
+      "completion": "Completion Date: {{value}}"
+    },
+    "infoWindow": "{{name}} ({{count}} units)",
+    "detailWindow": {
+      "name": "<strong>{{value}}</strong>",
+      "manufacturer": "Turbine Manufacturer: {{value}}",
+      "capacity": "Turbine Capacity: {{value}} kW",
+      "turbineCount": "Total Turbines in Complex: {{value}}",
+      "complexCapacity": "Complex Capacity: {{value}} kW",
+      "capacityBreakdown": "({{value}})",
+      "completion": "Completion Date: {{value}}",
+      "address": "Address: {{value}}"
+    }
+  }
+}
