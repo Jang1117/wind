@@ -83,6 +83,11 @@
       border-radius: 4px; /* 컨트롤 모서리와 동일 */
       right: 0; /* 우측 정렬 */
       align-items: flex-end; /* 내부 버튼들을 우측 정렬 */
+      width: 120px; /* 설정 버튼과 동일한 가로 길이 */
+    }
+    /* 설정 컨테이너 내부 버튼 스타일 */
+    #settings-container .control-button {
+      width: 110px; /* 설정 컨테이너 내부 버튼은 약간 작게 */
     }
     /* 설정 버튼 스타일 */
     #settings-button {
@@ -516,13 +521,8 @@
       console.log("지도 생성됨:", map);
       setTimeout(() => {
         map.relayout();
-        if (allWindFarms.length > 0) {
-          const avgLat = allWindFarms.reduce((sum, farm) => sum + farm.lat, 0) / allWindFarms.length;
-          const avgLon = allWindFarms.reduce((sum, farm) => sum + farm.lon, 0) / allWindFarms.length;
-          map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
-          document.getElementById('all-info').style.display = 'block';
-          updateInfoPanels();
-        }
+        document.getElementById('all-info').style.display = 'block';
+        updateInfoPanels();
         console.log("지도 렌더링 완료");
         updateMarkers();
         startTrackingLocation();
@@ -563,7 +563,7 @@
 
     function toggleNamesVisibility() {
       areNamesVisible = !areNamesVisible;
-      document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[isEnglish ? 'en' : 'ko'].nameToggle : translations[isEnglish ? 'en' : 'ko'].nameToggleOn;
+      document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
       updateMarkers();
     }
 
