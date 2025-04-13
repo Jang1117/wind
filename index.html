@@ -41,7 +41,7 @@
             border-radius: 4px;
             display: none;
         }
-        /* 컨트롤 버튼 스타일 – 필요에 따라 위치를 조정 */
+        /* 기본 컨트롤 버튼들 (초기 상태에 보이는 버튼들) */
         .control-button {
             position: absolute;
             right: 10px;
@@ -58,16 +58,25 @@
             height: 34px;
             line-height: 1.5;
         }
-        /* 버튼 위치 (아래 순서로 위에서부터 배치 – 원하는 순서대로 재배열 가능) */
-        #initial-reset { top: 10px; }       /* '처음으로' 버튼 – 전체 초기화 */
-        #map-type-toggle { top: 55px; }
-        #name-toggle-button { top: 100px; }
-        #translate-button { top: 145px; }        /* '초기화' 버튼 – 선택만 리셋 */
-        #reset-button { top: 190px; }
-        #windfarm-dropdown { top: 235px; }
-        #manufacturer-dropdown { top: 280px; }
-
-        /* 정보 패널 스타일 */
+        /* 위치 조정 (원하는 순서대로 배치) */
+        #initial-reset { top: 10px; }         /* 전체 초기화 (처음으로) */
+        #settings-button { top: 55px; }         /* 설정 버튼 */
+        #reset-button { top: 100px; }            /* 선택만 초기화 */
+        #windfarm-dropdown { top: 145px; }
+        #manufacturer-dropdown { top: 190px; }
+        /* 추가(설정) 옵션: 기본 지도, 이름 끄기, 언어선택 – 기본 숨김 */
+        #advanced-settings {
+            position: absolute;
+            right: 10px;
+            top: 240px;
+            z-index: 10;
+            display: none;
+        }
+        #advanced-settings .control-button {
+            /* 개별 버튼 간의 간격 등 필요 시 조정 */
+            margin-top: 5px;
+        }
+        /* 정보 패널 */
         #all-info, #manufacturer-info, #complex-info {
             position: absolute;
             z-index: 10;
@@ -118,24 +127,29 @@
     </style>
 </head>
 <body>
-    <!-- 지도 -->
+    <!-- 지도 영역 -->
     <div id="map"></div>
     <div id="loading">지도 로딩 중...</div>
     <div id="error-message"></div>
     
-    <!-- 컨트롤 버튼들 (위쪽에 배치) -->
+    <!-- 기본 컨트롤 버튼들 -->
     <button id="initial-reset" class="control-button">처음으로</button>
-    <button id="map-type-toggle" class="control-button">기본 지도</button>
-    <button id="name-toggle-button" class="control-button">이름 끄기</button>
+    <button id="settings-button" class="control-button">설정</button>
     <button id="reset-button" class="control-button">초기화</button>
-    <button id="translate-button" class="control-button">English</button>
     <select id="windfarm-dropdown" class="control-button">
         <option value="">풍력단지</option>
     </select>
     <select id="manufacturer-dropdown" class="control-button">
         <option value="">제조사</option>
     </select>
-
+    
+    <!-- 추가(설정) 옵션 – 기본 숨김 -->
+    <div id="advanced-settings">
+        <button id="map-type-toggle" class="control-button">기본 지도</button>
+        <button id="name-toggle-button" class="control-button">이름 끄기</button>
+        <button id="translate-button" class="control-button">English</button>
+    </div>
+    
     <!-- 정보 패널 -->
     <div id="all-info">
         <span id="info-all-capacity"></span><br>
@@ -157,7 +171,8 @@
         <span id="info-complex-turbine-count"></span><br>
         <span id="info-complex-completion"></span>
     </div>
-
+    
+    <!-- 자바스크립트 -->
     <script>
         let map;
         let markers = [];
@@ -317,7 +332,6 @@
         }
 
         // CSV 파일에 없는 제조사 데이터는 manufacturers.json을 사용합니다.
-
         function getTranslatedSiteInfo(complexId, field) {
             const site = siteTranslations.find(s => s.site_number == complexId);
             if (site) {
@@ -330,7 +344,7 @@
             return farm ? (field === 'name' ? farm.name : farm.address) : null;
         }
 
-        // "처음으로" 버튼: 전체 초기화 – 모든 선택 리셋, 지도 중심 및 줌 레벨 기본값으로 재설정
+        // "처음으로" 버튼: 전체 초기화 – 모든 선택 리셋, 지도 중심 및 줌 레벨 재설정
         function resetToInitial() {
             selectedComplex = '';
             selectedManufacturer = '';
@@ -342,7 +356,6 @@
             allInfo.style.display = 'block';
             manufacturerInfo.style.display = 'none';
             complexInfo.style.display = 'none';
-            // 기본 지도 중심과 줌 레벨 (원하는 값으로 설정 – 여기선 초기값 사용)
             map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
             map.setLevel(13);
             map.relayout();
@@ -350,26 +363,38 @@
             updateInfoPanels();
         }
 
-        // "초기화" 버튼: 선택값만 리셋 – 현재 지도 중심과 줌 레벨은 유지
+        // "초기화" 버튼: 선택값만 리셋 – 현재 지도 중심/줌 유지
         function resetSelectionsOnly() {
             selectedComplex = '';
             selectedManufacturer = '';
             document.getElementById('windfarm-dropdown').value = '';
             document.getElementById('manufacturer-dropdown').value = '';
-            // 지도 중심, 줌 레벨은 그대로 유지
             updateInfoPanels();
             updateMarkers();
         }
+
+        // settings 버튼을 눌렀을 때 추가 버튼(advanced-settings)의 표시 토글
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('settings-button').addEventListener('click', function() {
+                const adv = document.getElementById('advanced-settings');
+                if (adv.style.display === 'none' || adv.style.display === '') {
+                    adv.style.display = 'block';
+                } else {
+                    adv.style.display = 'none';
+                }
+            });
+        });
 
         function updateUILanguage() {
             const lang = isEnglish ? 'en' : 'ko';
             document.getElementById('page-title').textContent = translations[lang].title;
             document.getElementById('loading').textContent = translations[lang].loading;
+            // advanced 설정 버튼 텍스트도 업데이트 (만약 번역을 적용하고 싶다면)
             document.getElementById('map-type-toggle').textContent = isSatellite ? translations[lang].mapTypeToggle : translations[lang].mapTypeToggleSatellite;
             document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
-            // "처음으로" 버튼은 보통 기본 텍스트 그대로 사용 (원한다면 번역도 적용 가능)
-            document.getElementById('reset-button').textContent = translations[lang].reset;
             document.getElementById('translate-button').textContent = translations[lang].translate;
+            // "초기화" 버튼, 드롭다운 기본 옵션 설정
+            document.getElementById('reset-button').textContent = translations[lang].reset;
             document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
             document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
             
@@ -499,7 +524,7 @@
                     const avgLat = allWindFarms.reduce((sum, farm) => sum + farm.lat, 0) / allWindFarms.length;
                     const avgLon = allWindFarms.reduce((sum, farm) => sum + farm.lon, 0) / allWindFarms.length;
                     map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
-                    // 초기 로드시 정보 패널이 바로 업데이트되도록 block 처리
+                    // 초기 로드시 정보 패널을 보이게 한 후 업데이트 수행
                     document.getElementById('all-info').style.display = 'block';
                     updateInfoPanels();
                 }
@@ -514,8 +539,16 @@
             kakao.maps.event.addListener(map, 'zoom_changed', updateMarkers);
             kakao.maps.event.addListener(map, 'idle', updateMarkers);
             document.getElementById('loading').style.display = 'none';
-            // 버튼 이벤트 등록: "처음으로"와 "초기화" 별도 처리
+            // 버튼 이벤트 등록
             document.getElementById('initial-reset').addEventListener('click', resetToInitial);
+            document.getElementById('settings-button').addEventListener('click', function() {
+                const adv = document.getElementById('advanced-settings');
+                if (adv.style.display === 'none' || adv.style.display === '') {
+                    adv.style.display = 'block';
+                } else {
+                    adv.style.display = 'none';
+                }
+            });
             document.getElementById('map-type-toggle').addEventListener('click', toggleMapType);
             document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
             document.getElementById('reset-button').addEventListener('click', resetSelectionsOnly);
@@ -543,7 +576,6 @@
             updateMarkers();
         }
 
-        // "처음으로" – 전체 초기화 (모든 선택 리셋, 지도 중심/줌 재설정)
         function resetToInitial() {
             selectedComplex = '';
             selectedManufacturer = '';
@@ -562,7 +594,6 @@
             updateInfoPanels();
         }
 
-        // "초기화" – 선택값만 리셋 (현재 지도 중심/줌 유지)
         function resetSelectionsOnly() {
             selectedComplex = '';
             selectedManufacturer = '';
@@ -708,7 +739,6 @@
 
         function updateInfoPanels() {
             const lang = isEnglish ? 'en' : 'ko';
-            // 항상 업데이트하도록 조건에서 display 검사 제거
             if (allWindFarms.length > 0) {
                 const totalCapacity = allWindFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
                 const complexCount = [...new Set(allWindFarms.map(farm => farm.complexId))].length;
@@ -749,7 +779,7 @@
                     },
                     {
                         enableHighAccuracy: true,
-                        timeout: 10000,
+                        timeout: 10000,  // 타임아웃을 늘림(10초)
                         maximumAge: 0
                     }
                 );
