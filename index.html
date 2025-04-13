@@ -272,8 +272,8 @@
 
         async function loadTranslations() {
             try {
-                console.log("translates.json 요청 중: /wind/translates.json");
-                const response = await fetch('/wind/translates.json');
+                console.log("translations.json 요청 중: /wind/translations.json");
+                const response = await fetch('/wind/translations.json');
                 if (!response.ok) {
                     throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
                 }
