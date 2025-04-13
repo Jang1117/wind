@@ -346,7 +346,7 @@
 
         async function loadCSVData() {
             try {
-                console.log("windfarm_data.csv 요청 중");
+                console.log("windfarm_data.csv 요청 중: /wind/windfarm_data.csv");
                 const response = await fetch('/wind/windfarm_data.csv');
                 if (!response.ok) {
                     throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
@@ -709,7 +709,7 @@
                 title: translations[isEnglish ? 'en' : 'ko'].myLocation,
                 clickable: false,
                 image: new kakao.maps.MarkerImage(
-                    'me.png',
+                    '/wind/me.png',
                     new kakao.maps.Size(48, 48)
                 )
             });
@@ -732,7 +732,7 @@
             console.log("현재 줌 레벨:", zoomLevel);
 
             const markerImage = new kakao.maps.MarkerImage(
-                'wind.png',
+                '/wind/wind.png',
                 new kakao.maps.Size(48, 48),
                 { offset: new kakao.maps.Point(16, 32) }
             );
