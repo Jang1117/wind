@@ -455,8 +455,8 @@
                     const avgLat = allWindFarms.reduce((sum, farm) => sum + farm.lat, 0) / allWindFarms.length;
                     const avgLon = allWindFarms.reduce((sum, farm) => sum + farm.lon, 0) / allWindFarms.length;
                     map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
+                    document.getElementById('all-info').style.display = 'block'; // 먼저 display를 block으로 설정
                     updateInfoPanels();
-                    document.getElementById('all-info').style.display = 'block';
                 }
                 console.log("지도 렌더링 완료");
                 updateMarkers();
