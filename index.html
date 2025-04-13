@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b8113591f35c3409335bdb4b5ee5613&libraries=clusterer&autoload=false" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <!-- 구글 번역 스크립트 추가 -->
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <style>
         html, body {
             margin: 0;
@@ -41,24 +43,15 @@
             font-size: 14px;
             text-align: center;
             box-sizing: border-box;
-            height: 34px; /* 선택적: 높이 통일 */
-            line-height: 1.5; /* 선택적: 텍스트 정렬 */
+            height: 34px;
+            line-height: 1.5;
         }
-        #map-type-toggle {
-            top: 10px;
-        }
-        #name-toggle-button {
-            top: 45px;
-        }
-        #reset-button {
-            top: 80px;
-        }
-        #windfarm-dropdown {
-            top: 115px;
-        }
-        #manufacturer-dropdown {
-            top: 150px;
-        }
+        #map-type-toggle { top: 10px; }
+        #name-toggle-button { top: 45px; }
+        #reset-button { top: 80px; }
+        #translate-button { top: 115px; } /* 새 버튼 위치 */
+        #windfarm-dropdown { top: 150px; } /* 기존 버튼 위치 조정 */
+        #manufacturer-dropdown { top: 185px; } /* 기존 버튼 위치 조정 */
         #all-info, #manufacturer-info, #complex-info {
             position: absolute;
             z-index: 10;
@@ -71,7 +64,6 @@
             display: none;
             max-width: 90%;
         }
-        /* PC 환경: 가운데 정렬 */
         @media screen and (min-width: 768px) {
             #all-info, #manufacturer-info, #complex-info {
                 top: 10px;
@@ -79,7 +71,6 @@
                 transform: translateX(-50%);
             }
         }
-        /* 모바일 환경: 왼쪽 상단 정렬 */
         @media screen and (max-width: 767px) {
             #all-info, #manufacturer-info, #complex-info {
                 top: 10px;
@@ -116,7 +107,9 @@
     <div id="error-message"></div>
     <button id="map-type-toggle" class="control-button">기본 지도</button>
     <button id="name-toggle-button" class="control-button">이름 끄기</button>
-    <button id="reset-button" class="control-button">초기화</button> <!-- 추가 -->
+    <button id="reset-button" class="control-button">초기화</button>
+    <!-- 번역 버튼 추가 -->
+    <button id="translate-button" class="control-button">English</button>
     <select id="windfarm-dropdown" class="control-button">
         <option value="">풍력단지</option>
     </select>
@@ -157,6 +150,40 @@
         let areNamesVisible = true;
         let selectedManufacturer = '';
         let selectedComplex = '';
+        let isEnglish = false; // 번역 상태 변수
+
+        // 구글 번역 초기화 함수
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'ko', // 기본 언어 한국어
+                includedLanguages: 'ko,en', // 한국어와 영어만 포함
+                layout: google.translate.TranslateElement.InlineLayout.NONE // UI 숨김
+            }, 'google_translate_element');
+        }
+
+        // 언어 토글 함수
+        function toggleLanguage() {
+            const translateButton = document.getElementById('translate-button');
+            const select = document.getElementsByClassName('goog-te-combo')[0];
+            if (!select) {
+                console.error('구글 번역 요소를 찾을 수 없습니다.');
+                return;
+            }
+
+            if (isEnglish) {
+                select.value = 'ko'; // 한국어로 변경
+                translateButton.textContent = 'English';
+                isEnglish = false;
+            } else {
+                select.value = 'en'; // 영어로 변경
+                translateButton.textContent = '한국어';
+                isEnglish = true;
+            }
+
+            // 언어 변경 이벤트 트리거
+            const event = new Event('change');
+            select.dispatchEvent(event);
+        }
 
         function formatNumberWithCommas(number) {
             if (!number) return "정보 없음";
@@ -165,7 +192,7 @@
 
         function formatGW(kw) {
             if (!kw) return "정보 없음";
-            return (kw / 1000000).toFixed(2); // kW를 GW로 변환, 소수점 2자리
+            return (kw / 1000000).toFixed(2);
         }
 
         async function loadCSVData() {
@@ -249,7 +276,6 @@
                     const avgLon = allWindFarms.reduce((sum, farm) => sum + farm.lon, 0) / allWindFarms.length;
                     map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
 
-                    // 전체 터빈 정보 설정
                     const totalCapacity = allWindFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
                     const complexCount = [...new Set(allWindFarms.map(farm => farm.complexId))].length;
                     const turbineCount = allWindFarms.length;
@@ -258,7 +284,7 @@
                     document.getElementById('info-all-capacity-gw').textContent = formatGW(totalCapacity);
                     document.getElementById('info-all-complex-count').textContent = complexCount;
                     document.getElementById('info-all-turbine-count').textContent = turbineCount;
-                    document.getElementById('all-info').style.display = 'block'; // 초기 상태 표시
+                    document.getElementById('all-info').style.display = 'block';
                 }
                 console.log("지도 렌더링 완료");
                 updateMarkers();
@@ -280,8 +306,8 @@
             document.getElementById('reset-button').addEventListener('click', resetSelections);
             document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
             document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
-            
-            
+            // 번역 버튼 이벤트 리스너 추가
+            document.getElementById('translate-button').addEventListener('click', toggleLanguage);
         }
 
         function toggleMapType() {
@@ -320,9 +346,9 @@
                 if (allWindFarms.length > 0) {
                     const avgLat = allWindFarms.reduce((sum, farm) => sum + farm.lat, 0) / allWindFarms.length;
                     const avgLon = allWindFarms.reduce((sum, farm) => sum + farm.lon, 0) / allWindFarms.length;
-                    map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
+                    map  map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
                 } else {
-                    map.setCenter(new kakao.maps.LatLng(37.5, 127.5)); // 대체 좌표
+                    map.setCenter(new kakao.maps.LatLng(37.5, 127.5));
                 }
                 map.setLevel(13);
                 map.relayout();
@@ -360,10 +386,9 @@
 
         function handleDropdownChange(event) {
             selectedComplex = event.target.value;
-            selectedManufacturer = ''; // 제조사 리셋
-            document.getElementById('manufacturer-dropdown').value = ''; // 제조사 드랍다운 리셋
+            selectedManufacturer = '';
+            document.getElementById('manufacturer-dropdown').value = '';
 
-            // 정보 창 관리
             const allInfo = document.getElementById('all-info');
             const manufacturerInfo = document.getElementById('manufacturer-info');
             const complexInfo = document.getElementById('complex-info');
@@ -375,16 +400,14 @@
                 const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
                 const avgLon = farmsInComplex.reduce((sum, farm) => sum + farm.lon, 0) / farmsInComplex.length;
 
-                // 단지 정보 계산 및 표시
                 updateComplexInfo(farmsInComplex);
                 complexInfo.style.display = 'block';
 
-                // 지도 조정
                 map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
                 map.setLevel(6);
             } else {
                 complexInfo.style.display = 'none';
-                allInfo.style.display = 'block'; // 전체 정보 표시
+                allInfo.style.display = 'block';
                 map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
                 map.setLevel(13);
             }
@@ -394,44 +417,36 @@
 
         function handleManufacturerChange(event) {
             selectedManufacturer = event.target.value;
-            selectedComplex = ''; // 풍력 단지 리셋
-            document.getElementById('windfarm-dropdown').value = ''; // 풍력 단지 드랍다운 리셋
+            selectedComplex = '';
+            document.getElementById('windfarm-dropdown').value = '';
 
-            // 정보 창 관리
             const allInfo = document.getElementById('all-info');
             const manufacturerInfo = document.getElementById('manufacturer-info');
             const complexInfo = document.getElementById('complex-info');
             allInfo.style.display = 'none';
             complexInfo.style.display = 'none';
 
-            // 제조사에 따른 터빈 필터링
             let filteredFarms = allWindFarms;
             if (selectedManufacturer) {
                 filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
             }
 
             if (selectedManufacturer) {
-                // 총 용량 계산
                 const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
-                // 단지 수 계산
                 const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
-                // 터빈 수 계산
                 const turbineCount = filteredFarms.length;
 
-                // 정보 업데이트
                 document.getElementById('info-manufacturer').textContent = selectedManufacturer;
                 document.getElementById('info-total-capacity').textContent = formatNumberWithCommas(totalCapacity);
                 document.getElementById('info-complex-count').textContent = complexCount;
                 document.getElementById('info-turbine-count').textContent = turbineCount;
 
-                // 정보 표시
                 manufacturerInfo.style.display = 'block';
             } else {
                 manufacturerInfo.style.display = 'none';
-                allInfo.style.display = 'block'; // 전체 정보 표시
+                allInfo.style.display = 'block';
             }
 
-            // 지도 조정
             if (filteredFarms.length === 0) {
                 map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
                 map.setLevel(13);
@@ -542,7 +557,6 @@
                 { offset: new kakao.maps.Point(16, 32) }
             );
 
-            // 필터링된 터빈 목록
             let filteredFarms = allWindFarms;
             if (selectedManufacturer) {
                 filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
@@ -588,22 +602,19 @@
 
                     kakao.maps.event.addListener(marker, 'click', () => {
                         selectedComplex = complexId;
-                        selectedManufacturer = ''; // 제조사 리셋
-                        document.getElementById('manufacturer-dropdown').value = ''; // 제조사 드랍다운 리셋
-                        document.getElementById('windfarm-dropdown').value = complexId; // 단지 드랍다운 동기화
+                        selectedManufacturer = '';
+                        document.getElementById('manufacturer-dropdown').value = '';
+                        document.getElementById('windfarm-dropdown').value = complexId;
 
-                        // 정보 창 관리
                         const allInfo = document.getElementById('all-info');
                         const manufacturerInfo = document.getElementById('manufacturer-info');
                         const complexInfo = document.getElementById('complex-info');
                         allInfo.style.display = 'none';
                         manufacturerInfo.style.display = 'none';
 
-                        // 단지 정보 표시
                         updateComplexInfo(group);
                         complexInfo.style.display = 'block';
 
-                        // 지도 조정
                         map.setCenter(position);
                         const currentLevel = map.getLevel();
                         map.setLevel(currentLevel - 5);
