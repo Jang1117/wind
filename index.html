@@ -161,8 +161,9 @@
         let selectedComplex = '';
         let isEnglish = false;
         let translations = {};
+        // 수정: siteTranslations를 전역 변수로 선언, fetch로 초기화
+        let siteTranslations = [];
 
-        // 수정: translates.json 데이터를 직접 삽입하여 로드
         translations = {
             "ko": {
                 "title": "한국 풍력 발전소 지도",
@@ -270,117 +271,22 @@
             }
         };
 
-        // 수정: translates.json 데이터 변수 (단지명 및 주소 번역)
-        let siteTranslations = [
-            {
-                "site_number": 1,
-                "site_name_kr": "행원",
-                "site_name_roman": "Haengwon",
-                "address_kr": "제주특별자치도 제주시 구좌읍 해맞이해안로 712-3 (제주대 660)",
-                "address_roman": "Jeju-teukbyeoljachido Jejusi Guzwaeup Haemajihaean-ro 712-3 (Jejudae 660)"
-            },
-            {
-                "site_number": 2,
-                "site_name_kr": "전북",
-                "site_name_roman": "Jeonbuk",
-                "address_kr": "전라북도 부안군",
-                "address_roman": "Jeollabuk-do Buangun"
-            },
-            {
-                "site_number": 3,
-                "site_name_kr": "영덕",
-                "site_name_roman": "Yeongdeok",
-                "address_kr": "경상북도 영덕군 영덕읍 화수리",
-                "address_roman": "Gyeongsangbuk-do Yeongdeokgun Yeongdeok-eup Hwasuri"
-            },
-            {
-                "site_number": 4,
-                "site_name_kr": "한경",
-                "site_name_roman": "Hangyeong",
-                "address_kr": "제주특별자치도 제주시 한경면 용수리 3879-5",
-                "address_roman": "Jeju-teukbyeoljachido Jejusi Hangyeongmyeon Yongsuri 3879-5"
-            },
-            {
-                "site_number": 5,
-                "site_name_kr": "강원",
-                "site_name_roman": "Gangwon",
-                "address_kr": "강원도 평창군 대관령면 횡계리",
-                "address_roman": "Gangwondo Pyeongchanggun Daegwallyeongmyeon Hoenggyeri"
-            },
-            {
-                "site_number": 6,
-                "site_name_kr": "신창",
-                "site_name_roman": "Sinchang",
-                "address_kr": "제주특별자치도 제주시",
-                "address_roman": "Jeju-teukbyeoljachido Jejusi"
-            },
-            {
-                "site_number": 7,
-                "site_name_kr": "양양",
-                "site_name_roman": "Yangyang",
-                "address_kr": "강원도 양양군 서면 영덕리",
-                "address_roman": "Gangwondo Yangyanggun Seomyeon Yeongdeokri"
-            },
-            {
-                "site_number": 8,
-                "site_name_kr": "월정",
-                "site_name_roman": "Woljeong",
-                "address_kr": "제주특별자치도 제주시",
-                "address_roman": "Jeju-teukbyeoljachido Jejusi"
-            },
-            {
-                "site_number": 10,
-                "site_name_kr": "고리",
-                "site_name_roman": "Gori",
-                "address_kr": "부산광역시 기장군 장안읍 효암리 258번지",
-                "address_roman": "Busangwangyeoksi Gijanggun Janganeup Hyoamri 258beonji"
-            },
-            {
-                "site_number": 11,
-                "site_name_kr": "태기산",
-                "site_name_roman": "Taegisan",
-                "address_kr": "강원도 횡성군 둔내면 태기리 산1-5번지",
-                "address_roman": "Gangwondo Hoengseonggun Dunnemyeon Taegiri san1-5beonji"
-            },
-            {
-                "site_number": 12,
-                "site_name_kr": "신안",
-                "site_name_roman": "Sinan",
-                "address_kr": "전라남도 신안군 비금면 구림리 산1-1",
-                "address_roman": "Jeollanam-do Sinangun Bigeummyeon Gurimri san1-1"
-            },
-            {
-                "site_number": 13,
-                "site_name_kr": "영양",
-                "site_name_roman": "Yeongyang",
-                "address_kr": "경상북도 영양군 석보면 맹동산길 284-40",
-                "address_roman": "Gyeongsangbuk-do Yeongyanggun Seokbomyeon Maengdongsangil 284-40"
-            },
-            {
-                "site_number": 14,
-                "site_name_kr": "삼달",
-                "site_name_roman": "Samdal",
-                "address_kr": "제주특별자치도 서귀포시 성산읍 삼달리 2004번지",
-                "address_roman": "Jeju-teukbyeoljachido Seogwiposi Seongsaneup Samdalli 2004beonji"
-            },
-            {
-                "site_number": 15,
-                "site_name_kr": "누에섬",
-                "site_name_roman": "Nuesseom",
-                "address_kr": "경기도 안산시",
-                "address_roman": "Gyeonggido Ansansi"
-            },
-            {
-                "site_number": 16,
-                "site_name_kr": "성산1",
-                "site_name_roman": "Seongsan1",
-                "address_kr": "제주특별자치도 서귀포시 성산읍 수산리  ------- (중략, 전체 데이터 포함) -------
-                "address_roman": "Jeju-teukbyeoljachido Seogwiposi Seongsaneup Susanri 4403-3"
-            },
-            // ... (나머지 데이터는 생략, 실제로는 전체 데이터 포함)
-        ];
+        // 수정: translates.json 로드 함수 추가
+        async function loadTranslations() {
+            try {
+                const response = await fetch('translates.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
+                }
+                siteTranslations = await response.json();
+                console.log("번역 데이터 로드 성공:", siteTranslations);
+            } catch (error) {
+                console.error("번역 데이터 로드 실패:", error);
+                showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.translationsLoad.replace('{{message}}', error.message));
+                siteTranslations = []; // 실패 시 빈 배열로 초기화
+            }
+        }
 
-        // 수정: 단지명 및 주소 번역 조회 함수
         function getTranslatedSiteInfo(complexId, field) {
             const site = siteTranslations.find(s => s.site_number == complexId);
             if (!site) return null;
@@ -390,7 +296,6 @@
             return field === 'name' ? site.site_name_kr : site.address_kr;
         }
 
-        // 수정: UI 언어 업데이트 함수
         function updateUILanguage() {
             const lang = isEnglish ? 'en' : 'ko';
             document.getElementById('page-title').textContent = translations[lang].title;
@@ -402,7 +307,6 @@
             document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
             document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
             
-            // 수정: 풍력단지 드롭다운 업데이트
             const dropdown = document.getElementById('windfarm-dropdown');
             const selectedValue = dropdown.value;
             while (dropdown.options.length > 1) dropdown.remove(1);
@@ -501,6 +405,12 @@
             }
         }
 
+        // 수정: 초기화 함수에서 번역 데이터와 CSV 데이터를 순차적으로 로드
+        async function initializeApp() {
+            await loadTranslations(); // 먼저 번역 데이터 로드
+            await loadCSVData(); // 그 다음 CSV 데이터 로드
+        }
+
         function initMap() {
             console.log("initMap 호출됨");
             const container = document.getElementById('map');
@@ -592,7 +502,6 @@
             }, 50);
         }
 
-        // 수정: 풍력단지 드롭다운 채우기
         function populateDropdown() {
             const dropdown = document.getElementById('windfarm-dropdown');
             const uniqueComplexes = [...new Set(allWindFarms.map(farm => farm.complexId))].filter(id => id);
@@ -705,7 +614,6 @@
             updateMarkers();
         }
 
-        // 수정: 단지 정보 패널 업데이트
         function updateComplexInfo(farmsInComplex) {
             const lang = isEnglish ? 'en' : 'ko';
             const complexId = farmsInComplex[0].complexId;
@@ -814,7 +722,6 @@
             currentInfowindows = [];
         }
 
-        // 수정: 마커 업데이트 함수
         function updateMarkers() {
             clearMap();
             const zoomLevel = map.getLevel();
@@ -934,7 +841,6 @@
             }
         }
 
-        // 수정: 터빈 상세 정보 표시 함수
         window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer, complexId) {
             currentInfowindows.forEach(infowindow => infowindow.setMap(null));
             currentInfowindows = [];
@@ -1016,8 +922,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             kakao.maps.load(() => {
                 console.log("Kakao Maps API 로드 성공");
-                // 수정: 번역 데이터가 이미 포함되어 있으므로 바로 CSV 로드
-                loadCSVData();
+                // 수정: initializeApp 호출로 번역과 CSV 데이터를 순차 로드
+                initializeApp();
             });
         });
 
