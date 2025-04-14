@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title id="page-title">한국 풍력 발전소 지도(Korea Wind Power Plant Map) by Seungho Jang</title>
+  <title id="page-title">한국 풍력 발전소 지도 by 장승호</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Kakao Maps SDK -->
@@ -54,7 +54,7 @@
     /* 모든 컨트롤 버튼 및 드롭다운에 동일한 스타일 */
     .control-button {
       width: 120px;
-      padding: 8px 12px; /* 버튼 내부 여백 */
+      /*padding: 8px 12px; *//* 버튼 내부 여백 복원 */
       background: rgba(255, 255, 255, 0.8);
       border: 1px solid #ccc;
       border-radius: 4px;
@@ -76,14 +76,14 @@
       display: none; /* 처음에는 숨김 */
       flex-direction: column;
       gap: 8px; /* 다른 컨트롤과 동일한 간격 */
-      margin-top: 8px; /* 설정 버튼과의 간격 */
+      /*margin-top: 8px; *//* 설정 버튼과의 간격 복원 */
       background: rgba(255, 255, 255, 0.8); /* 컨트롤 배경과 동일 */
       padding: 5px; /* 내부 여백 */
       border: 1px solid #ccc; /* 컨트롤 테두리와 동일 */
       border-radius: 4px; /* 컨트롤 모서리와 동일 */
       right: 0; /* 우측 정렬 */
       align-items: center; /* 내부 버튼들을 중앙 정렬 */
-      width: 120px; /* 설정 버튼과 동일한 가로 길이 */
+      /* width: 120px; */ /* 설정 버튼과 동일한 가로 길이 복원 */
     }
     /* 설정 컨테이너 내부 버튼 스타일 */
     #settings-container .control-button {
@@ -977,7 +977,7 @@
     // 전역 오류 핸들러 추가
     window.addEventListener('unhandledrejection', event => {
       console.warn('처리되지 않은 Promise 거부:', event.reason);
-      // 사용자에게 표시하지 않음 (동작에 영향 없으므로)
+      // 사용자에게는 표시하지 않음 (동작에 영향 없으므로)
     });
 
     document.addEventListener('DOMContentLoaded', function() {
