@@ -916,10 +916,16 @@
       const capacityBreakdown = Object.entries(capacityCount)
         .map(([cap, count]) => `${formatNumberWithCommas(cap)}kW * ${count}${isEnglish ? ' units' : '기'}`)
         .join(", ");
+      // 제조사 이름 처리
+      let displayManufacturer = manufacturer || translations[lang].noInfo;
+      if (isEnglish && manufacturerData && manufacturerData.manufacturers) {
+        const manufacturerInfo = manufacturerData.manufacturers.find(m => m.manufacturer === manufacturer);
+        displayManufacturer = manufacturerInfo ? manufacturerInfo.manufacturer_en : manufacturer || translations[lang].noInfo;
+      }
       const content = `
           <div class="detail-window" onclick="window.closeInfowindow(event, this)">
               ${translations[lang].detailWindow.name.replace('{{value}}', truncateText(turbineName, 20))}<br>
-              ${translations[lang].detailWindow.manufacturer.replace('{{value}}', truncateText(manufacturer || translations[lang].noInfo, 15))}<br>
+              ${translations[lang].detailWindow.manufacturer.replace('{{value}}', truncateText(displayManufacturer, 15))}<br>
               ${translations[lang].detailWindow.capacity.replace('{{value}}', formattedCapacity)}<br>
               ${translations[lang].detailWindow.turbineCount.replace('{{value}}', totalTurbines)}<br>
               ${translations[lang].detailWindow.complexCapacity.replace('{{value}}', truncateText(formattedTotalComplexCapacity, 25))}<br>
