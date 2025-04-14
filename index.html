@@ -224,6 +224,7 @@
         "windfarmDropdown": "풍력단지",
         "manufacturerDropdown": "제조사",
         "settings": "설정/Setting",
+        "initialReset": "처음으로", // 추가
         "allInfo": {
           "totalCapacity": "총 용량: {{value}} kW",
           "totalCapacityGW": "총 용량: {{value}} GW",
@@ -277,6 +278,7 @@
         "windfarmDropdown": "Wind Farm",
         "manufacturerDropdown": "Manufacturer",
         "settings": "설정/Setting",
+        "initialReset": "Home", // 추가
         "allInfo": {
           "totalCapacity": "Total Capacity: {{value}} kW",
           "totalCapacityGW": "Total Capacity: {{value}} GW",
@@ -405,21 +407,22 @@
       document.getElementById('translate-button').textContent = translations[lang].translate;
       document.getElementById('reset-button').textContent = translations[lang].reset;
       document.getElementById('settings-button').textContent = translations[lang].settings;
+      document.getElementById('initial-reset').textContent = translations[lang].initialReset; // 추가
       document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
       document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
-
+    
       const windfarmDropdown = document.getElementById('windfarm-dropdown');
       const selectedValue = windfarmDropdown.value;
       while (windfarmDropdown.options.length > 1) windfarmDropdown.remove(1);
       populateDropdown();
       windfarmDropdown.value = selectedValue;
-
+    
       const manufacturerDropdown = document.getElementById('manufacturer-dropdown');
       const selectedManufacturer = manufacturerDropdown.value;
       while (manufacturerDropdown.options.length > 1) manufacturerDropdown.remove(1);
       populateManufacturerDropdown();
       manufacturerDropdown.value = selectedManufacturer;
-
+    
       updateInfoPanels();
       updateMarkers();
     }
