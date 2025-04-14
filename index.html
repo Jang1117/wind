@@ -1,13 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-  <title id="page-title">한국 풍력 발전소 지도</title>
+  <title id="page-title">Korea Wind Power Plant by Seungho Jang</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" id="meta-description" content="한국 풍력 발전소의 위치, 제조사, 단지 정보를 제공하는 대화형 지도입니다. 신재생에너지와 친환경 에너지 데이터를 확인하세요.">
+  <meta name="keywords" content="한국 풍력 발전소, 풍력단지 지도, 풍력 터빈, 제조사, 신재생에너지, 신재생, 풍력, 친환경 에너지, 한국 탄소중립">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="장승호, Seungho Jang">
+  <!-- Open Graph for Social Media -->
+  <meta property="og:title" content="한국 풍력 발전소 지도">
+  <meta property="og:description" content="한국의 풍력 발전소 위치와 정보를 탐색하세요. 제조사, 용량, 단지별 데이터를 대화형 지도로 확인할 수 있습니다.">
+  <meta property="og:type" content="website">
   <!-- Kakao Maps SDK -->
   <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b8113591f35c3409335bdb4b5ee5613&libraries=clusterer&autoload=false" defer></script>
   <!-- PapaParse -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <!-- 구조화된 데이터 -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "한국 풍력 발전소 지도",
+    "url": "https://yourwebsite.com",
+    "description": "한국 풍력 발전소와 풍력단지의 위치, 제조사, 용량 정보를 제공하는 대화형 지도",
+    "inLanguage": ["ko", "en"],
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://yourwebsite.com/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
   <style>
     html, body {
       margin: 0;
@@ -141,9 +165,14 @@
       text-overflow: ellipsis;
       max-height: 80vh;
     }
+    .seo-content {
+      display: none;
+    }
   </style>
 </head>
 <body>
+  <!-- SEO용 헤딩 -->
+  <h1 id="main-heading" class="control-button" style="position: absolute; top: 10px; left: 10px; z-index: 10;">한국 풍력 발전소 지도</h1>
   <!-- 지도 영역 -->
   <div id="map"></div>
   <div id="loading">지도 로딩 중...</div>
@@ -189,6 +218,12 @@
     <span id="info-complex-completion"></span>
   </div>
   
+  <!-- SEO용 정적 콘텐츠 -->
+  <div class="seo-content">
+    <p>한국 풍력 발전소 지도에서 전국의 풍력단지 위치, 터빈 제조사, 용량 정보를 확인하세요. 신재생에너지와 친환경 에너지 데이터를 제공합니다.</p>
+    <p>주요 키워드: 한국 풍력 발전소, 풍력단지 지도, 풍력 터빈 제조사, 신재생에너지, 탄소중립.</p>
+  </div>
+  
   <script>
     let map;
     let markers = [];
@@ -210,7 +245,9 @@
 
     translations = {
       "ko": {
-        "title": "한국 풍력 발전소 지도",
+        "title": "한국 풍력 발전소 지도 - 위치, 제조사, 단지 정보",
+        "mainHeading": "한국 풍력 발전소 지도",
+        "metaDescription": "한국 풍력 발전소의 위치, 제조사, 단지 정보를 제공하는 대화형 지도입니다. 신재생에너지와 친환경 에너지 데이터를 확인하세요.",
         "loading": "지도 로딩 중...",
         "mapTypeToggle": "기본 지도",
         "mapTypeToggleSatellite": "위성 지도",
@@ -264,7 +301,9 @@
         "myLocation": "내 위치"
       },
       "en": {
-        "title": "South Korea Wind Farm Map",
+        "title": "South Korea Wind Farm Map - Locations, Manufacturers, Data",
+        "mainHeading": "South Korea Wind Farm Map",
+        "metaDescription": "Interactive map of South Korea wind farms, providing locations, manufacturers, and complex data. Explore renewable and green energy information.",
         "loading": "Loading map...",
         "mapTypeToggle": "Road Map",
         "mapTypeToggleSatellite": "Satellite Map",
@@ -357,7 +396,8 @@
           throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
         }
         siteTranslations = await response.json();
-        console.log("번역 데이터 로드 성공:", siteTranslations);
+        console.log("번역 데이터 로드 성공:", siteTranslation
+    s);
       } catch (error) {
         console.error("번역 데이터 로드 실패:", error);
         showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.translationsLoad.replace('{{message}}', error.message));
@@ -483,6 +523,11 @@
     function updateUILanguage() {
       const lang = isEnglish ? 'en' : 'ko';
       document.getElementById('page-title').textContent = translations[lang].title;
+      document.getElementById('main-heading').textContent = translations[lang].mainHeading;
+      document.getElementById('meta-description').content = translations[lang].metaDescription;
+      document.querySelector('meta[property="og:title"]').content = translations[lang].title;
+      document.querySelector('meta[property="og:description"]').content = translations[lang].metaDescription;
+      document.documentElement.lang = lang;
       document.getElementById('loading').textContent = translations[lang].loading;
       document.getElementById('map-type-toggle').textContent = isSatellite ? translations[lang].mapTypeToggle : translations[lang].mapTypeToggleSatellite;
       document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
