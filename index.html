@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title id="page-title">한국 풍력 발전소 지도 by 장승호</title>
+  <title id="page-title">한국 풍력 발전소 지도</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Kakao Maps SDK -->
@@ -258,7 +258,8 @@
           "csvParse": "CSV 파싱 실패: {{message}}",
           "geolocation": "위치 정보 가져오기 실패",
           "geolocationUnsupported": "위치 정보 지원 안 됨",
-          "translationsLoad": "번역 데이터 로드 실패: {{message}}"
+          "translationsLoad": "번역 데이터 로드 실패: {{message}}",
+          "manufacturersLoad": "제조사 데이터 로드 실패: {{message}}"
         },
         "myLocation": "내 위치"
       },
@@ -311,7 +312,8 @@
           "csvParse": "Failed to parse CSV: {{message}}",
           "geolocation": "Failed to get location",
           "geolocationUnsupported": "Geolocation not supported",
-          "translationsLoad": "Failed to load translations: {{message}}"
+          "translationsLoad": "Failed to load translations: {{message}}",
+          "manufacturersLoad": "Failed to load manufacturers: {{message}}"
         },
         "myLocation": "My Location"
       }
@@ -339,10 +341,11 @@
           throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
         }
         manufacturerData = await response.json();
-        console.log("제조사 데이터 로드 성공:", manufacturerData);
+        console.log("제조사 데이터 로드 성공:", JSON.stringify(manufacturerData, null, 2));
       } catch (error) {
         console.error("제조사 데이터 로드 실패:", error);
-        manufacturerData = null;
+        showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.manufacturersLoad.replace('{{message}}', error.message));
+        manufacturerData = { manufacturers: [] }; // 빈 배열로 초기화
       }
     }
 
@@ -426,7 +429,6 @@
     async function initializeApp() {
       console.log("앱 초기화 시작");
       try {
-        // 병렬로 데이터 로드하여 지연 감소
         await Promise.all([
           loadTranslations(),
           loadManufacturers(),
@@ -531,6 +533,56 @@
       return (kw / 1000000).toFixed(2);
     }
 
+    function populateManufacturerDropdown() {
+      const dropdown = document.getElementById('manufacturer-dropdown');
+      while (dropdown.options.length > 1) dropdown.remove(1);
+      console.log("제조사 드롭다운 초기화 완료, manufacturerData:", JSON.stringify(manufacturerData, null, 2));
+
+      let manufacturers = [];
+
+      // 1. manufacturerData에서 제조사 목록 가져오기
+      if (manufacturerData && manufacturerData.manufacturers && Array.isArray(manufacturerData.manufacturers)) {
+        manufacturers = manufacturerData.manufacturers.map(m => ({
+          manufacturer: m.manufacturer || '',
+          manufacturer_en: m.manufacturer_en || m.manufacturer || ''
+        }));
+        console.log("manufacturerData에서 가져온 제조사:", manufacturers);
+      } else {
+        console.warn("manufacturerData가 없거나 형식이 잘못됨, 대체 데이터 사용");
+      }
+
+      // 2. manufacturerData가 없으면 allWindFarms에서 제조사 추출
+      if (manufacturers.length === 0 && allWindFarms.length > 0) {
+        const uniqueManufacturers = [...new Set(allWindFarms.map(farm => farm.manufacturer).filter(m => m))];
+        manufacturers = uniqueManufacturers.map(m => ({
+          manufacturer: m,
+          manufacturer_en: m // 영어 이름 없으면 기본값으로 사용
+        }));
+        console.log("allWindFarms에서 추출한 제조사:", manufacturers);
+      }
+
+      // 3. 제조사 정렬 및 드롭다운 추가
+      if (manufacturers.length > 0) {
+        manufacturers.sort((a, b) => {
+          const nameA = isEnglish ? a.manufacturer_en : a.manufacturer;
+          const nameB = isEnglish ? b.manufacturer_en : b.manufacturer;
+          return nameA.localeCompare(nameB, isEnglish ? 'en' : 'ko');
+        });
+
+        manufacturers.forEach(m => {
+          if (m.manufacturer) { // manufacturer 값이 유효한 경우만 추가
+            const option = document.createElement('option');
+            option.value = m.manufacturer;
+            option.textContent = isEnglish ? m.manufacturer_en : m.manufacturer;
+            dropdown.appendChild(option);
+          }
+        });
+        console.log("드롭다운에 추가된 옵션 수:", dropdown.options.length - 1);
+      } else {
+        console.warn("표시할 제조사 데이터 없음");
+      }
+    }
+
     function initMap() {
       console.log("initMap 호출됨");
       const container = document.getElementById('map');
@@ -604,25 +656,6 @@
         option.textContent = complex.name;
         dropdown.appendChild(option);
       });
-    }
-
-    function populateManufacturerDropdown() {
-      const dropdown = document.getElementById('manufacturer-dropdown');
-      while (dropdown.options.length > 1) dropdown.remove(1);
-      if (manufacturerData && manufacturerData.manufacturers) {
-        let manufacturers = manufacturerData.manufacturers.slice();
-        manufacturers.sort((a, b) => {
-          const nameA = isEnglish ? a.manufacturer_en : a.manufacturer;
-          const nameB = isEnglish ? b.manufacturer_en : b.manufacturer;
-          return nameA.localeCompare(nameB, isEnglish ? 'en' : 'ko');
-        });
-        manufacturers.forEach(m => {
-          const option = document.createElement('option');
-          option.value = m.manufacturer;
-          option.textContent = isEnglish ? m.manufacturer_en : m.manufacturer;
-          dropdown.appendChild(option);
-        });
-      }
     }
 
     function handleDropdownChange(event) {
@@ -974,10 +1007,8 @@
       }
     };
 
-    // 전역 오류 핸들러 추가
     window.addEventListener('unhandledrejection', event => {
       console.warn('처리되지 않은 Promise 거부:', event.reason);
-      // 사용자에게는 표시하지 않음 (동작에 영향 없으므로)
     });
 
     document.addEventListener('DOMContentLoaded', function() {
