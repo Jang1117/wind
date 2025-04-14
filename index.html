@@ -386,6 +386,12 @@
       selectedManufacturer = '';
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
+      const allInfo = document.getElementById('all-info');
+      const manufacturerInfo = document.getElementById('manufacturer-info');
+      const complexInfo = document.getElementById('complex-info');
+      allInfo.style.display = 'block'; // 전체 정보 표시
+      manufacturerInfo.style.display = 'none'; // 제조사 정보 숨김
+      complexInfo.style.display = 'none'; // 단지 정보 숨김
       updateInfoPanels();
       updateMarkers();
     }
