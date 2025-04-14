@@ -898,9 +898,7 @@
       currentInfowindows = [];
       const lang = isEnglish ? 'en' : 'ko';
       const turbineName = name;
-      const totalTurbines = turbineCountByComplex[complexId] || 0;
-      const formattedCapacity = formatNumberWithCommas(capacity);
-      const totalComplexCapacity = totalCapacityByComplex[complexId] || 0;
+      const totalComplexCapacity = total  totalCapacityByComplex[complexId] || 0;
       const formattedTotalComplexCapacity = formatNumberWithCommas(totalComplexCapacity);
       const farmsInComplex = allWindFarms.filter(farm => farm.complexId === complexId);
       const capacityCount = {};
@@ -919,9 +917,7 @@
       const content = `
           <div class="detail-window" onclick="window.closeInfowindow(event, this)">
               ${translations[lang].detailWindow.name.replace('{{value}}', truncateText(turbineName, 20))}<br>
-              ${translations[lang].detailWindow.manufacturer.replace('{{value}}', truncateText(manufacturer || translations[lang].noInfo, 15))}<br>
-              ${translations[lang].detailWindow.capacity.replace('{{value}}', formattedCapacity)}<br>
-              ${translations[lang].detailWindow.turbineCount.replace('{{value}}', totalTurbines)}<br>
+              ${translations[lang].detailWindow.manufacturer.replace('{{value}}', truncateText(manufacturer || translations[lang].noInfo, 15)).replace('Manufacturer', isEnglish ? 'Turbine Manufacturer' : '터빈 제조사')}<br>
               ${translations[lang].detailWindow.complexCapacity.replace('{{value}}', truncateText(formattedTotalComplexCapacity, 25))}<br>
               ${translations[lang].detailWindow.capacityBreakdown.replace('{{value}}', truncateText(capacityBreakdown, 25))}<br>
               ${translations[lang].detailWindow.completion.replace('{{value}}', truncateText(completionDate || translations[lang].noInfo, 15))}<br>
