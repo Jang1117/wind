@@ -698,7 +698,17 @@
       const capacityBreakdown = Object.entries(capacityCount)
         .map(([cap, count]) => `${formatNumberWithCommas(cap)}kW * ${count}${isEnglish ? ' units' : '기'}`)
         .join(", ");
-      const manufacturers = [...new Set(farmsInComplex.map(farm => farm.manufacturer).filter(m => m))].join(", ") || translations[lang].noInfo;
+      // 제조사 이름 처리
+      const manufacturerSet = new Set(farmsInComplex.map(farm => farm.manufacturer).filter(m => m));
+      let manufacturers;
+      if (isEnglish && manufacturerData && manufacturerData.manufacturers) {
+        manufacturers = [...manufacturerSet].map(m => {
+          const manufacturerInfo = manufacturerData.manufacturers.find(info => info.manufacturer === m);
+          return manufacturerInfo ? manufacturerInfo.manufacturer_en : m;
+        }).join(", ") || translations[lang].noInfo;
+      } else {
+        manufacturers = [...manufacturerSet].join(", ") || translations[lang].noInfo;
+      }
       const turbineCount = farmsInComplex.length;
       const completionDates = farmsInComplex.map(farm => farm.completionDate).filter(date => date);
       const completionDate = completionDates.length > 0 ? completionDates.sort()[0] : translations[lang].noInfo;
