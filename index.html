@@ -166,6 +166,7 @@
     <div id="settings-container" style="display: none;">
       <button id="map-type-toggle" class="control-button">기본 지도</button>
       <button id="name-toggle-button" class="control-button">이름 끄기</button>
+      <button id="marker-toggle-button" class="control-button">마커 끄기</button> <!-- 새 버튼 추가 -->
       <button id="translate-button" class="control-button">English</button>
     </div>
   </div>
@@ -204,6 +205,7 @@
     let myLocationMarker = null;
     let watchId = null;
     let areNamesVisible = true;
+    let areMarkersVisible = true; // 마커 표시 여부 변수 추가
     let selectedManufacturer = '';
     let selectedComplex = '';
     let isEnglish = false;
@@ -219,6 +221,8 @@
         "mapTypeToggleSatellite": "위성 지도",
         "nameToggle": "이름 끄기",
         "nameToggleOn": "이름 켜기",
+        "markerToggle": "마커 끄기",
+        "markerToggleOn": "마커 켜기",
         "reset": "선택 초기화",
         "translate": "English",
         "windfarmDropdown": "풍력단지",
@@ -273,6 +277,8 @@
         "mapTypeToggleSatellite": "Satellite Map",
         "nameToggle": "Hide Names",
         "nameToggleOn": "Show Names",
+        "markerToggle": "Hide Markers",
+        "markerToggleOn": "Show Markers",
         "reset": "Select Reset",
         "translate": "한국어",
         "windfarmDropdown": "Wind Farm",
@@ -404,6 +410,7 @@
       document.getElementById('loading').textContent = translations[lang].loading;
       document.getElementById('map-type-toggle').textContent = isSatellite ? translations[lang].mapTypeToggle : translations[lang].mapTypeToggleSatellite;
       document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
+      document.getElementById('marker-toggle-button').textContent = areMarkersVisible ? translations[lang].markerToggle : translations[lang].markerToggleOn; // 마커 버튼 텍스트
       document.getElementById('translate-button').textContent = translations[lang].translate;
       document.getElementById('reset-button').textContent = translations[lang].reset;
       document.getElementById('settings-button').textContent = translations[lang].settings;
@@ -550,6 +557,7 @@
       document.getElementById('reset-button').addEventListener('click', resetSelectionsOnly);
       document.getElementById('map-type-toggle').addEventListener('click', toggleMapType);
       document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
+      document.getElementById('marker-toggle-button').addEventListener('click', toggleMarkersVisibility); // 마커 토글 이벤트 리스너 추가
       document.getElementById('translate-button').addEventListener('click', toggleLanguage);
       document.getElementById('settings-button').addEventListener('click', () => {
         const settingsContainer = document.getElementById('settings-container');
@@ -580,6 +588,14 @@
       updateMarkers();
     }
 
+    function toggleMarkersVisibility() {
+      areMarkersVisible = !areMarkersVisible;
+      const lang = isEnglish ? 'en' : 'ko';
+      document.getElementById('marker-toggle-button').textContent = areMarkersVisible ? translations[lang].markerToggle : translations[lang].markerToggleOn;
+      updateMarkers();
+      console.log("마커 표시 상태:", areMarkersVisible ? "표시" : "숨김");
+    }
+    
     function populateDropdown() {
       const dropdown = document.getElementById('windfarm-dropdown');
       const uniqueComplexes = [...new Set(allWindFarms.map(farm => farm.complexId))].filter(id => id);
@@ -831,14 +847,16 @@
           const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
           const position = new kakao.maps.LatLng(avgLat, avgLon);
           const complexName = getTranslatedSiteInfo(complexId, 'name') || group[0].name;
-          const marker = new kakao.maps.Marker({
-            position: position,
-            title: `${complexName} (${group.length}${isEnglish ? ' turbines' : '개 터빈'})`,
-            clickable: true,
-            image: markerImage
-          });
-          marker.setMap(map);
-          markers.push(marker);
+          if (areMarkersVisible) { // 마커 표시 여부 확인
+            const marker = new kakao.maps.Marker({
+              position: position,
+              title: `${complexName} (${group.length}${isEnglish ? ' turbines' : '개 터빈'})`,
+              clickable: true,
+              image: markerImage
+            });
+            marker.setMap(map);
+            markers.push(marker);
+          }
           if (areNamesVisible) {
             const overlay = new kakao.maps.CustomOverlay({
               position: position,
@@ -850,23 +868,25 @@
             overlay.setMap(map);
             overlays.push(overlay);
           }
-          kakao.maps.event.addListener(marker, 'click', () => {
-            selectedComplex = complexId;
-            selectedManufacturer = '';
-            document.getElementById('manufacturer-dropdown').value = '';
-            document.getElementById('windfarm-dropdown').value = complexId;
-            const allInfo = document.getElementById('all-info');
-            const manufacturerInfo = document.getElementById('manufacturer-info');
-            const complexInfo = document.getElementById('complex-info');
-            allInfo.style.display = 'none';
-            manufacturerInfo.style.display = 'none';
-            updateComplexInfo(group);
-            complexInfo.style.display = 'block';
-            map.setCenter(position);
-            const currentLevel = map.getLevel();
-            map.setLevel(currentLevel - 5);
-            updateMarkers();
-          });
+          if (areMarkersVisible) { // 마커 클릭 이벤트는 마커가 있을 때만 추가
+            kakao.maps.event.addListener(marker, 'click', () => {
+              selectedComplex = complexId;
+              selectedManufacturer = '';
+              document.getElementById('manufacturer-dropdown').value = '';
+              document.getElementById('windfarm-dropdown').value = complexId;
+              const allInfo = document.getElementById('all-info');
+              const manufacturerInfo = document.getElementById('manufacturer-info');
+              const complexInfo = document.getElementById('complex-info');
+              allInfo.style.display = 'none';
+              manufacturerInfo.style.display = 'none';
+              updateComplexInfo(group);
+              complexInfo.style.display = 'block';
+              map.setCenter(position);
+              const currentLevel = map.getLevel();
+              map.setLevel(currentLevel - 5);
+              updateMarkers();
+            });
+          }
         });
       } else {
         const bounds = map.getBounds();
@@ -878,14 +898,16 @@
           const position = new kakao.maps.LatLng(farm.lat, farm.lon);
           const complexName = getTranslatedSiteInfo(farm.complexId, 'name') || farm.name;
           const turbineName = `${complexName} ${farm.turbineId}`;
-          const marker = new kakao.maps.Marker({
-            position: position,
-            title: turbineName,
-            clickable: true,
-            image: markerImage
-          });
-          marker.setMap(map);
-          markers.push(marker);
+          if (areMarkersVisible) { // 마커 표시 여부 확인
+            const marker = new kakao.maps.Marker({
+              position: position,
+              title: turbineName,
+              clickable: true,
+              image: markerImage
+            });
+            marker.setMap(map);
+            markers.push(marker);
+          }
           if (areNamesVisible) {
             const overlay = new kakao.maps.CustomOverlay({
               position: position,
@@ -897,7 +919,9 @@
             overlay.setMap(map);
             overlays.push(overlay);
           }
-          kakao.maps.event.addListener(marker, 'click', () => toggleFarmDetails(complexName, farm.turbineId, farm.type, farm.completionDate, getTranslatedSiteInfo(farm.complexId, 'address') || farm.address, farm.lat, farm.lon, farm.capacity, farm.manufacturer, farm.complexId));
+          if (areMarkersVisible) { // 마커 클릭 이벤트는 마커가 있을 때만 추가
+            kakao.maps.event.addListener(marker, 'click', () => toggleFarmDetails(complexName, farm.turbineId, farm.type, farm.completionDate, getTranslatedSiteInfo(farm.complexId, 'address') || farm.address, farm.lat, farm.lon, farm.capacity, farm.manufacturer, farm.complexId));
+          }
         });
       }
       if (myLocationMarker) {
