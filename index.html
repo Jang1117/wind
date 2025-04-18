@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title id="page-title">Korea Wind Power Plant Map by Seungho Jang</title>
+  <title id="page-title">한국 풍력 발전소 지도 by Seungho Jang</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" id="meta-description" content="한국 풍력 발전소의 위치, 제조사, 단지 정보를 제공하는 대화형 지도입니다. 신재생에너지와 친환경 에너지 데이터를 확인하세요.">
@@ -141,6 +141,36 @@
       text-overflow: ellipsis;
       max-height: 80vh;
     }
+    /* 정보 팝업 스타일 */
+    #info-popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10001;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 20px;
+      text-align: center;
+      font-size: 14px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      max-width: 300px;
+      width: 90%;
+    }
+    #info-popup .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #info-popup-content {
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -165,6 +195,7 @@
       <button id="name-toggle-button" class="control-button">이름 끄기</button>
       <button id="marker-toggle-button" class="control-button">마커 끄기</button>
       <button id="translate-button" class="control-button">English</button>
+      <button id="info-button" class="control-button">정보</button>
     </div>
   </div>
   
@@ -190,6 +221,12 @@
     <span id="info-complex-completion"></span>
   </div>
   
+  <!-- 정보 팝업 -->
+  <div id="info-popup">
+    <button class="close-button" onclick="toggleInfoPopup()">×</button>
+    <div id="info-popup-content"></div>
+  </div>
+  
   <script>
     let map;
     let markers = [];
@@ -202,7 +239,7 @@
     let myLocationMarker = null;
     let watchId = null;
     let areNamesVisible = true;
-    let areMarkersVisible = true; // 마커 표시 여부
+    let areMarkersVisible = true;
     let selectedManufacturer = '';
     let selectedComplex = '';
     let isEnglish = false;
@@ -218,10 +255,12 @@
         "mapTypeToggleSatellite": "위성 지도",
         "nameToggle": "이름 끄기",
         "nameToggleOn": "이름 켜기",
-        "markerToggle": "마커 끄기", // 추가
-        "markerToggleOn": "마커 켜기", // 추가
+        "markerToggle": "마커 끄기",
+        "markerToggleOn": "마커 켜기",
         "reset": "선택 초기화",
         "translate": "English",
+        "infoButton": "정보", // 추가
+        "infoPopup": "제작자: 장승호<br>Email: 7911171g@gmail.com", // 추가
         "windfarmDropdown": "풍력단지",
         "manufacturerDropdown": "제조사",
         "settings": "설정/Setting",
@@ -272,12 +311,14 @@
         "loading": "Loading map...",
         "mapTypeToggle": "Road Map",
         "mapTypeToggleSatellite": "Satellite Map",
-        "nameToggle": "Hide Name",
-        "nameToggleOn": "Show Name",
-        "markerToggle": "Hide Marker", // 추가
-        "markerToggleOn": "Show Marker", // 추가
+        "nameToggle": "Hide Names",
+        "nameToggleOn": "Show Names",
+        "markerToggle": "Hide Markers",
+        "markerToggleOn": "Show Markers",
         "reset": "Select Reset",
         "translate": "한국어",
+        "infoButton": "Info", // 추가
+        "infoPopup": "Creator: Seungho Jang<br>Email: 7911171g@gmail.com", // 추가
         "windfarmDropdown": "Wind Farm",
         "manufacturerDropdown": "Manufacturer",
         "settings": "설정/Setting",
@@ -409,6 +450,7 @@
       document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
       document.getElementById('marker-toggle-button').textContent = areMarkersVisible ? translations[lang].markerToggle : translations[lang].markerToggleOn;
       document.getElementById('translate-button').textContent = translations[lang].translate;
+      document.getElementById('info-button').textContent = translations[lang].infoButton; // 추가
       document.getElementById('reset-button').textContent = translations[lang].reset;
       document.getElementById('settings-button').textContent = translations[lang].settings;
       document.getElementById('initial-reset').textContent = translations[lang].initialReset;
@@ -429,6 +471,8 @@
     
       updateInfoPanels();
       updateMarkers();
+      // 정보 팝업 내용 업데이트
+      document.getElementById('info-popup-content').innerHTML = translations[lang].infoPopup;
     }
 
     function showError(message) {
@@ -444,6 +488,12 @@
       isEnglish = !isEnglish;
       console.log("언어 전환:", isEnglish ? "영어" : "한국어");
       updateUILanguage();
+    }
+
+    function toggleInfoPopup() {
+      const infoPopup = document.getElementById('info-popup');
+      infoPopup.style.display = infoPopup.style.display === 'none' ? 'block' : 'none';
+      console.log("정보 팝업 표시 상태:", infoPopup.style.display);
     }
 
     function formatNumberWithCommas(number) {
@@ -556,6 +606,7 @@
       document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
       document.getElementById('marker-toggle-button').addEventListener('click', toggleMarkersVisibility);
       document.getElementById('translate-button').addEventListener('click', toggleLanguage);
+      document.getElementById('info-button').addEventListener('click', toggleInfoPopup); // 추가
       document.getElementById('settings-button').addEventListener('click', () => {
         const settingsContainer = document.getElementById('settings-container');
         settingsContainer.style.display = settingsContainer.style.display === 'none' ? 'flex' : 'none';
@@ -563,6 +614,12 @@
       });
       document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
       document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
+      // 팝업 외부 클릭 시 닫기
+      document.getElementById('info-popup').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('info-popup')) {
+          toggleInfoPopup();
+        }
+      });
     }
 
     function toggleMapType() {
