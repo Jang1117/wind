@@ -57,7 +57,6 @@
     /* 모든 컨트롤 버튼 및 드롭다운에 동일한 스타일 */
     .control-button {
       width: 120px;
-      /*padding: 8px 12px; *//* 버튼 내부 여백 복원 */
       background: rgba(255, 255, 255, 0.8);
       border: 1px solid #ccc;
       border-radius: 4px;
@@ -79,14 +78,12 @@
       display: none; /* 처음에는 숨김 */
       flex-direction: column;
       gap: 8px; /* 다른 컨트롤과 동일한 간격 */
-      /*margin-top: 8px; *//* 설정 버튼과의 간격 복원 */
       background: rgba(255, 255, 255, 0.8); /* 컨트롤 배경과 동일 */
       padding: 5px; /* 내부 여백 */
       border: 1px solid #ccc; /* 컨트롤 테두리와 동일 */
       border-radius: 4px; /* 컨트롤 모서리와 동일 */
       right: 0; /* 우측 정렬 */
       align-items: center; /* 내부 버튼들을 중앙 정렬 */
-      /* width: 120px; */ /* 설정 버튼과 동일한 가로 길이 복원 */
     }
     /* 설정 컨테이너 내부 버튼 스타일 */
     #settings-container .control-button {
@@ -166,7 +163,7 @@
     <div id="settings-container" style="display: none;">
       <button id="map-type-toggle" class="control-button">기본 지도</button>
       <button id="name-toggle-button" class="control-button">이름 끄기</button>
-      <button id="marker-toggle-button" class="control-button">마커 끄기</button> <!-- 새 버튼 추가 -->
+      <button id="marker-toggle-button" class="control-button">마커 끄기</button>
       <button id="translate-button" class="control-button">English</button>
     </div>
   </div>
@@ -205,7 +202,7 @@
     let myLocationMarker = null;
     let watchId = null;
     let areNamesVisible = true;
-    let areMarkersVisible = true; // 마커 표시 여부 변수 추가
+    let areMarkersVisible = true; // 마커 표시 여부
     let selectedManufacturer = '';
     let selectedComplex = '';
     let isEnglish = false;
@@ -221,14 +218,14 @@
         "mapTypeToggleSatellite": "위성 지도",
         "nameToggle": "이름 끄기",
         "nameToggleOn": "이름 켜기",
-        "markerToggle": "마커 끄기",
-        "markerToggleOn": "마커 켜기",
+        "markerToggle": "마커 끄기", // 추가
+        "markerToggleOn": "마커 켜기", // 추가
         "reset": "선택 초기화",
         "translate": "English",
         "windfarmDropdown": "풍력단지",
         "manufacturerDropdown": "제조사",
         "settings": "설정/Setting",
-        "initialReset": "처음으로", // 추가
+        "initialReset": "처음으로",
         "allInfo": {
           "totalCapacity": "총 용량: {{value}} kW",
           "totalCapacityGW": "총 용량: {{value}} GW",
@@ -251,14 +248,14 @@
         },
         "infoWindow": "{{name}} ({{count}}기)",
         "detailWindow": {
-              "name": "단지명: {{value}}",
-              "manufacturer": "터빈제조사: {{value}}", // "제조사" -> "터빈제조사"
-              "capacity": "터빈용량: {{value}} kW", // "용량" -> "터빈용량"
-              "turbineCount": "단지 터빈 수: {{value}}",
-              "complexCapacity": "단지 총 용량: {{value}} kW",
-              "capacityBreakdown": "용량 분포: {{value}}",
-              "completion": "준공일: {{value}}",
-              "address": "주소: {{value}}"
+          "name": "단지명: {{value}}",
+          "manufacturer": "터빈제조사: {{value}}",
+          "capacity": "터빈용량: {{value}} kW",
+          "turbineCount": "단지 터빈 수: {{value}}",
+          "complexCapacity": "단지 총 용량: {{value}} kW",
+          "capacityBreakdown": "용량 분포: {{value}}",
+          "completion": "준공일: {{value}}",
+          "address": "주소: {{value}}"
         },
         "noInfo": "정보 없음",
         "errorMessage": {
@@ -277,14 +274,14 @@
         "mapTypeToggleSatellite": "Satellite Map",
         "nameToggle": "Hide Names",
         "nameToggleOn": "Show Names",
-        "markerToggle": "Hide Markers",
-        "markerToggleOn": "Show Markers",
+        "markerToggle": "Hide Markers", // 추가
+        "markerToggleOn": "Show Markers", // 추가
         "reset": "Select Reset",
         "translate": "한국어",
         "windfarmDropdown": "Wind Farm",
         "manufacturerDropdown": "Manufacturer",
         "settings": "설정/Setting",
-        "initialReset": "Home", // 추가
+        "initialReset": "Home",
         "allInfo": {
           "totalCapacity": "Total Capacity: {{value}} kW",
           "totalCapacityGW": "Total Capacity: {{value}} GW",
@@ -307,14 +304,14 @@
         },
         "infoWindow": "{{name}} ({{count}} turbines)",
         "detailWindow": {
-              "name": "Complex: {{value}}",
-              "manufacturer": "Turbine Manufacturer: {{value}}", // "Manufacturer" -> "Turbine Manufacturer"
-              "capacity": "Turbine Capacity: {{value}} kW", // "Capacity" -> "Turbine Capacity"
-              "turbineCount": "Complex Turbines: {{value}}",
-              "complexCapacity": "Complex Total Capacity: {{value}} kW",
-              "capacityBreakdown": "Capacity Breakdown: {{value}}",
-              "completion": "Completion: {{value}}",
-              "address": "Address: {{value}}"
+          "name": "Complex: {{value}}",
+          "manufacturer": "Turbine Manufacturer: {{value}}",
+          "capacity": "Turbine Capacity: {{value}} kW",
+          "turbineCount": "Complex Turbines: {{value}}",
+          "complexCapacity": "Complex Total Capacity: {{value}} kW",
+          "capacityBreakdown": "Capacity Breakdown: {{value}}",
+          "completion": "Completion: {{value}}",
+          "address": "Address: {{value}}"
         },
         "noInfo": "No Info",
         "errorMessage": {
@@ -397,9 +394,9 @@
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
-      allInfo.style.display = 'none'; // 전체 정보 숨김
-      manufacturerInfo.style.display = 'none'; // 제조사 정보 숨김
-      complexInfo.style.display = 'none'; // 단지 정보 숨김
+      allInfo.style.display = 'none';
+      manufacturerInfo.style.display = 'none';
+      complexInfo.style.display = 'none';
       updateInfoPanels();
       updateMarkers();
     }
@@ -410,11 +407,11 @@
       document.getElementById('loading').textContent = translations[lang].loading;
       document.getElementById('map-type-toggle').textContent = isSatellite ? translations[lang].mapTypeToggle : translations[lang].mapTypeToggleSatellite;
       document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
-      document.getElementById('marker-toggle-button').textContent = areMarkersVisible ? translations[lang].markerToggle : translations[lang].markerToggleOn; // 마커 버튼 텍스트
+      document.getElementById('marker-toggle-button').textContent = areMarkersVisible ? translations[lang].markerToggle : translations[lang].markerToggleOn;
       document.getElementById('translate-button').textContent = translations[lang].translate;
       document.getElementById('reset-button').textContent = translations[lang].reset;
       document.getElementById('settings-button').textContent = translations[lang].settings;
-      document.getElementById('initial-reset').textContent = translations[lang].initialReset; // 추가
+      document.getElementById('initial-reset').textContent = translations[lang].initialReset;
       document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
       document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
     
@@ -425,10 +422,10 @@
       windfarmDropdown.value = selectedValue;
     
       const manufacturerDropdown = document.getElementById('manufacturer-dropdown');
-      const selectedManufacturer = manufacturerDropdown.value;
+      const selectedManufacturerValue = manufacturerDropdown.value;
       while (manufacturerDropdown.options.length > 1) manufacturerDropdown.remove(1);
       populateManufacturerDropdown();
-      manufacturerDropdown.value = selectedManufacturer;
+      manufacturerDropdown.value = selectedManufacturerValue;
     
       updateInfoPanels();
       updateMarkers();
@@ -557,7 +554,7 @@
       document.getElementById('reset-button').addEventListener('click', resetSelectionsOnly);
       document.getElementById('map-type-toggle').addEventListener('click', toggleMapType);
       document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
-      document.getElementById('marker-toggle-button').addEventListener('click', toggleMarkersVisibility); // 마커 토글 이벤트 리스너 추가
+      document.getElementById('marker-toggle-button').addEventListener('click', toggleMarkersVisibility);
       document.getElementById('translate-button').addEventListener('click', toggleLanguage);
       document.getElementById('settings-button').addEventListener('click', () => {
         const settingsContainer = document.getElementById('settings-container');
@@ -583,7 +580,7 @@
 
     function toggleNamesVisibility() {
       areNamesVisible = !areNamesVisible;
-      const lang = isEnglish ? 'en' : 'ko'; // lang 변수 정의
+      const lang = isEnglish ? 'en' : 'ko';
       document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
       updateMarkers();
     }
@@ -595,7 +592,7 @@
       updateMarkers();
       console.log("마커 표시 상태:", areMarkersVisible ? "표시" : "숨김");
     }
-    
+
     function populateDropdown() {
       const dropdown = document.getElementById('windfarm-dropdown');
       const uniqueComplexes = [...new Set(allWindFarms.map(farm => farm.complexId))].filter(id => id);
@@ -717,7 +714,6 @@
       const capacityBreakdown = Object.entries(capacityCount)
         .map(([cap, count]) => `${formatNumberWithCommas(cap)}kW * ${count}${isEnglish ? ' units' : '기'}`)
         .join(", ");
-      // 제조사 이름 처리
       const manufacturerSet = new Set(farmsInComplex.map(farm => farm.manufacturer).filter(m => m));
       let manufacturers;
       if (isEnglish && manufacturerData && manufacturerData.manufacturers) {
@@ -847,8 +843,9 @@
           const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
           const position = new kakao.maps.LatLng(avgLat, avgLon);
           const complexName = getTranslatedSiteInfo(complexId, 'name') || group[0].name;
-          if (areMarkersVisible) { // 마커 표시 여부 확인
-            const marker = new kakao.maps.Marker({
+          let marker = null;
+          if (areMarkersVisible) {
+            marker = new kakao.maps.Marker({
               position: position,
               title: `${complexName} (${group.length}${isEnglish ? ' turbines' : '개 터빈'})`,
               clickable: true,
@@ -868,7 +865,7 @@
             overlay.setMap(map);
             overlays.push(overlay);
           }
-          if (areMarkersVisible) { // 마커 클릭 이벤트는 마커가 있을 때만 추가
+          if (areMarkersVisible && marker) {
             kakao.maps.event.addListener(marker, 'click', () => {
               selectedComplex = complexId;
               selectedManufacturer = '';
@@ -898,8 +895,9 @@
           const position = new kakao.maps.LatLng(farm.lat, farm.lon);
           const complexName = getTranslatedSiteInfo(farm.complexId, 'name') || farm.name;
           const turbineName = `${complexName} ${farm.turbineId}`;
-          if (areMarkersVisible) { // 마커 표시 여부 확인
-            const marker = new kakao.maps.Marker({
+          let marker = null;
+          if (areMarkersVisible) {
+            marker = new kakao.maps.Marker({
               position: position,
               title: turbineName,
               clickable: true,
@@ -919,7 +917,7 @@
             overlay.setMap(map);
             overlays.push(overlay);
           }
-          if (areMarkersVisible) { // 마커 클릭 이벤트는 마커가 있을 때만 추가
+          if (areMarkersVisible && marker) {
             kakao.maps.event.addListener(marker, 'click', () => toggleFarmDetails(complexName, farm.turbineId, farm.type, farm.completionDate, getTranslatedSiteInfo(farm.complexId, 'address') || farm.address, farm.lat, farm.lon, farm.capacity, farm.manufacturer, farm.complexId));
           }
         });
@@ -953,7 +951,6 @@
       const capacityBreakdown = Object.entries(capacityCount)
         .map(([cap, count]) => `${formatNumberWithCommas(cap)}kW * ${count}${isEnglish ? ' units' : '기'}`)
         .join(", ");
-      // 제조사 이름 처리
       let displayManufacturer = manufacturer || translations[lang].noInfo;
       if (isEnglish && manufacturerData && manufacturerData.manufacturers) {
         const manufacturerInfo = manufacturerData.manufacturers.find(m => m.manufacturer === manufacturer);
