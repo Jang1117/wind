@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title id="page-title">한국 풍력 발전소 지도 by Seungho Jang</title>
+  <title id="page-title">Korea Wind Power Plant Map by Seungho Jang</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" id="meta-description" content="한국 풍력 발전소의 위치, 제조사, 단지 정보를 제공하는 대화형 지도입니다. 신재생에너지와 친환경 에너지 데이터를 확인하세요.">
@@ -259,8 +259,8 @@
         "markerToggleOn": "마커 켜기",
         "reset": "선택 초기화",
         "translate": "English",
-        "infoButton": "정보", // 추가
-        "infoPopup": "제작자: 장승호<br>Email: 7911171g@gmail.com", // 추가
+        "infoButton": "정보",
+        "infoPopup": "제작자: 장승호<br>Email: 7911171g@gmail.com",
         "windfarmDropdown": "풍력단지",
         "manufacturerDropdown": "제조사",
         "settings": "설정/Setting",
@@ -317,8 +317,8 @@
         "markerToggleOn": "Show Markers",
         "reset": "Select Reset",
         "translate": "한국어",
-        "infoButton": "Info", // 추가
-        "infoPopup": "Creator: Seungho Jang<br>Email: 7911171g@gmail.com", // 추가
+        "infoButton": "Info",
+        "infoPopup": "Creator: Seungho Jang<br>Email: 7911171g@gmail.com",
         "windfarmDropdown": "Wind Farm",
         "manufacturerDropdown": "Manufacturer",
         "settings": "설정/Setting",
@@ -450,7 +450,7 @@
       document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
       document.getElementById('marker-toggle-button').textContent = areMarkersVisible ? translations[lang].markerToggle : translations[lang].markerToggleOn;
       document.getElementById('translate-button').textContent = translations[lang].translate;
-      document.getElementById('info-button').textContent = translations[lang].infoButton; // 추가
+      document.getElementById('info-button').textContent = translations[lang].infoButton;
       document.getElementById('reset-button').textContent = translations[lang].reset;
       document.getElementById('settings-button').textContent = translations[lang].settings;
       document.getElementById('initial-reset').textContent = translations[lang].initialReset;
@@ -572,6 +572,7 @@
       await loadTranslations();
       await loadManufacturers();
       await loadCSVData();
+      updateUILanguage(); // 추가: 초기 언어 설정 및 UI 초기화
       console.log("앱 초기화 완료");
     }
 
@@ -606,7 +607,7 @@
       document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
       document.getElementById('marker-toggle-button').addEventListener('click', toggleMarkersVisibility);
       document.getElementById('translate-button').addEventListener('click', toggleLanguage);
-      document.getElementById('info-button').addEventListener('click', toggleInfoPopup); // 추가
+      document.getElementById('info-button').addEventListener('click', toggleInfoPopup);
       document.getElementById('settings-button').addEventListener('click', () => {
         const settingsContainer = document.getElementById('settings-container');
         settingsContainer.style.display = settingsContainer.style.display === 'none' ? 'flex' : 'none';
