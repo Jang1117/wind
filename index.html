@@ -249,7 +249,7 @@
 
     translations = {
       "ko": {
-        "title": "한국 풍력 발전소 지도",
+        "title": "한국 풍력 발전소 지도 by 장승호",
         "loading": "지도 로딩 중...",
         "mapTypeToggle": "기본 지도",
         "mapTypeToggleSatellite": "위성 지도",
@@ -307,7 +307,7 @@
         "myLocation": "내 위치"
       },
       "en": {
-        "title": "South Korea Wind Farm Map",
+        "title": "South Korea Wind Farm Map by Seungho Jang",
         "loading": "Loading map...",
         "mapTypeToggle": "Road Map",
         "mapTypeToggleSatellite": "Satellite Map",
@@ -490,9 +490,18 @@
       updateUILanguage();
     }
 
+    // 수정된 toggleInfoPopup 함수
     function toggleInfoPopup() {
       const infoPopup = document.getElementById('info-popup');
-      infoPopup.style.display = infoPopup.style.display === 'none' ? 'block' : 'none';
+      const isCurrentlyVisible = infoPopup.style.display === 'block';
+      
+      // 팝업 표시/숨김 전환
+      infoPopup.style.display = isCurrentlyVisible ? 'none' : 'block';
+      
+      // 팝업 콘텐츠 업데이트
+      const lang = isEnglish ? 'en' : 'ko';
+      document.getElementById('info-popup-content').innerHTML = translations[lang].infoPopup;
+      
       console.log("정보 팝업 표시 상태:", infoPopup.style.display);
     }
 
@@ -607,7 +616,16 @@
       document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
       document.getElementById('marker-toggle-button').addEventListener('click', toggleMarkersVisibility);
       document.getElementById('translate-button').addEventListener('click', toggleLanguage);
-      document.getElementById('info-button').addEventListener('click', toggleInfoPopup);
+      
+      // 수정된 info-button 이벤트 리스너 등록
+      const infoButton = document.getElementById('info-button');
+      if (infoButton) {
+        infoButton.addEventListener('click', toggleInfoPopup);
+        console.log("info-button 이벤트 리스너 등록 완료");
+      } else {
+        console.error("info-button 요소를 찾을 수 없습니다");
+      }
+      
       document.getElementById('settings-button').addEventListener('click', () => {
         const settingsContainer = document.getElementById('settings-container');
         settingsContainer.style.display = settingsContainer.style.display === 'none' ? 'flex' : 'none';
