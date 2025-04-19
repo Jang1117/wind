@@ -437,13 +437,21 @@
         console.log(`캐시된 날씨 데이터 사용: ${complexId}`);
         return weatherCache[complexId].data;
       }
-
+    
       try {
-        const url = `https://api.open-meteo.com/v1/kma?latitude=${lat}&longitude=${lon}&current=wind_direction_10m,wind_speed_10m,temperature_2m&models=kma_ldps&timezone=Asia%2FSeoul`;
-        console.log(`날씨 데이터 요청: ${url}`);
-        const response = await fetch(url);
+        // 1차 시도: KMA API
+        let url = `https://api.open-meteo.com/v1/kma?latitude=${lat}&longitude=${lon}&current=wind_direction_10m,wind_speed_10m,temperature_2m&models=kma_ldps&timezone=Asia%2FSeoul`;
+        console.log(`날씨 데이터 요청 (KMA): ${url}`);
+        let response = await fetch(url);
         if (!response.ok) {
-          throw new Error(`HTTP 오류! 상태: ${response.status}`);
+          console.warn(`KMA API 실패: 상태 ${response.status}, Forecast API로 폴백`);
+          // 2차 시도: Forecast API
+          url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_direction_10m,wind_speed_10m,temperature_2m&timezone=Asia%2FSeoul`;
+          console.log(`날씨 데이터 요청 (Forecast): ${url}`);
+          response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`HTTP 오류! 상태: ${response.status}`);
+          }
         }
         const data = await response.json();
         if (!data.current) {
