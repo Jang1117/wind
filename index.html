@@ -222,9 +222,11 @@
     <span id="info-complex-manufacturers"></span><br>
     <span id="info-complex-turbine-count"></span><br>
     <span id="info-complex-completion"></span><br>
+    <!-- 주석 처리: 날씨 정보 관련 UI 요소 -->
+    <!--
     <span id="info-complex-wind-speed-10m"></span><br>
     <span id="info-complex-wind-direction"></span><br>
-    <!-- <span id="info-complex-temperature"></span> --> <!-- 기온 제거 -->
+    -->
   </div>
   
   <!-- 정보 팝업 -->
@@ -252,8 +254,11 @@
     let translations = {};
     let siteTranslations = [];
     let manufacturerData = null;
+    /* 주석 처리: 날씨 캐시 관련 변수 */
+    /*
     let weatherCache = {};
     const CACHE_DURATION = 10 * 60 * 1000; // 10분
+    */
 
     translations = {
       "ko": {
@@ -292,8 +297,11 @@
           "manufacturers": "제조사: {{value}}",
           "turbineCount": "터빈 수: {{value}}",
           "completion": "준공일: {{value}}",
+          /* 주석 처리: 날씨 정보 관련 번역 */
+          /*
           "windSpeed10m": "풍속(10m): {{value}} m/s",
           "windDirection": "풍향: {{value}} ({{degrees}}°)"
+          */
         },
         "infoWindow": "{{name}} ({{count}}기)",
         "detailWindow": {
@@ -305,8 +313,11 @@
           "capacityBreakdown": "용량 분포: {{value}}",
           "completion": "준공일: {{value}}",
           "address": "주소: {{value}}",
+          /* 주석 처리: 날씨 정보 관련 번역 */
+          /*
           "windSpeed10m": "풍속(10m): {{value}} m/s",
           "windDirection": "풍향: {{value}} ({{degrees}}°)"
+          */
         },
         "noInfo": "정보 없음",
         "errorMessage": {
@@ -315,7 +326,10 @@
           "geolocation": "위치 정보 가져오기 실패",
           "geolocationUnsupported": "위치 정보 지원 안 됨",
           "translationsLoad": "번역 데이터 로드 실패: {{message}}",
+          /* 주석 처리: 날씨 오류 메시지 */
+          /*
           "weatherLoad": "날씨 데이터 로드 실패: {{message}}"
+          */
         },
         "myLocation": "내 위치"
       },
@@ -355,8 +369,11 @@
           "manufacturers": "Manufacturers: {{value}}",
           "turbineCount": "Turbines: {{value}}",
           "completion": "Completion: {{value}}",
+          /* 주석 처리: 날씨 정보 관련 번역 */
+          /*
           "windSpeed10m": "Wind Speed (10m): {{value}} m/s",
           "windDirection": "Wind Direction: {{value}} ({{degrees}}°)"
+          */
         },
         "infoWindow": "{{name}} ({{count}} turbines)",
         "detailWindow": {
@@ -368,8 +385,11 @@
           "capacityBreakdown": "Capacity Breakdown: {{value}}",
           "completion": "Completion: {{value}}",
           "address": "Address: {{value}}",
+          /* 주석 처리: 날씨 정보 관련 번역 */
+          /*
           "windSpeed10m": "Wind Speed (10m): {{value}} m/s",
           "windDirection": "Wind Direction: {{value}} ({{degrees}}°)"
+          */
         },
         "noInfo": "No Info",
         "errorMessage": {
@@ -378,7 +398,10 @@
           "geolocation": "Failed to get location",
           "geolocationUnsupported": "Geolocation not supported",
           "translationsLoad": "Failed to load translations: {{message}}",
+          /* 주석 처리: 날씨 오류 메시지 */
+          /*
           "weatherLoad": "Failed to load weather data: {{message}}"
+          */
         },
         "myLocation": "My Location"
       }
@@ -455,6 +478,8 @@
       return { nx, ny };
     }
 
+    /* 주석 처리: 날씨 데이터 가져오기 함수 */
+    /*
     async function fetchWeatherData(lat, lon, complexId) {
       const now = Date.now();
       if (weatherCache[complexId] && (now - weatherCache[complexId].timestamp < CACHE_DURATION)) {
@@ -505,7 +530,10 @@
         return null;
       }
     }
+    */
 
+    /* 주석 처리: 풍향 변환 함수 */
+    /*
     function degreesToDirection(degrees) {
       const directions = isEnglish
         ? ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
@@ -513,6 +541,7 @@
       const index = Math.round((degrees % 360) / 22.5) % 16;
       return directions[index];
     }
+    */
 
     function resetToInitial() {
       selectedComplex = '';
@@ -862,9 +891,12 @@
       const turbineCount = farmsInComplex.length;
       const completionDates = farmsInComplex.map(farm => farm.completionDate).filter(date => date);
       const completionDate = completionDates.length > 0 ? completionDates.sort()[0] : translations[lang].noInfo;
+      /* 주석 처리: 날씨 데이터 호출 */
+      /*
       const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
       const avgLon = farmsInComplex.reduce((sum, farm) => sum + farm.lon, 0) / farmsInComplex.length;
       const weather = await fetchWeatherData(avgLat, avgLon, complexId);
+      */
 
       document.getElementById('info-complex-name').innerHTML = translations[lang].complexInfo.name.replace('{{value}}', complexName);
       document.getElementById('info-complex-capacity').innerHTML = translations[lang].complexInfo.capacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
@@ -873,6 +905,8 @@
       document.getElementById('info-complex-turbine-count').innerHTML = translations[lang].complexInfo.turbineCount.replace('{{value}}', turbineCount);
       document.getElementById('info-complex-completion').innerHTML = translations[lang].complexInfo.completion.replace('{{value}}', completionDate);
 
+      /* 주석 처리: 날씨 정보 UI 업데이트 */
+      /*
       const noInfo = translations[lang].noInfo;
       document.getElementById('info-complex-wind-speed-10m').innerHTML = translations[lang].complexInfo.windSpeed10m.replace(
         '{{value}}',
@@ -881,6 +915,7 @@
       document.getElementById('info-complex-wind-direction').innerHTML = translations[lang].complexInfo.windDirection
         .replace('{{value}}', weather && weather.windDirection10m != null ? degreesToDirection(weather.windDirection10m) : noInfo)
         .replace('{{degrees}}', weather && weather.windDirection10m != null ? weather.windDirection10m : '');
+      */
     }
 
     function updateInfoPanels() {
@@ -1079,9 +1114,12 @@
         const manufacturerInfo = manufacturerData.manufacturers.find(m => m.manufacturer === manufacturer);
         displayManufacturer = manufacturerInfo ? manufacturerInfo.manufacturer_en : manufacturer || translations[lang].noInfo;
       }
+      /* 주석 처리: 날씨 데이터 호출 */
+      /*
       const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
       const avgLon = farmsInComplex.reduce((sum, farm) => sum + farm.lon, 0) / farmsInComplex.length;
       const weather = await fetchWeatherData(avgLat, avgLon, complexId);
+      */
 
       const noInfo = translations[lang].noInfo;
       const content = `
@@ -1094,6 +1132,8 @@
           ${translations[lang].detailWindow.capacityBreakdown.replace('{{value}}', truncateText(capacityBreakdown, 25))}<br>
           ${translations[lang].detailWindow.completion.replace('{{value}}', truncateText(completionDate || translations[lang].noInfo, 15))}<br>
           ${translations[lang].detailWindow.address.replace('{{value}}', truncateText(address || translations[lang].noInfo, 20))}<br>
+          <!-- 주석 처리: 날씨 정보 표시 -->
+          <!--
           ${weather && weather.windSpeed10m != null
             ? translations[lang].detailWindow.windSpeed10m.replace('{{value}}', weather.windSpeed10m.toFixed(1))
             : translations[lang].detailWindow.windSpeed10m.replace('{{value}}', noInfo)}<br>
@@ -1102,6 +1142,7 @@
                 .replace('{{value}}', degreesToDirection(weather.windDirection10m))
                 .replace('{{degrees}}', weather.windDirection10m)
             : translations[lang].detailWindow.windDirection.replace('{{value}}', noInfo).replace('{{degrees}}', '')}
+          -->
         </div>
       `;
       const basePosition = new kakao.maps.LatLng(lat, lon);
