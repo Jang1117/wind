@@ -223,7 +223,6 @@
     <span id="info-complex-turbine-count"></span><br>
     <span id="info-complex-completion"></span><br>
     <span id="info-complex-wind-speed-10m"></span><br>
-    <span id="info-complex-wind-speed-50m"></span><br>
     <span id="info-complex-wind-direction"></span><br>
     <span id="info-complex-temperature"></span>
   </div>
@@ -294,7 +293,6 @@
           "turbineCount": "터빈 수: {{value}}",
           "completion": "준공일: {{value}}",
           "windSpeed10m": "풍속(10m): {{value}} m/s",
-          "windSpeed50m": "풍속(50m): {{value}} m/s",
           "windDirection": "풍향: {{value}} ({{degrees}}°)",
           "temperature": "기온: {{value}}°C"
         },
@@ -309,7 +307,6 @@
           "completion": "준공일: {{value}}",
           "address": "주소: {{value}}",
           "windSpeed10m": "풍속(10m): {{value}} m/s",
-          "windSpeed50m": "풍속(50m): {{value}} m/s",
           "windDirection": "풍향: {{value}} ({{degrees}}°)",
           "temperature": "기온: {{value}}°C"
         },
@@ -361,7 +358,6 @@
           "turbineCount": "Turbines: {{value}}",
           "completion": "Completion: {{value}}",
           "windSpeed10m": "Wind Speed (10m): {{value}} m/s",
-          "windSpeed50m": "Wind Speed (50m): {{value}} m/s",
           "windDirection": "Wind Direction: {{value}} ({{degrees}}°)",
           "temperature": "Temperature: {{value}}°C"
         },
@@ -376,7 +372,6 @@
           "completion": "Completion: {{value}}",
           "address": "Address: {{value}}",
           "windSpeed10m": "Wind Speed (10m): {{value}} m/s",
-          "windSpeed50m": "Wind Speed (50m): {{value}} m/s",
           "windDirection": "Wind Direction: {{value}} ({{degrees}}°)",
           "temperature": "Temperature: {{value}}°C"
         },
@@ -442,25 +437,23 @@
         console.log(`캐시된 날씨 데이터 사용: ${complexId}`);
         return weatherCache[complexId].data;
       }
-    
+
       try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=wind_direction_10m,wind_speed_10m,wind_speed_50m,temperature_2m&timezone=Asia%2FSeoul`;
+        const url = `https://api.open-meteo.com/v1/kma?latitude=${lat}&longitude=${lon}&current=wind_direction_10m,wind_speed_10m,temperature_2m&models=kma_ldps&timezone=Asia%2FSeoul`;
         console.log(`날씨 데이터 요청: ${url}`);
         const response = await fetch(url);
         if (!response.ok) {
           throw new Error(`HTTP 오류! 상태: ${response.status}`);
         }
         const data = await response.json();
-        if (!data.hourly || !data.hourly.time || data.hourly.time.length === 0) {
-          throw new Error('유효한 시간별 데이터가 없습니다.');
+        if (!data.current) {
+          throw new Error('유효한 현재 날씨 데이터가 없습니다.');
         }
-        const latestIndex = data.hourly.time.length - 1;
         const weather = {
-          windSpeed10m: data.hourly.wind_speed_10m[latestIndex] ?? null,
-          windSpeed50m: data.hourly.wind_speed_50m[latestIndex] ?? null,
-          windDirection10m: data.hourly.wind_direction_10m[latestIndex] ?? null,
-          temperature2m: data.hourly.temperature_2m[latestIndex] ?? null,
-          time: data.hourly.time[latestIndex]
+          windSpeed10m: data.current.wind_speed_10m ?? null,
+          windDirection10m: data.current.wind_direction_10m ?? null,
+          temperature2m: data.current.temperature_2m ?? null,
+          time: data.current.time
         };
         weatherCache[complexId] = {
           data: weather,
@@ -869,38 +862,29 @@
       const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
       const avgLon = farmsInComplex.reduce((sum, farm) => sum + farm.lon, 0) / farmsInComplex.length;
       const weather = await fetchWeatherData(avgLat, avgLon, complexId);
-    
+
       document.getElementById('info-complex-name').innerHTML = translations[lang].complexInfo.name.replace('{{value}}', complexName);
       document.getElementById('info-complex-capacity').innerHTML = translations[lang].complexInfo.capacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
       document.getElementById('info-complex-capacity-breakdown').innerHTML = translations[lang].complexInfo.capacityBreakdown.replace('{{value}}', `(${capacityBreakdown})`);
       document.getElementById('info-complex-manufacturers').innerHTML = translations[lang].complexInfo.manufacturers.replace('{{value}}', manufacturers);
       document.getElementById('info-complex-turbine-count').innerHTML = translations[lang].complexInfo.turbineCount.replace('{{value}}', turbineCount);
       document.getElementById('info-complex-completion').innerHTML = translations[lang].complexInfo.completion.replace('{{value}}', completionDate);
-    
+
       const noInfo = translations[lang].noInfo;
       if (weather) {
-        // 풍속 (10m)
         document.getElementById('info-complex-wind-speed-10m').innerHTML = translations[lang].complexInfo.windSpeed10m.replace(
           '{{value}}',
           weather.windSpeed10m != null ? weather.windSpeed10m.toFixed(1) : noInfo
         );
-        // 풍속 (50m)
-        document.getElementById('info-complex-wind-speed-50m').innerHTML = translations[lang].complexInfo.windSpeed50m.replace(
-          '{{value}}',
-          weather.windSpeed50m != null ? weather.windSpeed50m.toFixed(1) : noInfo
-        );
-        // 풍향
         document.getElementById('info-complex-wind-direction').innerHTML = translations[lang].complexInfo.windDirection
           .replace('{{value}}', weather.windDirection10m != null ? degreesToDirection(weather.windDirection10m) : noInfo)
           .replace('{{degrees}}', weather.windDirection10m != null ? weather.windDirection10m : '');
-        // 기온
         document.getElementById('info-complex-temperature').innerHTML = translations[lang].complexInfo.temperature.replace(
           '{{value}}',
           weather.temperature2m != null ? weather.temperature2m.toFixed(1) : noInfo
         );
       } else {
         document.getElementById('info-complex-wind-speed-10m').innerHTML = translations[lang].complexInfo.windSpeed10m.replace('{{value}}', noInfo);
-        document.getElementById('info-complex-wind-speed-50m').innerHTML = translations[lang].complexInfo.windSpeed50m.replace('{{value}}', noInfo);
         document.getElementById('info-complex-wind-direction').innerHTML = translations[lang].complexInfo.windDirection
           .replace('{{value}}', noInfo)
           .replace('{{degrees}}', '');
@@ -1132,7 +1116,7 @@
       const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
       const avgLon = farmsInComplex.reduce((sum, farm) => sum + farm.lon, 0) / farmsInComplex.length;
       const weather = await fetchWeatherData(avgLat, avgLon, complexId);
-    
+
       const noInfo = translations[lang].noInfo;
       const content = `
           <div class="detail-window" onclick="window.closeInfowindow(event, this)">
@@ -1147,9 +1131,6 @@
               ${weather && weather.windSpeed10m != null
                 ? translations[lang].detailWindow.windSpeed10m.replace('{{value}}', weather.windSpeed10m.toFixed(1))
                 : translations[lang].detailWindow.windSpeed10m.replace('{{value}}', noInfo)}<br>
-              ${weather && weather.windSpeed50m != null
-                ? translations[lang].detailWindow.windSpeed50m.replace('{{value}}', weather.windSpeed50m.toFixed(1))
-                : translations[lang].detailWindow.windSpeed50m.replace('{{value}}', noInfo)}<br>
               ${weather && weather.windDirection10m != null
                 ? translations[lang].detailWindow.windDirection
                     .replace('{{value}}', degreesToDirection(weather.windDirection10m))
