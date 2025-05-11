@@ -1,0 +1,34 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 저장소 코드 체크아웃
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Node.js 환경 설정
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      # HTML 파일에 KAKAO_APP_KEY 주입
+      - name: Inject Kakao App Key
+        env:
+          KAKAO_APP_KEY: ${{ secrets.KAKAO_APP_KEY }}
+        run: |
+          sed -i "s|KAKAO_APP_KEY|$KAKAO_APP_KEY|g" index.html
+
+      # GitHub Pages에 배포
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
