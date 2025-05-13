@@ -806,8 +806,8 @@
   },
   {
     "site_number": 119,
-    "site_name_kr": "해맞이",
-    "site_name_roman": "Haemaji",
+    "site_name_kr": "영덕 해맞이",
+    "site_name_roman": "Yeongdeog Haemaji",
     "address_kr": "경상북도 영덕군 영덕읍 삼계리 산25",
     "address_roman": "Gyeongsangbugdo Yeongdeoggun Yeongdeogeub Samgyeri San25"
   },
@@ -834,8 +834,8 @@
   },
   {
     "site_number": 123,
-    "site_name_kr": "양양2",
-    "site_name_roman": "Yangyang2",
+    "site_name_kr": "양양 만월산",
+    "site_name_roman": "Yangyang Manwolsan",
     "address_kr": "강원도 양양군 현남면",
     "address_roman": "Gangweondo Yangyanggun Hyeonnammyeon"
   },
