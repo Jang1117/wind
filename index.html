@@ -518,10 +518,10 @@
     async function loadCSVData() {
       try {
         console.log("windfarm_data.csv 요청 중: /wind/windfarm_data.csv");
-        const response = await fetch('/wind/windfarm_data.csv');
-        if (!response.ok) {
-          throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
-        }
+        const response = await fetch(`/wind/windfarm_data.csv?t=${new Date().getTime()}`);
+            if (!response.ok) {
+              throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
+            }
         const text = await response.text();
         console.log("CSV 데이터:", text.substring(0, 200) + "...");
         Papa.parse(text, {
@@ -571,10 +571,10 @@
           }
         });
       } catch (error) {
-        console.error('CSV 로드 실패:', error);
-        showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvLoad.replace('{{message}}', error.message));
+          console.error('CSV 로드 실패:', error);
+          showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvLoad.replace('{{message}}', error.message));
+        }
       }
-    }
 
     async function initializeApp() {
       console.log("앱 초기화 시작");
