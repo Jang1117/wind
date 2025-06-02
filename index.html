@@ -1212,6 +1212,17 @@
             marker.setMap(map);
             markers.push(marker);
 
+            // 개별 터빈 이름 표시
+            const overlay = new kakao.maps.CustomOverlay({
+              position: position,
+              content: `<div class="info-window">${farm.name} - ${farm.turbineId || ''}</div>`,
+              xAnchor: 0.5,
+              yAnchor: 2,
+              zIndex: 10
+            });
+            overlay.setMap(map);
+            overlays.push(overlay);
+
             // 개별 터빈 마커 클릭 이벤트
             kakao.maps.event.addListener(marker, 'click', () => {
               window.toggleFarmDetails(
@@ -1301,7 +1312,7 @@
               
               // 경계에 맞춰 지도 이동 및 확대/축소
               map.setBounds(bounds, {
-                padding: 50 // 경계로부터 50픽셀 여백 추가
+                padding: 100 // 경계로부터 100픽셀 여백 추가
               });
 
               updateMarkers();
