@@ -1194,36 +1194,31 @@
       } else if (selectedComplex) {
         filteredFarms = allWindFarms.filter(farm => farm.complexId === selectedComplex);
       }
-      filteredFarms = filteredFarms.filter(farm => farm.age !== null);
+      filteredFarms = filteredFarms.filter(farm => farm.age !== null && farm.lat && farm.lon);
       console.log("필터링된 터빈 수:", filteredFarms.length);
       const lang = isEnglish ? 'en' : 'ko';
-      // 변경: 단지 이름만 표시하도록 수정
-      const farmsByComplex = {};
+    
+      // 개별 터빈에 대해 마커와 오버레이 생성
       filteredFarms.forEach(farm => {
-        if (!farmsByComplex[farm.complexId]) farmsByComplex[farm.complexId] = [];
-        farmsByComplex[farm.complexId].push(farm);
-      });
-      Object.keys(farmsByComplex).forEach(complexId => {
-        const group = farmsByComplex[complexId];
-        const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
-        const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
-        const position = new kakao.maps.LatLng(avgLat, avgLon);
-        const complexName = getTranslatedSiteInfo(complexId, 'name') || group[0].name;
+        const position = new kakao.maps.LatLng(farm.lat, farm.lon);
+        const complexName = getTranslatedSiteInfo(farm.complexId, 'name') || farm.name;
+        
         let marker = null;
         if (areMarkersVisible) {
           marker = new kakao.maps.Marker({
             position: position,
-            title: `${complexName} (${group.length}${isEnglish ? ' turbines' : '개 터빈'})`,
+            title: `${complexName} (${farm.turbineId || '터빈'})`,
             clickable: true,
             image: markerImage
           });
           marker.setMap(map);
           markers.push(marker);
         }
+    
         if (areNamesVisible) {
           const overlay = new kakao.maps.CustomOverlay({
             position: position,
-            content: `<div class="info-window">${translations[lang].infoWindow.replace('{{name}}', complexName).replace('{{count}}', group.length)}</div>`,
+            content: `<div class="info-window">${translations[lang].infoWindow.replace('{{name}}', complexName).replace('{{count}}', '1')}</div>`,
             xAnchor: 0.5,
             yAnchor: 2,
             zIndex: 10
@@ -1231,18 +1226,19 @@
           overlay.setMap(map);
           overlays.push(overlay);
         }
+    
         if (areMarkersVisible && marker) {
           kakao.maps.event.addListener(marker, 'click', () => {
-            selectedComplex = complexId;
+            selectedComplex = farm.complexId;
             selectedManufacturer = '';
             selectedOperator = '';
             selectedOperationPeriod = '';
-            areNamesVisible = true; // 변경: 마커 클릭 시 이름 on
+            areNamesVisible = true;
             document.getElementById('manufacturer-dropdown').value = '';
             document.getElementById('operator-dropdown').value = '';
             document.getElementById('operation-period-dropdown').value = '';
-            document.getElementById('windfarm-dropdown').value = complexId;
-            document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 변경: 버튼 텍스트 동기화
+            document.getElementById('windfarm-dropdown').value = farm.complexId;
+            document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
             const allInfo = document.getElementById('all-info');
             const manufacturerInfo = document.getElementById('manufacturer-info');
             const complexInfo = document.getElementById('complex-info');
@@ -1252,15 +1248,31 @@
             manufacturerInfo.style.display = 'none';
             operatorInfo.style.display = 'none';
             operationPeriodInfo.style.display = 'none';
-            updateComplexInfo(group);
+            const farmsInComplex = allWindFarms.filter(f => f.complexId === farm.complexId);
+            updateComplexInfo(farmsInComplex);
             complexInfo.style.display = 'block';
             map.setCenter(position);
             const currentLevel = map.getLevel();
-            map.setLevel(currentLevel - 5);
+            map.setLevel(currentLevel <= 5 ? currentLevel : 5);
             updateMarkers();
+            // 개별 터빈 정보 표시
+            toggleFarmDetails(
+              farm.name,
+              farm.turbineId,
+              farm.type,
+              farm.completionDate,
+              getTranslatedSiteInfo(farm.complexId, 'address') || farm.address,
+              farm.lat,
+              farm.lon,
+              farm.capacity,
+              farm.manufacturer,
+              farm.complexId,
+              farm.operator
+            );
           });
         }
       });
+    
       if (myLocationMarker) {
         myLocationMarker.setMap(map);
         markers.push(myLocationMarker);
