@@ -57,15 +57,29 @@
     /* 모든 컨트롤 버튼 및 드롭다운에 동일한 스타일 */
     .control-button {
       width: 120px;
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.95); /* 선명한 배경 */
       border: 1px solid #ccc;
       border-radius: 4px;
       cursor: pointer;
       font-size: 14px;
+      font-family: 'Noto Sans KR', Arial, sans-serif; /* 한국어 우선 */
+      font-weight: 500; /* 가독성 강화 */
       text-align: center;
       box-sizing: border-box;
       height: 34px;
-      line-height: 1.5;
+      line-height: 34px; /* 수직 중앙 정렬 */
+      color: #000000; /* 검정 글자 */
+      padding: 0 10px;
+      overflow: visible;
+      z-index: 10001;
+    }
+   #initial-reset, #settings-button, #reset-button {
+      color: #000000; /* 동일한 텍스트 색상 */
+      font-weight: 500; /* 동일한 글씨 두께 */
+      background: rgba(255, 255, 255, 0.95); /* 동일한 배경 */
+      font-size: 14px; /* 동일한 글씨 크기 */
+      line-height: 34px; /* 동일한 수직 정렬 */
+      padding: 0 10px; /* 동일한 패딩 */
     }
     /* 드롭다운에도 버튼 스타일 적용 */
     select.control-button {
@@ -182,7 +196,7 @@
   <!-- 컨트롤 컨테이너 -->
   <div id="controls">
     <button id="initial-reset" class="control-button">처음으로</button>
-    <button id="reset-button" class="control-button">선택 초기화</button>
+    <button id="reset-button" class="control-button">선택 해제</button>
     <select id="windfarm-dropdown" class="control-button">
       <option value="">풍력단지</option>
     </select>
@@ -195,7 +209,7 @@
     <select id="operating-period-dropdown" class="control-button">
       <option value="">운영기간</option>
     </select>
-    <button id="settings-button" class="control-button">설정/Setting</button>
+    <button id="settings-button" class="control-button">설정</button>
     <div id="settings-container" style="display: none;">
       <button id="map-type-toggle" class="control-button">기본 지도</button>
       <button id="name-toggle-button" class="control-button">이름 끄기</button>
@@ -263,7 +277,20 @@
     let selectedOperator = '';
     let selectedOperatingPeriod = '';
     let isEnglish = false;
-    let translations = {};
+    let translations = {
+      "ko": {
+        "initialReset": "초기화면",
+        "reset": "선택 해제",
+        "settings": "설정",
+        // [Other translations unchanged]
+      },
+      "en": {
+        "initialReset": "Home",
+        "reset": "Select Reset",
+        "settings": "Settings",
+        // [Other translations unchanged]
+      }
+    };
     let siteTranslations = [];
     let manufacturerData = null;
     const CURRENT_DATE = new Date('2025-06-01'); // Current date for operating period calculation
@@ -540,7 +567,26 @@
     }
 
     function updateUILanguage() {
+      console.log("updateUILanguage 실행, isEnglish:", isEnglish);
       const lang = isEnglish ? 'en' : 'ko';
+      const initialResetBtn = document.getElementById('initial-reset');
+      const resetBtn = document.getElementById('reset-button');
+      const settingsBtn = document.getElementById('settings-button');
+      if (initialResetBtn) {
+        initialResetBtn.textContent = translations[lang].initialReset || "초기화면";
+      } else {
+        console.error("initial-reset 버튼을 찾을 수 없습니다.");
+      }
+      if (resetBtn) {
+        resetBtn.textContent = translations[lang].reset || "선택 해제";
+      } else {
+        console.error("reset-button 버튼을 찾을 수 없습니다.");
+      }
+      if (settingsBtn) {
+        settingsBtn.textContent = translations[lang].settings || "설정";
+      } else {
+        console.error("settings-button 버튼을 찾을 수 없습니다.");
+      }
       document.getElementById('page-title').textContent = translations[lang].title;
       document.getElementById('meta-description').content = translations[lang].title;
       document.getElementById('loading').textContent = translations[lang].loading;
@@ -552,6 +598,7 @@
       document.getElementById('reset-button').textContent = translations[lang].reset;
       document.getElementById('settings-button').textContent = translations[lang].settings;
       document.getElementById('initial-reset').textContent = translations[lang].initialReset;
+      
       document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
       document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
       document.getElementById('operator-dropdown').options[0].textContent = translations[lang].operatorDropdown;
