@@ -1,0 +1,272 @@
+{
+  "operators": [
+    {
+      "operator": "DMS",
+      "operator_en": "DMS"
+    },
+    {
+      "operator": "GS파워",
+      "operator_en": "GS Power"
+    },
+    {
+      "operator": "GS풍력발전",
+      "operator_en": "GS Wind Power"
+    },
+    {
+      "operator": "SK D&D",
+      "operator_en": "SK D&D"
+    },
+    {
+      "operator": "ST International",
+      "operator_en": "ST International"
+    },
+    {
+      "operator": "강원도청",
+      "operator_en": "Gangwon Provincial Office"
+    },
+    {
+      "operator": "강원풍력발전",
+      "operator_en": "Gangwon Wind Power"
+    },
+    {
+      "operator": "경주산업단지풍력발전",
+      "operator_en": "Gyeongju Industrial Complex Wind Power"
+    },
+    {
+      "operator": "구래주민풍력",
+      "operator_en": "Gurae Resident Wind Power"
+    },
+    {
+      "operator": "군산풍력발전",
+      "operator_en": "Gunsan Wind Power"
+    },
+    {
+      "operator": "그린에너지발전",
+      "operator_en": "Green Energy Power"
+    },
+    {
+      "operator": "금성풍력발전",
+      "operator_en": "Geumseong Wind Power"
+    },
+    {
+      "operator": "노랑에너지",
+      "operator_en": "Yellow Energy"
+    },
+    {
+      "operator": "대관령풍력",
+      "operator_en": "Daegwallyeong Wind Power"
+    },
+    {
+      "operator": "대기풍력발전",
+      "operator_en": "Daegi Wind Power"
+    },
+    {
+      "operator": "대명에너지",
+      "operator_en": "Daemyung Energy"
+    },
+    {
+      "operator": "동국S&C",
+      "operator_en": "Dongkuk S&C"
+    },
+    {
+      "operator": "동복리풍력 특성화마을",
+      "operator_en": "Dongbok-ri Wind Power Specialized Village"
+    },
+    {
+      "operator": "동양건설사업",
+      "operator_en": "Dongyang Construction"
+    },
+    {
+      "operator": "두산에너빌리티",
+      "operator_en": "Doosan Enerbility"
+    },
+    {
+      "operator": "북촌서모풍력",
+      "operator_en": "Bukchon Seomo Wind Power"
+    },
+    {
+      "operator": "삼수풍력발전",
+      "operator_en": "Samsu Wind Power"
+    },
+    {
+      "operator": "수망풍력",
+      "operator_en": "Sumang Wind Power"
+    },
+    {
+      "operator": "신안그린에너지",
+      "operator_en": "Sinan Green Energy"
+    },
+    {
+      "operator": "신흥풍력",
+      "operator_en": "Sinheung Wind Power"
+    },
+    {
+      "operator": "아일랜드발전인프라",
+      "operator_en": "Island Power Infrastructure"
+    },
+    {
+      "operator": "안산시청",
+      "operator_en": "Ansan City Hall"
+    },
+    {
+      "operator": "영덕 호지마을풍력발전소",
+      "operator_en": "Yeongdeok Hojimaeul Wind Power Plant"
+    },
+    {
+      "operator": "영암군청",
+      "operator_en": "Yeongam County Office"
+    },
+    {
+      "operator": "영양에코파워",
+      "operator_en": "Yeongyang Eco Power"
+    },
+    {
+      "operator": "영양제2풍력발전",
+      "operator_en": "Yeongyang 2nd Wind Power"
+    },
+    {
+      "operator": "영월에코윈드",
+      "operator_en": "Yeongwol Eco Wind"
+    },
+    {
+      "operator": "월정풍력 특성화마을",
+      "operator_en": "Woljeong Wind Power Specialized Village"
+    },
+    {
+      "operator": "윈드밀파워",
+      "operator_en": "Windmill Power"
+    },
+    {
+      "operator": "윈드시너지",
+      "operator_en": "Wind Synergy"
+    },
+    {
+      "operator": "유니슨",
+      "operator_en": "Unison"
+    },
+    {
+      "operator": "인제군청",
+      "operator_en": "Inje County Office"
+    },
+    {
+      "operator": "자은주민바람발전소",
+      "operator_en": "Jaeun Resident Wind Power Plant"
+    },
+    {
+      "operator": "전남테크노파크",
+      "operator_en": "Jeonnam Techno Park"
+    },
+    {
+      "operator": "전북도청",
+      "operator_en": "Jeonbuk Provincial Office"
+    },
+    {
+      "operator": "제주김녕풍력발전",
+      "operator_en": "Jeju Gimnyeong Wind Power"
+    },
+    {
+      "operator": "제주대학교",
+      "operator_en": "Jeju National University"
+    },
+    {
+      "operator": "제주도청",
+      "operator_en": "Jeju Provincial Office"
+    },
+    {
+      "operator": "제주에너지공사",
+      "operator_en": "Jeju Energy Corporation"
+    },
+    {
+      "operator": "청산풍력발전",
+      "operator_en": "Cheongsan Wind Power"
+    },
+    {
+      "operator": "태기산풍력발전",
+      "operator_en": "Taegisan Wind Power"
+    },
+    {
+      "operator": "태백가덕산풍력발전",
+      "operator_en": "Taebaek Gadeoksan Wind Power"
+    },
+    {
+      "operator": "하장풍력발전",
+      "operator_en": "Hajang Wind Power"
+    },
+    {
+      "operator": "한국남동발전",
+      "operator_en": "Korea South-East Power"
+    },
+    {
+      "operator": "한국남부발전",
+      "operator_en": "Korea Southern Power"
+    },
+    {
+      "operator": "한국농어촌공사",
+      "operator_en": "Korea Rural Community Corporation"
+    },
+    {
+      "operator": "한국동서발전",
+      "operator_en": "Korea East-West Power"
+    },
+    {
+      "operator": "한국서부발전",
+      "operator_en": "Korea Western Power"
+    },
+    {
+      "operator": "한국수력원자력",
+      "operator_en": "Korea Hydro & Nuclear Power"
+    },
+    {
+      "operator": "한국수자원공사",
+      "operator_en": "Korea Water Resources Corporation"
+    },
+    {
+      "operator": "한국에너지기술연구원",
+      "operator_en": "Korea Institute of Energy Research"
+    },
+    {
+      "operator": "한국전력공사",
+      "operator_en": "Korea Electric Power Corporation"
+    },
+    {
+      "operator": "한국중부발전",
+      "operator_en": "Korea Midland Power"
+    },
+    {
+      "operator": "한국해상풍력",
+      "operator_en": "Korea Offshore Wind Power"
+    },
+    {
+      "operator": "한신에너지",
+      "operator_en": "Hanshin Energy"
+    },
+    {
+      "operator": "한전전력연구원",
+      "operator_en": "KEPCO Research Institute"
+    },
+    {
+      "operator": "한진산업",
+      "operator_en": "Hanjin Industrial"
+    },
+    {
+      "operator": "행원풍력 특성화마을",
+      "operator_en": "Haengwon Wind Power Specialized Village"
+    },
+    {
+      "operator": "현대중공업",
+      "operator_en": "Hyundai Heavy Industries"
+    },
+    {
+      "operator": "호림풍력발전",
+      "operator_en": "Horim Wind Power"
+    },
+    {
+      "operator": "효성윈드파워홀딩스",
+      "operator_en": "Hyosung Wind Power Holdings"
+    },
+    {
+      "operator": "희승풍력발전",
+      "operator_en": "Heeseung Wind Power"
+    }
+  ]
+}
