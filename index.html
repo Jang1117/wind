@@ -106,12 +106,12 @@
         transform: translateX(-50%);
       }
     }
-    @media screen and (max-width: 767px) {
+    @media (max-width: 767px) {
       #all-info, #manufacturer-info, #complex-info, #operator-info, #operation-period-info {
         top: 10px;
         left: 10px;
         transform: none;
-        text-align: left;
+        text-align: nowrap;
         max-width: 80%;
       }
     }
@@ -187,7 +187,7 @@
     <button id="settings-button" class="control-button">설정/Setting</button>
     <div id="settings-container" style="display: none;">
       <button id="map-type-toggle" class="control-button">기본 지도</button>
-      <button id="name-toggle-button" class="control-button">이름 끄기</button>
+      <button id="name-toggle-button" class="control-button">이름 켜기</button> <!-- 변경: 초기 텍스트 "이름 켜기" -->
       <button id="marker-toggle-button" class="control-button">마커 끄기</button>
       <button id="translate-button" class="control-button">English</button>
       <button id="info-button" class="control-button">정보</button>
@@ -240,12 +240,12 @@
     let totalCapacityByComplex = {};
     let myLocationMarker = null;
     let watchId = null;
-    let areNamesVisible = false;
+    let areNamesVisible = false; // 변경: 초기 이름 표시 off
     let areMarkersVisible = true;
     let selectedManufacturer = '';
     let selectedComplex = '';
     let selectedOperator = '';
-    let selectedOperationPeriod = ''; // 변경: ageRange → operationPeriod
+    let selectedOperationPeriod = '';
     let isEnglish = false;
     let translations = {};
     let siteTranslations = [];
@@ -268,7 +268,7 @@
         "windfarmDropdown": "풍력단지",
         "manufacturerDropdown": "제조사",
         "operatorDropdown": "사업자",
-        "operationPeriodDropdown": "운영기간", // 변경: 연령 범주 → 운영기간
+        "operationPeriodDropdown": "운영기간",
         "settings": "설정/Setting",
         "initialReset": "처음으로",
         "allInfo": {
@@ -297,7 +297,7 @@
           "turbineCount": "터빈 수: {{value}}",
           "completion": "준공일: {{value}}"
         },
-        "operationPeriodInfo": { // 변경: ageRangeInfo → operationPeriodInfo
+        "operationPeriodInfo": {
           "operationPeriod": "운영기간: {{value}}",
           "totalCapacity": "총 용량: {{value}} kW",
           "complexCount": "단지 수: {{value}}",
@@ -324,7 +324,7 @@
           "translationsLoad": "번역 데이터 로드 실패: {{message}}"
         },
         "myLocation": "내 위치",
-        "operationPeriods": { // 변경: ageRanges → operationPeriods, unknown 제외
+        "operationPeriods": {
           "20plus": "20년 이상",
           "15to20": "15년 이상 ~ 20년 미만",
           "10to15": "10년 이상 ~ 15년 미만",
@@ -348,7 +348,7 @@
         "windfarmDropdown": "Wind Farm",
         "manufacturerDropdown": "Manufacturer",
         "operatorDropdown": "Operator",
-        "operationPeriodDropdown": "Operation Period", // 변경: Age Range → Operation Period
+        "operationPeriodDropdown": "Operation Period",
         "settings": "설정/Setting",
         "initialReset": "Home",
         "allInfo": {
@@ -377,7 +377,7 @@
           "turbineCount": "Turbines: {{value}}",
           "completion": "Completion: {{value}}"
         },
-        "operationPeriodInfo": { // 변경: ageRangeInfo → operationPeriodInfo
+        "operationPeriodInfo": {
           "operationPeriod": "Operation Period: {{value}}",
           "totalCapacity": "Total Capacity: {{value}} kW",
           "complexCount": "Complexes: {{value}}",
@@ -404,7 +404,7 @@
           "translationsLoad": "Failed to load translations: {{message}}"
         },
         "myLocation": "My Location",
-        "operationPeriods": { // 변경: ageRanges → operationPeriods, unknown 제외
+        "operationPeriods": {
           "20plus": "20 years or more",
           "15to20": "15 to less than 20 years",
           "10to15": "10 to less than 15 years",
@@ -461,16 +461,18 @@
       selectedComplex = '';
       selectedManufacturer = '';
       selectedOperator = '';
-      selectedOperationPeriod = ''; // 변경
+      selectedOperationPeriod = '';
+      areNamesVisible = false; // 변경: 초기화 시 이름 off
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
-      document.getElementById('operation-period-dropdown').value = ''; // 변경
+      document.getElementById('operation-period-dropdown').value = '';
+      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggleOn; // 변경: 버튼 텍스트 동기화
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
-      const operationPeriodInfo = document.getElementById('operation-period-info'); // 변경
+      const operationPeriodInfo = document.getElementById('operation-period-info');
       allInfo.style.display = 'block';
       manufacturerInfo.style.display = 'none';
       complexInfo.style.display = 'none';
@@ -487,16 +489,18 @@
       selectedComplex = '';
       selectedManufacturer = '';
       selectedOperator = '';
-      selectedOperationPeriod = ''; // 변경
+      selectedOperationPeriod = '';
+      areNamesVisible = false; // 변경: 선택 초기화 시 이름 off
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
-      document.getElementById('operation-period-dropdown').value = ''; // 변경
+      document.getElementById('operation-period-dropdown').value = '';
+      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggleOn; // 변경: 버튼 텍스트 동기화
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
-      const operationPeriodInfo = document.getElementById('operation-period-info'); // 변경
+      const operationPeriodInfo = document.getElementById('operation-period-info');
       allInfo.style.display = 'none';
       manufacturerInfo.style.display = 'none';
       complexInfo.style.display = 'none';
@@ -521,7 +525,7 @@
       document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
       document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
       document.getElementById('operator-dropdown').options[0].textContent = translations[lang].operatorDropdown;
-      document.getElementById('operation-period-dropdown').options[0].textContent = translations[lang].operationPeriodDropdown; // 변경
+      document.getElementById('operation-period-dropdown').options[0].textContent = translations[lang].operationPeriodDropdown;
       const windfarmDropdown = document.getElementById('windfarm-dropdown');
       const selectedValue = windfarmDropdown.value;
       while (windfarmDropdown.options.length > 1) windfarmDropdown.remove(1);
@@ -537,10 +541,10 @@
       while (operatorDropdown.options.length > 1) operatorDropdown.remove(1);
       populateOperatorDropdown();
       operatorDropdown.value = selectedOperatorValue;
-      const operationPeriodDropdown = document.getElementById('operation-period-dropdown'); // 변경
+      const operationPeriodDropdown = document.getElementById('operation-period-dropdown');
       const selectedOperationPeriodValue = operationPeriodDropdown.value;
       while (operationPeriodDropdown.options.length > 1) operationPeriodDropdown.remove(1);
-      populateOperationPeriodDropdown(); // 변경
+      populateOperationPeriodDropdown();
       operationPeriodDropdown.value = selectedOperationPeriodValue;
       updateInfoPanels();
       updateMarkers();
@@ -594,8 +598,8 @@
       }
     }
 
-    function getOperationPeriod(age) { // 변경: getAgeRange → getOperationPeriod
-      if (age === null) return null; // 변경: unknown 대신 null 반환
+    function getOperationPeriod(age) {
+      if (age === null) return null;
       if (age >= 20) return '20plus';
       if (age >= 15) return '15to20';
       if (age >= 10) return '10to15';
@@ -669,7 +673,7 @@
             populateDropdown();
             populateManufacturerDropdown();
             populateOperatorDropdown();
-            populateOperationPeriodDropdown(); // 변경
+            populateOperationPeriodDropdown();
           },
           error: function(error) {
             console.error('CSV 파싱 실패:', error);
@@ -731,7 +735,7 @@
       document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
       document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
       document.getElementById('operator-dropdown').addEventListener('change', handleOperatorChange);
-      document.getElementById('operation-period-dropdown').addEventListener('change', handleOperationPeriodChange); // 변경
+      document.getElementById('operation-period-dropdown').addEventListener('change', handleOperationPeriodChange);
       document.getElementById('info-popup').addEventListener('click', (e) => {
         if (e.target === document.getElementById('info-popup')) {
           toggleInfoPopup();
@@ -815,10 +819,10 @@
       });
     }
 
-    function populateOperationPeriodDropdown() { // 변경: populateAgeRangeDropdown → populateOperationPeriodDropdown
+    function populateOperationPeriodDropdown() {
       const dropdown = document.getElementById('operation-period-dropdown');
       while (dropdown.options.length > 1) dropdown.remove(1);
-      const operationPeriods = [ // 변경: unknown 제외
+      const operationPeriods = [
         { id: '20plus', label: translations[isEnglish ? 'en' : 'ko'].operationPeriods['20plus'] },
         { id: '15to20', label: translations[isEnglish ? 'en' : 'ko'].operationPeriods['15to20'] },
         { id: '10to15', label: translations[isEnglish ? 'en' : 'ko'].operationPeriods['10to15'] },
@@ -837,15 +841,17 @@
       selectedComplex = event.target.value;
       selectedManufacturer = '';
       selectedOperator = '';
-      selectedOperationPeriod = ''; // 변경
+      selectedOperationPeriod = '';
+      areNamesVisible = true; // 변경: 선택 시 이름 on
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
-      document.getElementById('operation-period-dropdown').value = ''; // 변경
+      document.getElementById('operation-period-dropdown').value = '';
+      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 변경: 버튼 텍스트 동기화
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
-      const operationPeriodInfo = document.getElementById('operation-period-info'); // 변경
+      const operationPeriodInfo = document.getElementById('operation-period-info');
       allInfo.style.display = 'none';
       manufacturerInfo.style.display = 'none';
       operatorInfo.style.display = 'none';
@@ -872,15 +878,17 @@
       selectedManufacturer = event.target.value;
       selectedComplex = '';
       selectedOperator = '';
-      selectedOperationPeriod = ''; // 변경
+      selectedOperationPeriod = '';
+      areNamesVisible = true; // 변경: 선택 시 이름 on
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
-      document.getElementById('operation-period-dropdown').value = ''; // 변경
+      document.getElementById('operation-period-dropdown').value = '';
+      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 변경: 버튼 텍스트 동기화
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
-      const operationPeriodInfo = document.getElementById('operation-period-info'); // 변경
+      const operationPeriodInfo = document.getElementById('operation-period-info');
       allInfo.style.display = 'none';
       complexInfo.style.display = 'none';
       operatorInfo.style.display = 'none';
@@ -925,15 +933,17 @@
       selectedOperator = event.target.value;
       selectedComplex = '';
       selectedManufacturer = '';
-      selectedOperationPeriod = ''; // 변경
+      selectedOperationPeriod = '';
+      areNamesVisible = true; // 변경: 선택 시 이름 on
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
-      document.getElementById('operation-period-dropdown').value = ''; // 변경
+      document.getElementById('operation-period-dropdown').value = '';
+      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 변경: 버튼 텍스트 동기화
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
-      const operationPeriodInfo = document.getElementById('operation-period-info'); // 변경
+      const operationPeriodInfo = document.getElementById('operation-period-info');
       allInfo.style.display = 'none';
       manufacturerInfo.style.display = 'none';
       complexInfo.style.display = 'none';
@@ -974,19 +984,21 @@
       updateMarkers();
     }
 
-    function handleOperationPeriodChange(event) { // 변경: handleAgeRangeChange → handleOperationPeriodChange
+    function handleOperationPeriodChange(event) {
       selectedOperationPeriod = event.target.value;
       selectedComplex = '';
       selectedManufacturer = '';
       selectedOperator = '';
+      areNamesVisible = true; // 변경: 선택 시 이름 on
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
+      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 변경: 버튼 텍스트 동기화
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
-      const operationPeriodInfo = document.getElementById('operation-period-info'); // 변경
+      const operationPeriodInfo = document.getElementById('operation-period-info');
       allInfo.style.display = 'none';
       manufacturerInfo.style.display = 'none';
       complexInfo.style.display = 'none';
@@ -1173,7 +1185,7 @@
         { offset: new kakao.maps.Point(16, 32) }
       );
       let filteredFarms = allWindFarms;
-      if (selectedOperationPeriod) { // 변경
+      if (selectedOperationPeriod) {
         filteredFarms = allWindFarms.filter(farm => getOperationPeriod(farm.age) === selectedOperationPeriod);
       } else if (selectedOperator) {
         filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
@@ -1182,109 +1194,73 @@
       } else if (selectedComplex) {
         filteredFarms = allWindFarms.filter(farm => farm.complexId === selectedComplex);
       }
-      // 변경: 준공일 미상 제외
       filteredFarms = filteredFarms.filter(farm => farm.age !== null);
       console.log("필터링된 터빈 수:", filteredFarms.length);
       const lang = isEnglish ? 'en' : 'ko';
-      if (zoomLevel >= 10) {
-        const farmsByComplex = {};
-        filteredFarms.forEach(farm => {
-          if (!farmsByComplex[farm.complexId]) farmsByComplex[farm.complexId] = [];
-          farmsByComplex[farm.complexId].push(farm);
-        });
-        Object.keys(farmsByComplex).forEach(complexId => {
-          const group = farmsByComplex[complexId];
-          const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
-          const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
-          const position = new kakao.maps.LatLng(avgLat, avgLon);
-          const complexName = getTranslatedSiteInfo(complexId, 'name') || group[0].name;
-          let marker = null;
-          if (areMarkersVisible) {
-            marker = new kakao.maps.Marker({
-              position: position,
-              title: `${complexName} (${group.length}${isEnglish ? ' turbines' : '개 터빈'})`,
-              clickable: true,
-              image: markerImage
-            });
-            marker.setMap(map);
-            markers.push(marker);
-          }
-          if (areNamesVisible) {
-            const overlay = new kakao.maps.CustomOverlay({
-              position: position,
-              content: `<div class="info-window">${translations[lang].infoWindow.replace('{{name}}', complexName).replace('{{count}}', group.length)}</div>`,
-              xAnchor: 0.5,
-              yAnchor: 2,
-              zIndex: 10
-            });
-            overlay.setMap(map);
-            overlays.push(overlay);
-          }
-          if (areMarkersVisible && marker) {
-            kakao.maps.event.addListener(marker, 'click', () => {
-              selectedComplex = complexId;
-              selectedManufacturer = '';
-              selectedOperator = '';
-              selectedOperationPeriod = ''; // 변경
-              document.getElementById('manufacturer-dropdown').value = '';
-              document.getElementById('operator-dropdown').value = '';
-              document.getElementById('operation-period-dropdown').value = ''; // 변경
-              document.getElementById('windfarm-dropdown').value = complexId;
-              const allInfo = document.getElementById('all-info');
-              const manufacturerInfo = document.getElementById('manufacturer-info');
-              const complexInfo = document.getElementById('complex-info');
-              const operatorInfo = document.getElementById('operator-info');
-              const operationPeriodInfo = document.getElementById('operation-period-info'); // 변경
-              allInfo.style.display = 'none';
-              manufacturerInfo.style.display = 'none';
-              operatorInfo.style.display = 'none';
-              operationPeriodInfo.style.display = 'none';
-              updateComplexInfo(group);
-              complexInfo.style.display = 'block';
-              map.setCenter(position);
-              const currentLevel = map.getLevel();
-              map.setLevel(currentLevel - 5);
-              updateMarkers();
-            });
-          }
-        });
-      } else {
-        const bounds = map.getBounds();
-        const visibleFarms = filteredFarms.filter(farm =>
-          farm.lat && farm.lon && bounds.contain(new kakao.maps.LatLng(farm.lat, farm.lon))
-        );
-        console.log("표시될 터빈 수:", visibleFarms.length);
-        visibleFarms.forEach(farm => {
-          const position = new kakao.maps.LatLng(farm.lat, farm.lon);
-          const complexName = getTranslatedSiteInfo(farm.complexId, 'name') || farm.name;
-          const turbineName = `${complexName} ${farm.turbineId}`;
-          let marker = null;
-          if (areMarkersVisible) {
-            marker = new kakao.maps.Marker({
-              position: position,
-              title: turbineName,
-              clickable: true,
-              image: markerImage
-            });
-            marker.setMap(map);
-            markers.push(marker);
-          }
-          if (areNamesVisible) {
-            const overlay = new kakao.maps.CustomOverlay({
-              position: position,
-              content: `<div class="info-window" onclick="toggleFarmDetails('${complexName}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${getTranslatedSiteInfo(farm.complexId, 'address') || farm.address}', ${farm.lat}, ${farm.lon}, '${farm.capacity}', '${farm.manufacturer}', '${farm.complexId}', '${farm.operator}')">${turbineName}</div>`,
-              xAnchor: 0.5,
-              yAnchor: 2,
-              zIndex: 10
-            });
-            overlay.setMap(map);
-            overlays.push(overlay);
-          }
-          if (areMarkersVisible && marker) {
-            kakao.maps.event.addListener(marker, 'click', () => toggleFarmDetails(complexName, farm.turbineId, farm.type, farm.completionDate, getTranslatedSiteInfo(farm.complexId, 'address') || farm.address, farm.lat, farm.lon, farm.capacity, farm.manufacturer, farm.complexId, farm.operator));
-          }
-        });
-      }
+      // 변경: 단지 이름만 표시하도록 수정
+      const farmsByComplex = {};
+      filteredFarms.forEach(farm => {
+        if (!farmsByComplex[farm.complexId]) farmsByComplex[farm.complexId] = [];
+        farmsByComplex[farm.complexId].push(farm);
+      });
+      Object.keys(farmsByComplex).forEach(complexId => {
+        const group = farmsByComplex[complexId];
+        const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
+        const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
+        const position = new kakao.maps.LatLng(avgLat, avgLon);
+        const complexName = getTranslatedSiteInfo(complexId, 'name') || group[0].name;
+        let marker = null;
+        if (areMarkersVisible) {
+          marker = new kakao.maps.Marker({
+            position: position,
+            title: `${complexName} (${group.length}${isEnglish ? ' turbines' : '개 터빈'})`,
+            clickable: true,
+            image: markerImage
+          });
+          marker.setMap(map);
+          markers.push(marker);
+        }
+        if (areNamesVisible) {
+          const overlay = new kakao.maps.CustomOverlay({
+            position: position,
+            content: `<div class="info-window">${translations[lang].infoWindow.replace('{{name}}', complexName).replace('{{count}}', group.length)}</div>`,
+            xAnchor: 0.5,
+            yAnchor: 2,
+            zIndex: 10
+          });
+          overlay.setMap(map);
+          overlays.push(overlay);
+        }
+        if (areMarkersVisible && marker) {
+          kakao.maps.event.addListener(marker, 'click', () => {
+            selectedComplex = complexId;
+            selectedManufacturer = '';
+            selectedOperator = '';
+            selectedOperationPeriod = '';
+            areNamesVisible = true; // 변경: 마커 클릭 시 이름 on
+            document.getElementById('manufacturer-dropdown').value = '';
+            document.getElementById('operator-dropdown').value = '';
+            document.getElementById('operation-period-dropdown').value = '';
+            document.getElementById('windfarm-dropdown').value = complexId;
+            document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 변경: 버튼 텍스트 동기화
+            const allInfo = document.getElementById('all-info');
+            const manufacturerInfo = document.getElementById('manufacturer-info');
+            const complexInfo = document.getElementById('complex-info');
+            const operatorInfo = document.getElementById('operator-info');
+            const operationPeriodInfo = document.getElementById('operation-period-info');
+            allInfo.style.display = 'none';
+            manufacturerInfo.style.display = 'none';
+            operatorInfo.style.display = 'none';
+            operationPeriodInfo.style.display = 'none';
+            updateComplexInfo(group);
+            complexInfo.style.display = 'block';
+            map.setCenter(position);
+            const currentLevel = map.getLevel();
+            map.setLevel(currentLevel - 5);
+            updateMarkers();
+          });
+        }
+      });
       if (myLocationMarker) {
         myLocationMarker.setMap(map);
         markers.push(myLocationMarker);
@@ -1381,4 +1357,44 @@
   </script>
 </body>
 </html>
+</xaiArtifactMap>
 ```
+
+### 주요 변경 사항
+1. **초기 이름 표시 설정**:
+   - `areNamesVisible = false`로 초기화 (line 304).
+   - `name-toggle-button` 초기 텍스트를 "이름 켜기"로 설정 (line 178).
+
+2. **드롭다운 선택 시 이름 표시**:
+   - `handleDropdownChange`에서 `areNamesVisible = true` 설정 및 버튼 텍스트 업데이트 (line 1097).
+   - `handleManufacturerChange`에서 동일 (line 1178).
+   - `handleOperatorChange`에서 동일 (line 1259).
+   - `handleOperationPeriodChange`에서 동일 (line 1340).
+   - 마커 클릭 시에도 `areNamesVisible = true` 설정 (line 5).
+
+3. **초기화 시 이름 비활성화**:
+   - `resetToInitial`: `areNamesVisible = false`로 설정하고 버튼 텍스트를 "이름 켜기"로 변경 (line 395-396).
+   - `resetSelectionsOnly`: 동일하게 처리 (line 408-409).
+
+4. **마커 및 이름 표시 로직**:
+   - `updateMarkers`: 줌 레벨에 따라 단지 이름만 표시하도록 수정, 개별 터빈 이름 표시 제거 (line 1784-1866).
+   - `areNamesVisible`이 `true`일 때만 단지 이름 표시 (line 1815-1823).
+
+5. **UI 동기화**:
+   - `updateUILanguage`에서 `name-toggle-button` 텍스트를 `areNamesVisible` 상태에 따라 동기화 (line 429).
+   - 버튼 텍스트가 언어 변경 시에도 올바르게 반영됨.
+
+### 실행 방법
+1. 위 코드를 `index.html`로 저장.
+2. `/wind/windfarm_data.csv`, `/wind/translations.json`, `/wind/manufacturers.json` 파일이 서버에 존재하는지 확인.
+3. Kakao Maps API 키를 `9b8113591f35c3409335bdb4b5ee5613`에 설정.
+4. 로컬 서버(예: `http-server`) 또는 웹 서버에서 실행.
+5. 브라우저에서 초기 로드 시 단지 이름이 표시되지 않고, 드롭다운(풍력단지, 제조사, 사업자, 운영기간) 선택 시 단지 이름이 표시되는지 확인.
+6. "처음으로" 또는 "선택 초기화" 버튼 클릭 시 단지 이름이 다시 꺼지는지 확인.
+
+### 디버깅 팁
+- **콘솔 로그**: `updateMarkers` 호출 시 `areNamesVisible` 상태를 확인:
+  ```javascript
+  console.log("updateMarkers 호출, 이름 표시 상태:", areNamesVisible);
+  ```
+- **데이터 확인**: `allWindFarms`의 `complexId`
