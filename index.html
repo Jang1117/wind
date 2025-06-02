@@ -1292,9 +1292,18 @@
               operationPeriodInfo.style.display = 'none';
               updateComplexInfo(group);
               complexInfo.style.display = 'block';
-              map.setCenter(position);
-              const currentLevel = map.getLevel();
-              map.setLevel(currentLevel > 3 ? 3 : currentLevel);
+
+              // 단지 내 모든 터빈의 위치를 포함하는 경계 생성
+              const bounds = new kakao.maps.LatLngBounds();
+              group.forEach(farm => {
+                bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
+              });
+              
+              // 경계에 맞춰 지도 이동 및 확대/축소
+              map.setBounds(bounds, {
+                padding: 50 // 경계로부터 50픽셀 여백 추가
+              });
+
               updateMarkers();
             });
           }
