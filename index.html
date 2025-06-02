@@ -73,20 +73,32 @@
       overflow: visible;
       z-index: 10001;
     }
-   #initial-reset, #settings-button, #reset-button {
-      color: #000000; /* 동일한 텍스트 색상 */
-      font-weight: 500; /* 동일한 글씨 두께 */
-      background: rgba(255, 255, 255, 0.95); /* 동일한 배경 */
-      font-size: 14px; /* 동일한 글씨 크기 */
-      line-height: 34px; /* 동일한 수직 정렬 */
-      padding: 0 10px; /* 동일한 패딩 */
-    }
+      #initial-reset,
+      #settings-button,
+      #reset-button {
+        width: 120px;
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-family: 'Noto Sans KR', Arial, sans-serif;
+        font-weight: 500;
+        text-align: center;
+        box-sizing: border-box;
+        height: 34px;
+        line-height: 34px; /* 수직 중앙 정렬 */
+        color: #000000; /* 검정 글자 */
+        padding: 0 10px;
+        overflow: visible;
+        z-index: 10001;
+      }
     /* 드롭다운에도 버튼 스타일 적용 */
-    select.control-button {
-      -webkit-appearance: none;
-         -moz-appearance: none;
-              appearance: none;
-    }
+      select.control-button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
     /* 설정 컨테이너 */
     #settings-container {
       display: none; /* 처음에는 숨김 */
