@@ -1197,70 +1197,110 @@
       filteredFarms = filteredFarms.filter(farm => farm.age !== null && farm.lat && farm.lon);
       console.log("필터링된 터빈 수:", filteredFarms.length);
       const lang = isEnglish ? 'en' : 'ko';
-      // 단지별로 그룹화하여 마커와 오버레이 생성
-      const farmsByComplex = {};
-      filteredFarms.forEach(farm => {
-        if (!farmsByComplex[farm.complexId]) farmsByComplex[farm.complexId] = [];
-        farmsByComplex[farm.complexId].push(farm);
-      });
-      Object.keys(farmsByComplex).forEach(complexId => {
-        const group = farmsByComplex[complexId];
-        const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
-        const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
-        const position = new kakao.maps.LatLng(avgLat, avgLon);
-        const complexName = getTranslatedSiteInfo(complexId, 'name') || group[0].name;
-        let marker = null;
-        if (areMarkersVisible) {
-          marker = new kakao.maps.Marker({
-            position: position,
-            title: `${complexName} (${group.length}${isEnglish ? ' turbines' : '개 터빈'})`,
-            clickable: true,
-            image: markerImage
-          });
-          marker.setMap(map);
-          markers.push(marker);
-        }
-        if (areNamesVisible) {
-          const overlay = new kakao.maps.CustomOverlay({
-            position: position,
-            content: `<div class="info-window">${translations[lang].infoWindow.replace('{{name}}', complexName).replace('{{count}}', group.length)}</div>`,
-            xAnchor: 0.5,
-            yAnchor: 2,
-            zIndex: 10
-          });
-          overlay.setMap(map);
-          overlays.push(overlay);
-        }
-        if (areMarkersVisible && marker) {
-          kakao.maps.event.addListener(marker, 'click', () => {
-            selectedComplex = complexId;
-            selectedManufacturer = '';
-            selectedOperator = '';
-            selectedOperationPeriod = '';
-            areNamesVisible = true;
-            document.getElementById('manufacturer-dropdown').value = '';
-            document.getElementById('operator-dropdown').value = '';
-            document.getElementById('operation-period-dropdown').value = '';
-            document.getElementById('windfarm-dropdown').value = complexId;
-            document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
-            const allInfo = document.getElementById('all-info');
-            const manufacturerInfo = document.getElementById('manufacturer-info');
-            const complexInfo = document.getElementById('complex-info');
-            const operatorInfo = document.getElementById('operator-info');
-            const operationPeriodInfo = document.getElementById('operation-period-info');
-            allInfo.style.display = 'none';
-            manufacturerInfo.style.display = 'none';
-            operatorInfo.style.display = 'none';
-            operationPeriodInfo.style.display = 'none';
-            updateComplexInfo(group);
-            complexInfo.style.display = 'block';
-            map.setCenter(position);
-            const currentLevel = map.getLevel();
-            map.setLevel(currentLevel - 5);
-            updateMarkers();
-          });
-        }
-      });
+
+      // 선택된 단지가 있으면 개별 터빈을 표시
+      if (selectedComplex) {
+        filteredFarms.forEach(farm => {
+          const position = new kakao.maps.LatLng(farm.lat, farm.lon);
+          if (areMarkersVisible) {
+            const marker = new kakao.maps.Marker({
+              position: position,
+              title: `${farm.name} - ${farm.turbineId || ''}`,
+              clickable: true,
+              image: markerImage
+            });
+            marker.setMap(map);
+            markers.push(marker);
+
+            // 개별 터빈 마커 클릭 이벤트
+            kakao.maps.event.addListener(marker, 'click', () => {
+              window.toggleFarmDetails(
+                farm.name,
+                farm.turbineId,
+                farm.type,
+                farm.completionDate,
+                farm.address,
+                farm.lat,
+                farm.lon,
+                farm.capacity,
+                farm.manufacturer,
+                farm.complexId,
+                farm.operator
+              );
+            });
+          }
+        });
+      } else {
+        // 단지별로 그룹화하여 마커와 오버레이 생성
+        const farmsByComplex = {};
+        filteredFarms.forEach(farm => {
+          if (!farmsByComplex[farm.complexId]) farmsByComplex[farm.complexId] = [];
+          farmsByComplex[farm.complexId].push(farm);
+        });
+
+        Object.keys(farmsByComplex).forEach(complexId => {
+          const group = farmsByComplex[complexId];
+          const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
+          const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
+          const position = new kakao.maps.LatLng(avgLat, avgLon);
+          const complexName = getTranslatedSiteInfo(complexId, 'name') || group[0].name;
+          let marker = null;
+
+          if (areMarkersVisible) {
+            marker = new kakao.maps.Marker({
+              position: position,
+              title: `${complexName} (${group.length}${isEnglish ? ' turbines' : '개 터빈'})`,
+              clickable: true,
+              image: markerImage
+            });
+            marker.setMap(map);
+            markers.push(marker);
+          }
+
+          if (areNamesVisible) {
+            const overlay = new kakao.maps.CustomOverlay({
+              position: position,
+              content: `<div class="info-window">${translations[lang].infoWindow.replace('{{name}}', complexName).replace('{{count}}', group.length)}</div>`,
+              xAnchor: 0.5,
+              yAnchor: 2,
+              zIndex: 10
+            });
+            overlay.setMap(map);
+            overlays.push(overlay);
+          }
+
+          if (areMarkersVisible && marker) {
+            kakao.maps.event.addListener(marker, 'click', () => {
+              selectedComplex = complexId;
+              selectedManufacturer = '';
+              selectedOperator = '';
+              selectedOperationPeriod = '';
+              areNamesVisible = true;
+              document.getElementById('manufacturer-dropdown').value = '';
+              document.getElementById('operator-dropdown').value = '';
+              document.getElementById('operation-period-dropdown').value = '';
+              document.getElementById('windfarm-dropdown').value = complexId;
+              document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
+              const allInfo = document.getElementById('all-info');
+              const manufacturerInfo = document.getElementById('manufacturer-info');
+              const complexInfo = document.getElementById('complex-info');
+              const operatorInfo = document.getElementById('operator-info');
+              const operationPeriodInfo = document.getElementById('operation-period-info');
+              allInfo.style.display = 'none';
+              manufacturerInfo.style.display = 'none';
+              operatorInfo.style.display = 'none';
+              operationPeriodInfo.style.display = 'none';
+              updateComplexInfo(group);
+              complexInfo.style.display = 'block';
+              map.setCenter(position);
+              const currentLevel = map.getLevel();
+              map.setLevel(currentLevel > 3 ? 3 : currentLevel);
+              updateMarkers();
+            });
+          }
+        });
+      }
+
       if (myLocationMarker) {
         myLocationMarker.setMap(map);
         markers.push(myLocationMarker);
