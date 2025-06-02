@@ -4,8 +4,8 @@
   <title id="page-title">Korea Wind Power Plant Map by Seungho Jang</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" id="meta-description" content="한국 풍력 발전소의 위치, 제조사, 사업자, 단지 정보를 제공하는 대화형 지도입니다. 신재생에너지와 친환경 에너지 데이터를 확인하세요.">
-  <meta name="keywords" content="한국 풍력 발전소, 풍력단지 지도, 풍력 터빈, 제조사, 사업자, 풍력, Wind Farm, Wind Power Plant, Korea Wind Farm, Korea Wind Power Plant">
+  <meta name="description" id="meta-description" content="한국 풍력 발전소의 위치, 제조사, 사업자, 단지, 준공일 정보를 제공하는 대화형 지도입니다. 신재생에너지와 친환경 에너지 데이터를 확인하세요.">
+  <meta name="keywords" content="한국 풍력 발전소, 풍력단지 지도, 풍력 터빈, 제조사, 사업자, 준공일, Wind Farm, Wind Power Plant, Korea Wind Farm, Korea Wind Power Plant">
   <meta name="robots" content="index, follow">
   <!-- Kakao Maps SDK -->
   <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=KAKAO_APP_KEY&libraries=clusterer&autoload=false" defer></script>
@@ -87,7 +87,7 @@
     #settings-button {
       width: 120px;
     }
-    #all-info, #manufacturer-info, #complex-info, #operator-info {
+    #all-info, #manufacturer-info, #complex-info, #operator-info, #age-range-info {
       position: absolute;
       z-index: 10;
       background: rgba(255, 255, 255, 0.8);
@@ -100,14 +100,14 @@
       max-width: 90%;
     }
     @media screen and (min-width: 768px) {
-      #all-info, #manufacturer-info, #complex-info, #operator-info {
+      #all-info, #manufacturer-info, #complex-info, #operator-info, #age-range-info {
         top: 10px;
         left: 50%;
         transform: translateX(-50%);
       }
     }
     @media screen and (max-width: 767px) {
-      #all-info, #manufacturer-info, #complex-info, #operator-info {
+      #all-info, #manufacturer-info, #complex-info, #operator-info, #age-range-info {
         top: 10px;
         left: 10px;
         transform: none;
@@ -181,6 +181,9 @@
     <select id="operator-dropdown" class="control-button">
       <option value="">사업자</option>
     </select>
+    <select id="age-range-dropdown" class="control-button">
+      <option value="">연령 범주</option>
+    </select>
     <button id="settings-button" class="control-button">설정/Setting</button>
     <div id="settings-container" style="display: none;">
       <button id="map-type-toggle" class="control-button">기본 지도</button>
@@ -216,6 +219,12 @@
     <span id="info-operator-complex-count"></span><br>
     <span id="info-operator-turbine-count"></span>
   </div>
+  <div id="age-range-info">
+    <span id="info-age-range"></span><br>
+    <span id="info-age-capacity"></span><br>
+    <span id="info-age-complex-count"></span><br>
+    <span id="info-age-turbine-count"></span>
+  </div>
   <div id="info-popup">
     <button class="close-button" onclick="toggleInfoPopup()">×</button>
     <div id="info-popup-content"></div>
@@ -236,6 +245,7 @@
     let selectedManufacturer = '';
     let selectedComplex = '';
     let selectedOperator = '';
+    let selectedAgeRange = '';
     let isEnglish = false;
     let translations = {};
     let siteTranslations = [];
@@ -258,6 +268,7 @@
         "windfarmDropdown": "풍력단지",
         "manufacturerDropdown": "제조사",
         "operatorDropdown": "사업자",
+        "ageRangeDropdown": "연령 범주",
         "settings": "설정/Setting",
         "initialReset": "처음으로",
         "allInfo": {
@@ -286,6 +297,12 @@
           "turbineCount": "터빈 수: {{value}}",
           "completion": "준공일: {{value}}"
         },
+        "ageRangeInfo": {
+          "ageRange": "연령 범주: {{value}}",
+          "totalCapacity": "총 용량: {{value}} kW",
+          "complexCount": "단지 수: {{value}}",
+          "turbineCount": "터빈 수: {{value}}"
+        },
         "infoWindow": "{{name}} ({{count}}기)",
         "detailWindow": {
           "name": "단지명: {{value}}",
@@ -306,7 +323,15 @@
           "geolocationUnsupported": "위치 정보 지원 안 됨",
           "translationsLoad": "번역 데이터 로드 실패: {{message}}"
         },
-        "myLocation": "내 위치"
+        "myLocation": "내 위치",
+        "ageRanges": {
+          "20plus": "20년 이상",
+          "15to20": "15년 이상 ~ 20년 미만",
+          "10to15": "10년 이상 ~ 15년 미만",
+          "5to10": "5년 이상 ~ 10년 미만",
+          "under5": "5년 미만",
+          "unknown": "준공일 미상"
+        }
       },
       "en": {
         "title": "South Korea Wind Farm Map by Seungho Jang",
@@ -324,6 +349,7 @@
         "windfarmDropdown": "Wind Farm",
         "manufacturerDropdown": "Manufacturer",
         "operatorDropdown": "Operator",
+        "ageRangeDropdown": "Age Range",
         "settings": "설정/Setting",
         "initialReset": "Home",
         "allInfo": {
@@ -352,6 +378,12 @@
           "turbineCount": "Turbines: {{value}}",
           "completion": "Completion: {{value}}"
         },
+        "ageRangeInfo": {
+          "ageRange": "Age Range: {{value}}",
+          "totalCapacity": "Total Capacity: {{value}} kW",
+          "complexCount": "Complexes: {{value}}",
+          "turbineCount": "Turbines: {{value}}"
+        },
         "infoWindow": "{{name}} ({{count}} turbines)",
         "detailWindow": {
           "name": "Complex: {{value}}",
@@ -372,7 +404,15 @@
           "geolocationUnsupported": "Geolocation not supported",
           "translationsLoad": "Failed to load translations: {{message}}"
         },
-        "myLocation": "My Location"
+        "myLocation": "My Location",
+        "ageRanges": {
+          "20plus": "20 years or more",
+          "15to20": "15 to less than 20 years",
+          "10to15": "10 to less than 15 years",
+          "5to10": "5 to less than 10 years",
+          "under5": "Less than 5 years",
+          "unknown": "Unknown completion date"
+        }
       }
     };
 
@@ -423,17 +463,21 @@
       selectedComplex = '';
       selectedManufacturer = '';
       selectedOperator = '';
+      selectedAgeRange = '';
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
+      document.getElementById('age-range-dropdown').value = '';
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
+      const ageRangeInfo = document.getElementById('age-range-info');
       allInfo.style.display = 'block';
       manufacturerInfo.style.display = 'none';
       complexInfo.style.display = 'none';
       operatorInfo.style.display = 'none';
+      ageRangeInfo.style.display = 'none';
       map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
       map.setLevel(13);
       map.relayout();
@@ -445,17 +489,21 @@
       selectedComplex = '';
       selectedManufacturer = '';
       selectedOperator = '';
+      selectedAgeRange = '';
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
+      document.getElementById('age-range-dropdown').value = '';
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
+      const ageRangeInfo = document.getElementById('age-range-info');
       allInfo.style.display = 'none';
       manufacturerInfo.style.display = 'none';
       complexInfo.style.display = 'none';
       operatorInfo.style.display = 'none';
+      ageRangeInfo.style.display = 'none';
       updateInfoPanels();
       updateMarkers();
     }
@@ -475,6 +523,7 @@
       document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
       document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
       document.getElementById('operator-dropdown').options[0].textContent = translations[lang].operatorDropdown;
+      document.getElementById('age-range-dropdown').options[0].textContent = translations[lang].ageRangeDropdown;
       const windfarmDropdown = document.getElementById('windfarm-dropdown');
       const selectedValue = windfarmDropdown.value;
       while (windfarmDropdown.options.length > 1) windfarmDropdown.remove(1);
@@ -490,6 +539,11 @@
       while (operatorDropdown.options.length > 1) operatorDropdown.remove(1);
       populateOperatorDropdown();
       operatorDropdown.value = selectedOperatorValue;
+      const ageRangeDropdown = document.getElementById('age-range-dropdown');
+      const selectedAgeRangeValue = ageRangeDropdown.value;
+      while (ageRangeDropdown.options.length > 1) ageRangeDropdown.remove(1);
+      populateAgeRangeDropdown();
+      ageRangeDropdown.value = selectedAgeRangeValue;
       updateInfoPanels();
       updateMarkers();
       document.getElementById('info-popup-content').innerHTML = translations[lang].infoPopup;
@@ -529,88 +583,107 @@
       return (kw / 1000000).toFixed(2);
     }
 
-      async function loadCSVData() {
-    try {
-      console.log("windfarm_data.csv 요청 중: /wind/windfarm_data.csv");
-      const response = await fetch(`/wind/windfarm_data.csv?t=${new Date().getTime()}`);
-      if (!response.ok) {
-        throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
+    function calculateAge(completionDate) {
+      if (!completionDate) return null;
+      try {
+        const date = new Date(completionDate);
+        if (isNaN(date.getTime())) return null;
+        const currentDate = new Date('2025-06-02');
+        const diffYears = (currentDate - date) / (1000 * 60 * 60 * 24 * 365.25);
+        return diffYears;
+      } catch (error) {
+        console.warn(`Invalid date format: ${completionDate}`);
+        return null;
       }
-      const text = await response.text();
-      console.log("CSV 데이터 (처음 200자):", text.substring(0, 200) + "...");
-  
-      Papa.parse(text, {
-        header: true,
-        skipEmptyLines: true,
-        encoding: "UTF-8", // 인코딩 명시
-        complete: function(results) {
-          console.log("파싱된 CSV 필드:", results.meta.fields); // 실제 열 이름 출력
-          allWindFarms = results.data.map(row => {
-            const name = row['단지명'] ? row['단지명'].trim() : null;
-            if (!name) {
-              console.warn("단지명 누락, 해당 행 스킵:", row);
-              return null;
-            }
-  
-            // 사업자 열 이름 확인 (다양한 변형 고려)
-            let operator = row['사업자'] || row['운영자'] || row['Operator'] || null;
-            if (!operator) {
-              console.warn(`사업자 정보 누락 (단지명: ${name})`);
-              operator = null; // 기본값 설정
-            } else {
-              operator = operator.trim();
-            }
-  
-            return {
-              complexId: row['단지번호'] ? row['단지번호'].trim() : null,
-              name: name,
-              turbineId: row['풍력기번호(임시)'] ? row['풍력기번호(임시)'].trim() : null,
-              completionDate: row['준공일'] ? row['준공일'].trim() : null,
-              type: row['분류'] ? row['분류'].trim() : null,
-              address: row['주소'] ? row['주소'].trim() : null,
-              xCoord: row['엑스좌표(GRS80_C_x)'] ? parseFloat(row['엑스좌표(GRS80_C_x)']) : null,
-              yCoord: row['와이좌표(GRS80_C_y)'] ? parseFloat(row['와이좌표(GRS80_C_y)']) : null,
-              lat: row['위도(lat)'] ? parseFloat(row['위도(lat)']) : null,
-              lon: row['경도(lon)'] ? parseFloat(row['경도(lon)']) : null,
-              capacity: row['용량(kW)'] ? parseFloat(row['용량(kW)']) : null,
-              manufacturer: row['제조사'] ? row['제조사'].trim() : null,
-              operator: operator
-            };
-          }).filter(row => row !== null);
-  
-          console.log("파싱된 데이터 (첫 5개):", allWindFarms.slice(0, 5));
-          console.log("사업자 목록:", [...new Set(allWindFarms.map(farm => farm.operator).filter(op => op))]);
-  
-          turbineCountByComplex = {};
-          totalCapacityByComplex = {};
-          allWindFarms.forEach(farm => {
-            if (!turbineCountByComplex[farm.complexId]) {
-              turbineCountByComplex[farm.complexId] = 0;
-              totalCapacityByComplex[farm.complexId] = 0;
-            }
-            turbineCountByComplex[farm.complexId]++;
-            if (farm.capacity) {
-              totalCapacityByComplex[farm.complexId] += farm.capacity;
-            }
-          });
-          console.log("단지별 터빈 수:", turbineCountByComplex);
-          console.log("단지별 총 용량:", totalCapacityByComplex);
-  
-          initMap();
-          populateDropdown();
-          populateManufacturerDropdown();
-          populateOperatorDropdown();
-        },
-        error: function(error) {
-          console.error('CSV 파싱 실패:', error);
-          showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvParse.replace('{{message}}', error.message));
-        }
-      });
-    } catch (error) {
-      console.error('CSV 로드 실패:', error);
-      showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvLoad.replace('{{message}}', error.message));
     }
-  }
+
+    function getAgeRange(age) {
+      if (age === null) return 'unknown';
+      if (age >= 20) return '20plus';
+      if (age >= 15) return '15to20';
+      if (age >= 10) return '10to15';
+      if (age >= 5) return '5to10';
+      return 'under5';
+    }
+
+    async function loadCSVData() {
+      try {
+        console.log("windfarm_data.csv 요청 중: /wind/windfarm_data.csv");
+        const response = await fetch(`/wind/windfarm_data.csv?t=${new Date().getTime()}`);
+        if (!response.ok) {
+          throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
+        }
+        const text = await response.text();
+        console.log("CSV 데이터 (처음 200자):", text.substring(0, 200) + "...");
+        Papa.parse(text, {
+          header: true,
+          skipEmptyLines: true,
+          encoding: "UTF-8",
+          complete: function(results) {
+            console.log("파싱된 CSV 필드:", results.meta.fields);
+            allWindFarms = results.data.map(row => {
+              const name = row['단지명'] ? row['단지명'].trim() : null;
+              if (!name) {
+                console.warn("단지명 누락, 해당 행 스킵:", row);
+                return null;
+              }
+              let operator = row['사업자'] || row['운영자'] || row['Operator'] || null;
+              if (!operator) {
+                console.warn(`사업자 정보 누락 (단지명: ${name})`);
+                operator = null;
+              } else {
+                operator = operator.trim();
+              }
+              const completionDate = row['준공일'] ? row['준공일'].trim() : null;
+              return {
+                complexId: row['단지번호'] ? row['단지번호'].trim() : null,
+                name: name,
+                turbineId: row['풍력기번호(임시)'] ? row['풍력기번호(임시)'].trim() : null,
+                completionDate: completionDate,
+                type: row['분류'] ? row['분류'].trim() : null,
+                address: row['주소'] ? row['주소'].trim() : null,
+                xCoord: row['엑스좌표(GRS80_C_x)'] ? parseFloat(row['엑스좌표(GRS80_C_x)']) : null,
+                yCoord: row['와이좌표(GRS80_C_y)'] ? parseFloat(row['와이좌표(GRS80_C_y)']) : null,
+                lat: row['위도(lat)'] ? parseFloat(row['위도(lat)']) : null,
+                lon: row['경도(lon)'] ? parseFloat(row['경도(lon)']) : null,
+                capacity: row['용량(kW)'] ? parseFloat(row['용량(kW)']) : null,
+                manufacturer: row['제조사'] ? row['제조사'].trim() : null,
+                operator: operator,
+                age: calculateAge(completionDate)
+              };
+            }).filter(row => row !== null);
+            console.log("파싱된 데이터 (첫 5개):", allWindFarms.slice(0, 5));
+            console.log("사업자 목록:", [...new Set(allWindFarms.map(farm => farm.operator).filter(op => op))]);
+            turbineCountByComplex = {};
+            totalCapacityByComplex = {};
+            allWindFarms.forEach(farm => {
+              if (!turbineCountByComplex[farm.complexId]) {
+                turbineCountByComplex[farm.complexId] = 0;
+                totalCapacityByComplex[farm.complexId] = 0;
+              }
+              turbineCountByComplex[farm.complexId]++;
+              if (farm.capacity) {
+                totalCapacityByComplex[farm.complexId] += farm.capacity;
+              }
+            });
+            console.log("단지별 터빈 수:", turbineCountByComplex);
+            console.log("단지별 총 용량:", totalCapacityByComplex);
+            initMap();
+            populateDropdown();
+            populateManufacturerDropdown();
+            populateOperatorDropdown();
+            populateAgeRangeDropdown();
+          },
+          error: function(error) {
+            console.error('CSV 파싱 실패:', error);
+            showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvParse.replace('{{message}}', error.message));
+          }
+        });
+      } catch (error) {
+        console.error('CSV 로드 실패:', error);
+        showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvLoad.replace('{{message}}', error.message));
+      }
+    }
 
     async function initializeApp() {
       console.log("앱 초기화 시작");
@@ -661,6 +734,7 @@
       document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
       document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
       document.getElementById('operator-dropdown').addEventListener('change', handleOperatorChange);
+      document.getElementById('age-range-dropdown').addEventListener('change', handleAgeRangeChange);
       document.getElementById('info-popup').addEventListener('click', (e) => {
         if (e.target === document.getElementById('info-popup')) {
           toggleInfoPopup();
@@ -744,19 +818,42 @@
       });
     }
 
+    function populateAgeRangeDropdown() {
+      const dropdown = document.getElementById('age-range-dropdown');
+      while (dropdown.options.length > 1) dropdown.remove(1);
+      const ageRanges = [
+        { id: '20plus', label: translations[isEnglish ? 'en' : 'ko'].ageRanges['20plus'] },
+        { id: '15to20', label: translations[isEnglish ? 'en' : 'ko'].ageRanges['15to20'] },
+        { id: '10to15', label: translations[isEnglish ? 'en' : 'ko'].ageRanges['10to15'] },
+        { id: '5to10', label: translations[isEnglish ? 'en' : 'ko'].ageRanges['5to10'] },
+        { id: 'under5', label: translations[isEnglish ? 'en' : 'ko'].ageRanges['under5'] },
+        { id: 'unknown', label: translations[isEnglish ? 'en' : 'ko'].ageRanges['unknown'] }
+      ];
+      ageRanges.forEach(range => {
+        const option = document.createElement('option');
+        option.value = range.id;
+        option.textContent = range.label;
+        dropdown.appendChild(option);
+      });
+    }
+
     function handleDropdownChange(event) {
       selectedComplex = event.target.value;
       selectedManufacturer = '';
       selectedOperator = '';
+      selectedAgeRange = '';
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
+      document.getElementById('age-range-dropdown').value = '';
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
+      const ageRangeInfo = document.getElementById('age-range-info');
       allInfo.style.display = 'none';
       manufacturerInfo.style.display = 'none';
       operatorInfo.style.display = 'none';
+      ageRangeInfo.style.display = 'none';
       if (selectedComplex) {
         const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
         const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
@@ -779,15 +876,19 @@
       selectedManufacturer = event.target.value;
       selectedComplex = '';
       selectedOperator = '';
+      selectedAgeRange = '';
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
+      document.getElementById('age-range-dropdown').value = '';
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
+      const ageRangeInfo = document.getElementById('age-range-info');
       allInfo.style.display = 'none';
       complexInfo.style.display = 'none';
       operatorInfo.style.display = 'none';
+      ageRangeInfo.style.display = 'none';
       let filteredFarms = allWindFarms;
       if (selectedManufacturer) {
         filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
@@ -828,15 +929,19 @@
       selectedOperator = event.target.value;
       selectedComplex = '';
       selectedManufacturer = '';
+      selectedAgeRange = '';
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
+      document.getElementById('age-range-dropdown').value = '';
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
+      const ageRangeInfo = document.getElementById('age-range-info');
       allInfo.style.display = 'none';
       manufacturerInfo.style.display = 'none';
       complexInfo.style.display = 'none';
+      ageRangeInfo.style.display = 'none';
       let filteredFarms = allWindFarms;
       if (selectedOperator) {
         filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
@@ -851,6 +956,60 @@
         operatorInfo.style.display = 'block';
       } else {
         operatorInfo.style.display = 'none';
+        allInfo.style.display = 'block';
+        updateInfoPanels();
+      }
+      if (filteredFarms.length === 0) {
+        map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
+        map.setLevel(13);
+      } else if (filteredFarms.length === 1) {
+        const farm = filteredFarms[0];
+        map.setCenter(new kakao.maps.LatLng(farm.lat, farm.lon));
+        map.setLevel(6);
+      } else {
+        const bounds = new kakao.maps.LatLngBounds();
+        filteredFarms.forEach(farm => {
+          if (farm.lat && farm.lon) {
+            bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
+          }
+        });
+        map.setBounds(bounds);
+      }
+      updateMarkers();
+    }
+
+    function handleAgeRangeChange(event) {
+      selectedAgeRange = event.target.value;
+      selectedComplex = '';
+      selectedManufacturer = '';
+      selectedOperator = '';
+      document.getElementById('windfarm-dropdown').value = '';
+      document.getElementById('manufacturer-dropdown').value = '';
+      document.getElementById('operator-dropdown').value = '';
+      const allInfo = document.getElementById('all-info');
+      const manufacturerInfo = document.getElementById('manufacturer-info');
+      const complexInfo = document.getElementById('complex-info');
+      const operatorInfo = document.getElementById('operator-info');
+      const ageRangeInfo = document.getElementById('age-range-info');
+      allInfo.style.display = 'none';
+      manufacturerInfo.style.display = 'none';
+      complexInfo.style.display = 'none';
+      operatorInfo.style.display = 'none';
+      let filteredFarms = allWindFarms;
+      if (selectedAgeRange) {
+        filteredFarms = allWindFarms.filter(farm => getAgeRange(farm.age) === selectedAgeRange);
+        const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
+        const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
+        const turbineCount = filteredFarms.length;
+        const lang = isEnglish ? 'en' : 'ko';
+        const rangeLabel = translations[lang].ageRanges[selectedAgeRange];
+        document.getElementById('info-age-range').innerHTML = translations[lang].ageRangeInfo.ageRange.replace('{{value}}', rangeLabel);
+        document.getElementById('info-age-capacity').innerHTML = translations[lang].ageRangeInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
+        document.getElementById('info-age-complex-count').innerHTML = translations[lang].ageRangeInfo.complexCount.replace('{{value}}', complexCount);
+        document.getElementById('info-age-turbine-count').innerHTML = translations[lang].ageRangeInfo.turbineCount.replace('{{value}}', turbineCount);
+        ageRangeInfo.style.display = 'block';
+      } else {
+        ageRangeInfo.style.display = 'none';
         allInfo.style.display = 'block';
         updateInfoPanels();
       }
@@ -943,6 +1102,17 @@
         const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
         updateComplexInfo(farmsInComplex);
       }
+      if (selectedAgeRange && document.getElementById('age-range-info').style.display === 'block') {
+        const filteredFarms = allWindFarms.filter(farm => getAgeRange(farm.age) === selectedAgeRange);
+        const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
+        const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
+        const turbineCount = filteredFarms.length;
+        const rangeLabel = translations[lang].ageRanges[selectedAgeRange];
+        document.getElementById('info-age-range').innerHTML = translations[lang].ageRangeInfo.ageRange.replace('{{value}}', rangeLabel);
+        document.getElementById('info-age-capacity').innerHTML = translations[lang].ageRangeInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
+        document.getElementById('info-age-complex-count').innerHTML = translations[lang].ageRangeInfo.complexCount.replace('{{value}}', complexCount);
+        document.getElementById('info-age-turbine-count').innerHTML = translations[lang].ageRangeInfo.turbineCount.replace('{{value}}', turbineCount);
+      }
     }
 
     function startTrackingLocation() {
@@ -1007,7 +1177,9 @@
         { offset: new kakao.maps.Point(16, 32) }
       );
       let filteredFarms = allWindFarms;
-      if (selectedOperator) {
+      if (selectedAgeRange) {
+        filteredFarms = allWindFarms.filter(farm => getAgeRange(farm.age) === selectedAgeRange);
+      } else if (selectedOperator) {
         filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
       } else if (selectedManufacturer) {
         filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
@@ -1055,16 +1227,20 @@
               selectedComplex = complexId;
               selectedManufacturer = '';
               selectedOperator = '';
+              selectedAgeRange = '';
               document.getElementById('manufacturer-dropdown').value = '';
               document.getElementById('operator-dropdown').value = '';
+              document.getElementById('age-range-dropdown').value = '';
               document.getElementById('windfarm-dropdown').value = complexId;
               const allInfo = document.getElementById('all-info');
               const manufacturerInfo = document.getElementById('manufacturer-info');
               const complexInfo = document.getElementById('complex-info');
               const operatorInfo = document.getElementById('operator-info');
+              const ageRangeInfo = document.getElementById('age-range-info');
               allInfo.style.display = 'none';
               manufacturerInfo.style.display = 'none';
               operatorInfo.style.display = 'none';
+              ageRangeInfo.style.display = 'none';
               updateComplexInfo(group);
               complexInfo.style.display = 'block';
               map.setCenter(position);
