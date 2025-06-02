@@ -181,9 +181,15 @@
     <select id="operator-dropdown" class="control-button">
       <option value="">사업자</option>
     </select>
-    <select id="age-range-dropdown" class="control-button">
-      <option value="">연령 범주</option>
+    <select id="complex-age-dropdown" class="control-button">
+      <option value="">단지 연령</option>
     </select>
+    <div id="complex-age-info">
+      <span id="info-complex-age"></span><br>
+      <span id="info-complex-age-capacity"></span><br>
+      <span id="info-complex-age-complex-count"></span><br>
+      <span id="info-complex-age-turbine-count"></span>
+    </div>
     <button id="settings-button" class="control-button">설정/Setting</button>
     <div id="settings-container" style="display: none;">
       <button id="map-type-toggle" class="control-button">기본 지도</button>
@@ -268,7 +274,7 @@
         "windfarmDropdown": "풍력단지",
         "manufacturerDropdown": "제조사",
         "operatorDropdown": "사업자",
-        "ageRangeDropdown": "연령 범주",
+        "complexAgeDropdown": "단지 연령",
         "settings": "설정/Setting",
         "initialReset": "처음으로",
         "allInfo": {
@@ -297,11 +303,11 @@
           "turbineCount": "터빈 수: {{value}}",
           "completion": "준공일: {{value}}"
         },
-        "ageRangeInfo": {
-          "ageRange": "연령 범주: {{value}}",
-          "totalCapacity": "총 용량: {{value}} kW",
-          "complexCount": "단지 수: {{value}}",
-          "turbineCount": "터빈 수: {{value}}"
+        "complexAgeInfo": {
+              "complexAge": "단지 연령: {{value}}",
+              "totalCapacity": "총 용량: {{value}} kW",
+              "complexCount": "단지 수: {{value}}",
+              "turbineCount": "터빈 수: {{value}}"
         },
         "infoWindow": "{{name}} ({{count}}기)",
         "detailWindow": {
@@ -349,7 +355,7 @@
         "windfarmDropdown": "Wind Farm",
         "manufacturerDropdown": "Manufacturer",
         "operatorDropdown": "Operator",
-        "ageRangeDropdown": "Age Range",
+        "complexAgeDropdown": "Complex Age",
         "settings": "설정/Setting",
         "initialReset": "Home",
         "allInfo": {
@@ -378,11 +384,11 @@
           "turbineCount": "Turbines: {{value}}",
           "completion": "Completion: {{value}}"
         },
-        "ageRangeInfo": {
-          "ageRange": "Age Range: {{value}}",
-          "totalCapacity": "Total Capacity: {{value}} kW",
-          "complexCount": "Complexes: {{value}}",
-          "turbineCount": "Turbines: {{value}}"
+        "complexAgeInfo": {
+              "complexAge": "Complex Age: {{value}}",
+              "totalCapacity": "Total Capacity: {{value}} kW",
+              "complexCount": "Complexes: {{value}}",
+              "turbineCount": "Turbines: {{value}}"
         },
         "infoWindow": "{{name}} ({{count}} turbines)",
         "detailWindow": {
@@ -840,11 +846,13 @@
       selectedComplex = event.target.value;
       selectedManufacturer = '';
       selectedOperator = '';
-      selectedAgeRange = '';
+      selectedComplexAge = '';
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
-      document.getElementById('age-range-dropdown').value = '';
-      const allInfo = document.getElementById('all-info');
+      document.getElementById('complex-age-dropdown').value = '';
+      areNamesVisible = selectedComplex ? true : areNamesVisible;
+      document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[isEnglish ? 'en' : 'ko'].nameToggle : translations[isEnglish ? 'en' : 'ko'].nameToggleOn;
+          const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
@@ -875,10 +883,12 @@
       selectedManufacturer = event.target.value;
       selectedComplex = '';
       selectedOperator = '';
-      selectedAgeRange = '';
+      selectedComplexAge = '';
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
-      document.getElementById('age-range-dropdown').value = '';
+      document.getElementById('complex-age-dropdown').value = '';
+      areNamesVisible = selectedManufacturer ? true : areNamesVisible;
+      document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[isEnglish ? 'en' : 'ko'].nameToggle : translations[isEnglish ? 'en' : 'ko'].nameToggleOn;
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
@@ -928,10 +938,12 @@
       selectedOperator = event.target.value;
       selectedComplex = '';
       selectedManufacturer = '';
-      selectedAgeRange = '';
+      selectedComplexAge = '';
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
-      document.getElementById('age-range-dropdown').value = '';
+      document.getElementById('complex-age-dropdown').value = '';
+      areNamesVisible = selectedOperator ? true : areNamesVisible;
+      document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[isEnglish ? 'en' : 'ko'].nameToggle : translations[isEnglish ? 'en' : 'ko'].nameToggleOn;
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
@@ -977,14 +989,16 @@
       updateMarkers();
     }
 
-    function handleAgeRangeChange(event) {
-      selectedAgeRange = event.target.value;
+  function handleComplexAgeChange(event) {
+      selectedComplexAge = event.target.value;
       selectedComplex = '';
       selectedManufacturer = '';
       selectedOperator = '';
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
+      areNamesVisible = selectedComplexAge ? true : areNamesVisible;
+      document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[isEnglish ? 'en' : 'ko'].nameToggle : translations[isEnglish ? 'en' : 'ko'].nameToggleOn;
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
