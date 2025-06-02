@@ -240,7 +240,7 @@
     let totalCapacityByComplex = {};
     let myLocationMarker = null;
     let watchId = null;
-    let areNamesVisible = true;
+    let areNamesVisible = false;
     let areMarkersVisible = true;
     let selectedManufacturer = '';
     let selectedComplex = '';
@@ -513,7 +513,7 @@
       document.getElementById('page-title').textContent = translations[lang].title;
       document.getElementById('loading').textContent = translations[lang].loading;
       document.getElementById('map-type-toggle').textContent = isSatellite ? translations[lang].mapTypeToggle : translations[lang].mapTypeToggleSatellite;
-      document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
+      document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn; // 초기 상태 반영
       document.getElementById('marker-toggle-button').textContent = areMarkersVisible ? translations[lang].markerToggle : translations[lang].markerToggleOn;
       document.getElementById('translate-button').textContent = translations[lang].translate;
       document.getElementById('info-button').textContent = translations[lang].infoButton;
@@ -546,7 +546,6 @@
       ageRangeDropdown.value = selectedAgeRangeValue;
       updateInfoPanels();
       updateMarkers();
-      document.getElementById('info-popup-content').innerHTML = translations[lang].infoPopup;
     }
 
     function showError(message) {
