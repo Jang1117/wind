@@ -561,7 +561,7 @@
         console.log("앱 초기화 완료");
       }
 
-      function initMap() {
+       function initMap() {
         console.log("initMap 호출됨");
         const container = document.getElementById('map');
         const options = {
@@ -580,44 +580,44 @@
           startTrackingLocation();
         }, 100);
         kakao.maps.event.addListener(map, 'click', () => {
-          currentInfowindows.forEach(fw => w.setMap(null));
+          currentInfowindows.forEach(infowindow => infowindow.setMap(null));
           currentInfowindows = [];
         });
-        // Modified: Conditional update to prevent recursive calls
-        kakao.maps.event.addListener('map, 'zoom_changed', () => {
-          if (!selectedComplex)) {
+        // Conditional update to prevent recursive calls
+        kakao.maps.event.addListener(map, 'zoom_changed', () => {
+          if (!selectedComplex) {
             updateMarkers();
           }
         });
-        kakao.maps.event.addListener('map, 'idle', () => {
-          if (!selectedComplex)) {
+        kakao.maps.event.addListener(map, 'idle', () => {
+          if (!selectedComplex) {
             updateMarkers();
           }
         });
-        document.getElementsById('loading').style.display = 'none';
-        document.getElementsById('initial-reset').addEventListener('click', resetToInitial);
-        document.getElementsById('reset-button').addEventListener('click', resetSelectionsOnly);
-        document.getElementsById('map-type-toggle').addEventListener('click', toggleMapType);
-        document.getElementsById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
-        document.getElementsById('marker-toggle-button').addEventListener('click', toggleMarkersVisibility);
-        document.getElementsById('translate-button').addEventListener('click', toggleLanguage);
-        const infoButton = document.getElementsById('info-button');
-        if (infoButton)) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('initial-reset').addEventListener('click', resetToInitial);
+        document.getElementById('reset-button').addEventListener('click', resetSelectionsOnly);
+        document.getElementById('map-type-toggle').addEventListener('click', toggleMapType);
+        document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
+        document.getElementById('marker-toggle-button').addEventListener('click', toggleMarkersVisibility);
+        document.getElementById('translate-button').addEventListener('click', toggleLanguage);
+        const infoButton = document.getElementById('info-button');
+        if (infoButton) {
           infoButton.addEventListener('click', toggleInfoPopup);
           console.log("info-button 이벤트 리스너 등록 완료");
         } else {
           console.error("info-button 요소를 찾을 수 없습니다");
         }
-        document.getElementsById('settings-button').addEventListener('click', () => {
-          const settingsContainer = document.getElementsById('settings-container');
+        document.getElementById('settings-button').addEventListener('click', () => {
+          const settingsContainer = document.getElementById('settings-container');
           settingsContainer.style.display = settingsContainer.style.display === 'none' ? 'flex' : 'none';
           console.log("설정 컨테이너 표시 상태:", settingsContainer.style.display);
         });
-        document.getElementsById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
-        document.getElementsById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
-        document.getElementsById('info-popup').addEventListener('click', (e => {
-          if (e.target === document.getElementsById('info-popup')) {
-            toggleInfoPanePopup();
+        document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
+        document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
+        document.getElementById('info-popup').addEventListener('click', (e) => {
+          if (e.target === document.getElementById('info-popup')) {
+            toggleInfoPopup();
           }
         });
       }
@@ -690,8 +690,8 @@
       function handleDropdownChange(event) {
         selectedComplex = event.target.value;
         selectedManufacturer = '';
-        document.getElementsById('manufacturer-dropdown').value = '';
-        const allInfo = document.getElementsById('all-info');
+        document.getElementById('manufacturer-dropdown').value = '';
+        const allInfo = document.getElementById('all-info');
         const manufacturerInfo = document.getElementById('manufacturer-info');
         const complexInfo = document.getElementById('complex-info');
         allInfo.style.display = 'none';
@@ -700,20 +700,20 @@
           const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
           const bounds = new kakao.maps.LatLngBounds();
           farmsInComplex.forEach(farm => {
-            if (farm.lat && farm.com) {
-              bounds.extend(new kakao.maps.LatLng(farm.lat, farm.com));
+            if (farm.lat && farm.lon) {
+              bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
             }
           });
           updateComplexInfo(farmsInComplex);
           complexInfo.style.display = 'block';
           if (farmsInComplex.length > 0) {
-            map.setBounds(bounds, 30); // 30px padding
+            map.setBounds(bounds, 30);
             const currentLevel = map.getLevel();
             if (currentLevel > 6) {
-              map.setLevel(6); // Prevent excessive zoom
+              map.setLevel(6);
             }
           }
-          areNamesVisible = true; // Show names when complex selected
+          areNamesVisible = true;
           document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
         } else {
           complexInfo.style.display = 'none';
@@ -892,44 +892,44 @@
           return;
         }
         isUpdatingMarkers = true;
-
+      
         try {
           clearMap();
           const zoomLevel = map.getLevel();
           console.log("Current zoom level:", zoomLevel);
-          const markerImage = new kakao.Maps.MarkerImage(
+          const markerImage = new kakao.maps.MarkerImage(
             '/wind/wind.png',
-            new kakao.Maps.Size(48, 48),
-            { offset: new kakaoMapsPoint(16, 32) }
+            new kakao.maps.Size(48, 48),
+            { offset: new kakao.maps.Point(16, 32) }
           );
           let filteredFarms = allWindFarms;
-          if (selectedManufacturer)) {
+          if (selectedManufacturer) {
             filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
-          } else if (selectedComplex)) {
-            filteredFarms = allWindFarms.filter(farm => farm.complexFilter === selectedComplex);
+          } else if (selectedComplex) {
+            filteredFarms = allWindFarms.filter(farm => farm.complexId === selectedComplex);
           }
           console.log("Filtered turbines:", filteredFarms.length);
           const lang = isEnglish ? 'en' : 'ko';
-
-          if (selectedComplex)) {
+      
+          if (selectedComplex) {
             // Show individual turbines for the selected complex
-            const bounds = new kakao.Maps.LatLngBounds();
+            const bounds = new kakao.maps.LatLngBounds();
             filteredFarms.forEach(farm => {
-              if (farm.lat && farm.com) {
-                const position = new kakao.Maps.LatLng(farm.lat, farm.com);
+              if (farm.lat && farm.lon) {
+                const position = new kakao.maps.LatLng(farm.lat, farm.lon);
                 bounds.extend(position);
-
+      
                 if (areMarkersVisible) {
-                  const marker = new kakao.Maps.Marker({
+                  const marker = new kakao.maps.Marker({
                     position: position,
-                    title: `${farm.title} (${farm.turbineId || 'No ID'})`,
+                    title: `${farm.name} (${farm.turbineId || 'No ID'})`,
                     clickable: true,
                     image: markerImage
                   });
                   marker.setMap(map);
                   markers.push(marker);
-
-                  kakao.Maps.event.addListener(marker, 'click', () => {
+      
+                  kakao.maps.event.addListener(marker, 'click', () => {
                     window.toggleFarmDetails(
                       getTranslatedSiteInfo(farm.complexId, 'name') || farm.name,
                       farm.turbineId || '',
@@ -940,83 +940,84 @@
                       farm.lon,
                       farm.capacity || '',
                       farm.manufacturer || '',
-                      farm.complexId || '',
-                    });
+                      farm.complexId || ''
+                    );
                   });
                 }
-
-                if (areNamesVisible)) {
-                  const overlay = new kakao.Maps.CustomOverlay({
+      
+                if (areNamesVisible) {
+                  const overlay = new kakao.maps.CustomOverlay({
                     position: position,
-                    content: `<div class="info-window="${farm.name} (${farm.turbineId || 'No ID'})"></div>`,
+                    content: `<div class="info-window">${farm.name} (${farm.turbineId || 'No ID'})</div>`,
                     xAnchor: 0.5,
                     yAnchor: 2,
-                    zIndex: 10,
+                    zIndex: 10
                   });
                   overlay.setMap(map);
-                  overlays.push(...overlay);
+                  overlays.push(overlay);
                 }
               }
             });
-
-            if (filteredFarms.length > 0)) {
-              map.setBounds(bounds, 30); // Fit all turbines
+      
+            if (filteredFarms.length > 0) {
+              map.setBounds(bounds, 30);
               const currentLevel = map.getLevel();
-              if (currentLevel > 6)) {
-                map.setLevel(6); // Max zoom level
+              if (currentLevel > 6) {
+                map.setLevel(6);
               }
             }
           } else {
             // Default: show complex-level markers
             const farmsByComplex = {};
             filteredFarms.forEach(farm => {
-              if (!farmsByComplex[farm.complexId])) {
+              if (!farmsByComplex[farm.complexId]) {
                 farmsByComplex[farm.complexId] = [];
               }
               farmsByComplex[farm.complexId].push(farm);
             });
-
+      
             Object.keys(farmsByComplex).forEach(complexId => {
               const group = farmsByComplex[complexId];
               const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
-              const avgLon = group.reduce((sum, farm) => sum + farm.com, 0) / group.length;
-              const position = new kakao.Maps.LatLng(avgLat, avgLon);
+              const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
+              const position = new kakao.maps.LatLng(avgLat, avgLon);
               const complexName = getTranslatedSiteInfo(complexId, 'name') || group[0].name;
               let marker = null;
-
-              if (areMarkersVisible)) {
-                marker = new kakao.Maps.Marker({
+      
+              if (areMarkersVisible) {
+                marker = new kakao.maps.Marker({
                   position: position,
                   title: `${complexName} (${group.length}${isEnglish ? ' turbines' : '개 터빈'})`,
                   clickable: true,
-                  image: markerImage,
+                  image: markerImage
                 });
                 marker.setMap(map);
                 markers.push(marker);
               }
-
-              if (areNamesVisible)) {
+      
+              if (areNamesVisible) {
                 const overlay = new kakao.Maps.CustomOverlay({
                   position: position,
-                  content: `<div class="info-window="${translations[lang].infoWindow.replace('{{name}}', complexName).replace('{{count}}', group.length)}</div>`,
+                  content: `<div class="info">${window.replace('{{name}}', complexName).replace('{{count}}', group.length)}</div>`,
                   xAnchor: 0.5,
                   yAnchor: 2,
                   zIndex: 10,
                 });
+      
                 overlay.setMap(map);
                 overlays.push(...overlay);
               }
-
-              if (areMarkersVisible && marker)) {
+      
+              if (areMarkersVisible && marker) {
                 kakao.Maps.event.addListener(marker, 'click', () => {
                   selectedComplex = complexId;
                   selectedManufacturer = '';
-                  document.getElementById('manufacturer').value-dropdown').value = '';
+                  document.getElementById('manufacturer-dropdown').value = '';
                   document.getElementById('windfarm-dropdown').value = complexId;
                   areNamesVisible = true;
                   document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
                   const allInfo = document.getElementById('all-info');
-                  const manufacturerInfo = document.getElementById('manufacturer').get-info');
+                  const manufacturerInfo = document.getElementById('manufacturer-info');
                   const complexInfo = document.getElementById('complex-info');
                   allInfo.style.display = 'none';
                   manufacturerInfo.style.display = 'none';
@@ -1025,13 +1026,13 @@
                   // Avoid recursive updateMarkers
                   const bounds = new kakao.Maps.LatLngBounds();
                   group.forEach(farm => {
-                    if (farm.lat && farm.com) {
-                      bounds.extend(new kakao.Maps.LatLng(farm.lat, farm.com));
+                    if (farm.lat && farm.lon) {
+                      bounds.extend(new kakao.Maps.LatLng(farm.lat, farm.lon));
                     }
                   });
                   map.setBounds(bounds, 30);
                   const currentLevel = map.getLevel();
-                  if (currentLevel > 6)) {
+                  if (currentLevel > 6) {
                     map.setLevel(6);
                   }
                   updateMarkers();
@@ -1039,8 +1040,8 @@
               }
             });
           }
-
-          if (myLocationMarker)) {
+      
+          if (myLocationMarker) {
             myLocationMarker.setMap(map);
             markers.push(myLocationMarker);
           }
