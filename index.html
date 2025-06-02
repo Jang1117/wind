@@ -1209,7 +1209,7 @@
           }
         );
       } else {
-        console.error("Ge FocalPoint(지점) 지원 안 됨");
+        console.error("Geolocation 지원 안 됨");
         showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.geolocationUnsupported);
       }
     }
@@ -1265,7 +1265,7 @@
       }
       console.log("필터링된 터빈 수:", filteredFarms.length);
       const lang = isEnglish ? 'en' : 'ko';
-      if (zoomLevel >= 10) {
+      if (zoomLevel >= 10 && !selectedComplex) {
         const farmsByComplex = {};
         filteredFarms.forEach(farm => {
           if (!farmsByComplex[farm.complexId]) farmsByComplex[farm.complexId] = [];
@@ -1321,9 +1321,8 @@
               updateComplexInfo(group);
               complexInfo.style.display = 'block';
               map.setCenter(position);
-              const currentLevel = map.getLevel();
-              map.setLevel(currentLevel - 5);
-              updateMarkers();
+              map.setLevel(6); // Zoom in to show individual turbines
+              updateMarkers(); // Re-render markers to show individual turbines
             });
           }
         });
