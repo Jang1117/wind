@@ -1,40 +1,185 @@
-
 <!DOCTYPE html>
-<html>
+<html> 
 <head>
   <title id="page-title">Korea Wind Power Plant Map by Seungho Jang</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="한국 풍력 발전소의 위치, 제조사, 단지 정보를 제공하는 대화형 지도입니다. 신재생에너지와 친환경 에너지 데이터를 확인하세요.">
+  <meta name="description" id="meta-description" content="한국 풍력 발전소의 위치, 제조사, 단지 정보를 제공하는 대화형 지도입니다. 신재생에너지와 친환경 에너지 데이터를 확인하세요.">
   <meta name="keywords" content="한국 풍력 발전소, 풍력단지 지도, 풍력 터빈, 제조사, 풍력, Wind Farm, Wind Power Plant, Korea Wind Farm, Korea Wind Power Plant">
   <meta name="robots" content="index, follow">
+  <!-- Kakao Maps SDK -->
   <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b8113591f35c3409335bdb4b5ee5613&libraries=clusterer&autoload=false" defer></script>
+  <!-- PapaParse -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-    #map { width: 100%; height: 100%; background: #f0f0f0; position: relative; }
-    #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background: rgba(255, 255, 255, 0.8); padding: 10px; }
-    #error-message { position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(255, 0, 0, 0.8); color: white; padding: 10px; border-radius: 4px; display: none; }
-    #controls { position: fixed; right: 10px; top: 10px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; }
-    .control-button { width: 120px; background: rgba(255, 255, 255, 0.8); border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 14px; text-align: center; box-sizing: border-box; height: 34px; line-height: 1.5; }
-    select.control-button { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
-    #settings-container { display: none; flex-direction: column; gap: 8px; background: rgba(255, 255, 255, 0.8); padding: 5px; border: 1px solid #ccc; border-radius: 4px; right: 0; align-items: center; }
-    #settings-container .control-button { width: 100px; }
-    #settings-button { width: 120px; }
-    #all-info, #manufacturer-info, #complex-info { position: absolute; z-index: 10; background: rgba(255, 255, 255, 0.8); border: 1px solid #ccc; border-radius: 4px; padding: 10px; font-size: 14px; text-align: center; display: none; max-width: 90%; }
-    @media screen and (min-width: 768px) { #all-info, #manufacturer-info, #complex-info { top: 10px; left: 50%; transform: translateX(-50%); } }
-    @media screen and (max-width: 767px) { #all-info, #manufacturer-info, #complex-info { top: 10px; left: 10px; transform: none; text-align: left; max-width: 80%; } }
-    .info-window { background: rgba(255, 255, 255, 0.8); padding: 5px; border: 1px solid #ccc; font-size: 12px; pointer-events: auto; }
-    .detail-window { background: white; padding: 10px; border: 1px solid #ccc; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); cursor: pointer; white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis; max-height: 80vh; }
-    #info-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10001; background: rgba(255, 255, 255, 0.9); border: 1px solid #ccc; border-radius: 4px; padding: 20px; text-align: center; font-size: 14px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); max-width: 300px; width: 90%; }
-    #info-popup .close-button { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 16px; cursor: pointer; }
-    #info-popup-content { margin-bottom: 10px; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+      background: #f0f0f0;
+      position: relative;
+    }
+    #loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px;
+    }
+    #error-message {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      background: rgba(255, 0, 0, 0.8);
+      color: white;
+      padding: 10px;
+      border-radius: 4px;
+      display: none;
+    }
+    /* 컨트롤 컨테이너 (우측 상단에 고정) */
+    #controls {
+      position: fixed;
+      right: 10px;
+      top: 10px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px; /* 각 버튼 사이 간격 */
+    }
+    /* 모든 컨트롤 버튼 및 드롭다운에 동일한 스타일 */
+    .control-button {
+      width: 120px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      text-align: center;
+      box-sizing: border-box;
+      height: 34px;
+      line-height: 1.5;
+    }
+    /* 드롭다운에도 버튼 스타일 적용 */
+    select.control-button {
+      -webkit-appearance: none;
+         -moz-appearance: none;
+              appearance: none;
+    }
+    /* 설정 컨테이너 */
+    #settings-container {
+      display: none; /* 처음에는 숨김 */
+      flex-direction: column;
+      gap: 8px; /* 다른 컨트롤과 동일한 간격 */
+      background: rgba(255, 255, 255, 0.8); /* 컨트롤 배경과 동일 */
+      padding: 5px; /* 내부 여백 */
+      border: 1px solid #ccc; /* 컨트롤 테두리와 동일 */
+      border-radius: 4px; /* 컨트롤 모서리와 동일 */
+      right: 0; /* 우측 정렬 */
+      align-items: center; /* 내부 버튼들을 중앙 정렬 */
+    }
+    /* 설정 컨테이너 내부 버튼 스타일 */
+    #settings-container .control-button {
+      width: 100px; /* 내부 버튼은 100px로 축소 */
+    }
+    /* 설정 버튼 스타일 */
+    #settings-button {
+      width: 120px; /* 다른 컨트롤 버튼과 동일 */
+    }
+    /* 정보 패널 */
+    #all-info, #manufacturer-info, #complex-info {
+      position: absolute;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 10px;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+      max-width: 90%;
+    }
+    @media screen and (min-width: 768px) {
+      #all-info, #manufacturer-info, #complex-info {
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+    @media screen and (max-width: 767px) {
+      #all-info, #manufacturer-info, #complex-info {
+        top: 10px;
+        left: 10px;
+        transform: none;
+        text-align: left;
+        max-width: 80%;
+      }
+    }
+    .info-window {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 5px;
+      border: 1px solid #ccc;
+      font-size: 12px;
+      pointer-events: auto;
+    }
+    .detail-window {
+      background: white;
+      padding: 10px;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      white-space: nowrap;
+      max-width: 90vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-height: 80vh;
+    }
+    /* 정보 팝업 스타일 */
+    #info-popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10001;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 20px;
+      text-align: center;
+      font-size: 14px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      max-width: 300px;
+      width: 90%;
+    }
+    #info-popup .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #info-popup-content {
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
+  <!-- 지도 영역 -->
   <div id="map"></div>
   <div id="loading">지도 로딩 중...</div>
   <div id="error-message"></div>
+  
+  <!-- 컨트롤 컨테이너 -->
   <div id="controls">
     <button id="initial-reset" class="control-button">처음으로</button>
     <button id="reset-button" class="control-button">선택 초기화</button>
@@ -53,6 +198,8 @@
       <button id="info-button" class="control-button">정보</button>
     </div>
   </div>
+  
+  <!-- 정보 패널 -->
   <div id="all-info">
     <span id="info-all-capacity"></span><br>
     <span id="info-all-capacity-gw"></span><br>
@@ -73,10 +220,13 @@
     <span id="info-complex-turbine-count"></span><br>
     <span id="info-complex-completion"></span>
   </div>
+  
+  <!-- 정보 팝업 -->
   <div id="info-popup">
     <button class="close-button" onclick="toggleInfoPopup()">×</button>
     <div id="info-popup-content"></div>
   </div>
+  
   <script>
     let map;
     let markers = [];
@@ -88,7 +238,7 @@
     let totalCapacityByComplex = {};
     let myLocationMarker = null;
     let watchId = null;
-    let areNamesVisible = false;
+    let areNamesVisible = true;
     let areMarkersVisible = true;
     let selectedManufacturer = '';
     let selectedComplex = '';
@@ -96,7 +246,6 @@
     let translations = {};
     let siteTranslations = [];
     let manufacturerData = null;
-    let isUpdatingMarkers = false;
 
     translations = {
       "ko": {
@@ -221,7 +370,9 @@
       try {
         console.log("manufacturers.json 요청 중: /wind/manufacturers.json");
         const response = await fetch('/wind/manufacturers.json?t=' + new Date().getTime());
-        if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
+        if (!response.ok) {
+          throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
+        }
         manufacturerData = await response.json();
         console.log("제조사 데이터 로드 성공:", manufacturerData);
       } catch (error) {
@@ -234,7 +385,9 @@
       try {
         console.log("translations.json 요청 중: /wind/translations.json");
         const response = await fetch('/wind/translations.json?t=' + new Date().getTime());
-        if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
+        if (!response.ok) {
+          throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
+        }
         siteTranslations = await response.json();
         console.log("번역 데이터 로드 성공:", siteTranslations);
       } catch (error) {
@@ -303,18 +456,22 @@
       document.getElementById('initial-reset').textContent = translations[lang].initialReset;
       document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
       document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
+    
       const windfarmDropdown = document.getElementById('windfarm-dropdown');
       const selectedValue = windfarmDropdown.value;
       while (windfarmDropdown.options.length > 1) windfarmDropdown.remove(1);
       populateDropdown();
       windfarmDropdown.value = selectedValue;
+    
       const manufacturerDropdown = document.getElementById('manufacturer-dropdown');
       const selectedManufacturerValue = manufacturerDropdown.value;
       while (manufacturerDropdown.options.length > 1) manufacturerDropdown.remove(1);
       populateManufacturerDropdown();
       manufacturerDropdown.value = selectedManufacturerValue;
+    
       updateInfoPanels();
       updateMarkers();
+      // 정보 팝업 내용 업데이트
       document.getElementById('info-popup-content').innerHTML = translations[lang].infoPopup;
     }
 
@@ -333,12 +490,18 @@
       updateUILanguage();
     }
 
+    // 수정된 toggleInfoPopup 함수
     function toggleInfoPopup() {
       const infoPopup = document.getElementById('info-popup');
       const isCurrentlyVisible = infoPopup.style.display === 'block';
+      
+      // 팝업 표시/숨김 전환
       infoPopup.style.display = isCurrentlyVisible ? 'none' : 'block';
+      
+      // 팝업 콘텐츠 업데이트
       const lang = isEnglish ? 'en' : 'ko';
       document.getElementById('info-popup-content').innerHTML = translations[lang].infoPopup;
+      
       console.log("정보 팝업 표시 상태:", infoPopup.style.display);
     }
 
@@ -356,7 +519,9 @@
       try {
         console.log("windfarm_data.csv 요청 중: /wind/windfarm_data.csv");
         const response = await fetch(`/wind/windfarm_data.csv?t=${new Date().getTime()}`);
-        if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
+            if (!response.ok) {
+              throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
+            }
         const text = await response.text();
         console.log("CSV 데이터:", text.substring(0, 200) + "...");
         Papa.parse(text, {
@@ -390,7 +555,9 @@
                 totalCapacityByComplex[farm.complexId] = 0;
               }
               turbineCountByComplex[farm.complexId]++;
-              if (farm.capacity) totalCapacityByComplex[farm.complexId] += farm.capacity;
+              if (farm.capacity) {
+                totalCapacityByComplex[farm.complexId] += farm.capacity;
+              }
             });
             console.log("단지별 터빈 수:", turbineCountByComplex);
             console.log("단지별 총 용량:", totalCapacityByComplex);
@@ -404,17 +571,17 @@
           }
         });
       } catch (error) {
-        console.error('CSV 로드 실패:', error);
-        showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvLoad.replace('{{message}}', error.message));
+          console.error('CSV 로드 실패:', error);
+          showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvLoad.replace('{{message}}', error.message));
+        }
       }
-    }
 
     async function initializeApp() {
       console.log("앱 초기화 시작");
       await loadTranslations();
       await loadManufacturers();
       await loadCSVData();
-      updateUILanguage();
+      updateUILanguage(); // 추가: 초기 언어 설정 및 UI 초기화
       console.log("앱 초기화 완료");
     }
 
@@ -440,12 +607,8 @@
         currentInfowindows.forEach(infowindow => infowindow.setMap(null));
         currentInfowindows = [];
       });
-      kakao.maps.event.addListener(map, 'zoom_changed', () => {
-        if (!selectedComplex) updateMarkers();
-      });
-      kakao.maps.event.addListener(map, 'idle', () => {
-        if (!selectedComplex) updateMarkers();
-      });
+      kakao.maps.event.addListener(map, 'zoom_changed', updateMarkers);
+      kakao.maps.event.addListener(map, 'idle', updateMarkers);
       document.getElementById('loading').style.display = 'none';
       document.getElementById('initial-reset').addEventListener('click', resetToInitial);
       document.getElementById('reset-button').addEventListener('click', resetSelectionsOnly);
@@ -453,6 +616,8 @@
       document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
       document.getElementById('marker-toggle-button').addEventListener('click', toggleMarkersVisibility);
       document.getElementById('translate-button').addEventListener('click', toggleLanguage);
+      
+      // 수정된 info-button 이벤트 리스너 등록
       const infoButton = document.getElementById('info-button');
       if (infoButton) {
         infoButton.addEventListener('click', toggleInfoPopup);
@@ -460,6 +625,7 @@
       } else {
         console.error("info-button 요소를 찾을 수 없습니다");
       }
+      
       document.getElementById('settings-button').addEventListener('click', () => {
         const settingsContainer = document.getElementById('settings-container');
         settingsContainer.style.display = settingsContainer.style.display === 'none' ? 'flex' : 'none';
@@ -467,8 +633,11 @@
       });
       document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
       document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
+      // 팝업 외부 클릭 시 닫기
       document.getElementById('info-popup').addEventListener('click', (e) => {
-        if (e.target === document.getElementById('info-popup')) toggleInfoPopup();
+        if (e.target === document.getElementById('info-popup')) {
+          toggleInfoPopup();
+        }
       });
     }
 
@@ -520,7 +689,7 @@
       const dropdown = document.getElementById('manufacturer-dropdown');
       while (dropdown.options.length > 1) dropdown.remove(1);
       if (manufacturerData && manufacturerData.manufacturers) {
-        let manufacturers = [...manufacturerData.manufacturers];
+        let manufacturers = manufacturerData.manufacturers.slice();
         manufacturers.sort((a, b) => {
           const nameA = isEnglish ? a.manufacturer_en : a.manufacturer;
           const nameB = isEnglish ? b.manufacturer_en : b.manufacturer;
@@ -546,19 +715,12 @@
       manufacturerInfo.style.display = 'none';
       if (selectedComplex) {
         const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
-        const bounds = new kakao.maps.LatLngBounds();
-        farmsInComplex.forEach(farm => {
-          if (farm.lat && farm.lon) bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
-        });
+        const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
+        const avgLon = farmsInComplex.reduce((sum, farm) => sum + farm.lon, 0) / farmsInComplex.length;
         updateComplexInfo(farmsInComplex);
         complexInfo.style.display = 'block';
-        if (farmsInComplex.length > 0) {
-          map.setBounds(bounds, 30);
-          const currentLevel = map.getLevel();
-          if (currentLevel > 6) map.setLevel(6);
-        }
-        areNamesVisible = true;
-        document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
+        map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
+        map.setLevel(6);
       } else {
         complexInfo.style.display = 'none';
         allInfo.style.display = 'block';
@@ -605,7 +767,9 @@
       } else {
         const bounds = new kakao.maps.LatLngBounds();
         filteredFarms.forEach(farm => {
-          if (farm.lat && farm.lon) bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
+          if (farm.lat && farm.lon) {
+            bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
+          }
         });
         map.setBounds(bounds);
       }
@@ -619,7 +783,9 @@
       const totalCapacity = farmsInComplex.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
       const capacityCount = {};
       farmsInComplex.forEach(farm => {
-        if (farm.capacity) capacityCount[farm.capacity] = (capacityCount[farm.capacity] || 0) + 1;
+        if (farm.capacity) {
+          capacityCount[farm.capacity] = (capacityCount[farm.capacity] || 0) + 1;
+        }
       });
       const capacityBreakdown = Object.entries(capacityCount)
         .map(([cap, count]) => `${formatNumberWithCommas(cap)}kW * ${count}${isEnglish ? ' units' : '기'}`)
@@ -685,22 +851,31 @@
             console.error("위치 가져오기 실패:", error);
             showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.geolocation);
           },
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
         );
       } else {
-        console.error("Geolocation 지원 안됨");
+        console.error("Geolocation 지원 안 됨");
         showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.geolocationUnsupported);
       }
     }
 
     function updateMyLocation(lat, lon) {
       const position = new kakao.maps.LatLng(lat, lon);
-      if (myLocationMarker) myLocationMarker.setMap(null);
+      if (myLocationMarker) {
+        myLocationMarker.setMap(null);
+      }
       myLocationMarker = new kakao.maps.Marker({
         position: position,
         title: translations[isEnglish ? 'en' : 'ko'].myLocation,
         clickable: false,
-        image: new kakao.maps.MarkerImage('/wind/me.png', new kakao.maps.Size(48, 48))
+        image: new kakao.maps.MarkerImage(
+          '/wind/me.png',
+          new kakao.maps.Size(48, 48)
+        )
       });
       myLocationMarker.setMap(map);
       markers.push(myLocationMarker);
@@ -716,151 +891,116 @@
     }
 
     function updateMarkers() {
-      if (isUpdatingMarkers) {
-        console.log("updateMarkers 재귀 호출 방지");
-        return;
+      clearMap();
+      const zoomLevel = map.getLevel();
+      console.log("현재 줌 레벨:", zoomLevel);
+      const markerImage = new kakao.maps.MarkerImage(
+        '/wind/wind.png',
+        new kakao.maps.Size(48, 48),
+        { offset: new kakao.maps.Point(16, 32) }
+      );
+      let filteredFarms = allWindFarms;
+      if (selectedManufacturer) {
+        filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
+      } else if (selectedComplex) {
+        filteredFarms = allWindFarms.filter(farm => farm.complexId === selectedComplex);
       }
-      isUpdatingMarkers = true;
-      try {
-        clearMap();
-        const zoomLevel = map.getLevel();
-        console.log("현재 줌 레벨:", zoomLevel);
-        const markerImage = new kakao.maps.MarkerImage(
-          '/wind/wind.png',
-          new kakao.maps.Size(48, 48),
-          { offset: new kakao.maps.Point(16, 32) }
-        );
-        let filteredFarms = allWindFarms;
-        if (selectedManufacturer) {
-          filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
-        } else if (selectedComplex) {
-          filteredFarms = allWindFarms.filter(farm => farm.complexId === selectedComplex);
-        }
-        console.log("필터링된 터빈 수:", filteredFarms.length);
-        if (selectedComplex) {
-          const bounds = new kakao.maps.LatLngBounds();
-          filteredFarms.forEach(farm => {
-            if (farm.lat && farm.lon) {
-              const position = new kakao.maps.LatLng(farm.lat, farm.lon);
-              bounds.extend(position);
-
-              if (areMarkersVisible) {
-                const marker = new kakao.maps.Marker({
-                  position: position,
-                  title: `${farm.name} (${farm.turbineId || 'No ID'})`,
-                  clickable: true,
-                  image: markerImage
-                });
-                marker.setMap(map);
-                markers.push(marker);
-
-                kakao.maps.event.addListener(marker, 'click', () => {
-                  window.toggleFarmDetails(
-                    getTranslatedSiteInfo(farm.complexId, 'name') || farm.name,
-                    farm.turbineId || '',
-                    farm.type || '',
-                    farm.completionDate || '',
-                    getTranslatedSiteInfo(farm.complexId, 'address') || farm.address || '',
-                    farm.lat,
-                    farm.lon,
-                    farm.capacity || '',
-                    farm.manufacturer || '',
-                    farm.complexId || ''
-                  );
-                });
-              }
-
-              if (areNamesVisible) {
-                const overlay = new kakao.maps.CustomOverlay({
-                  position: position,
-                  content: `<div class="info-window">${farm.name} (${farm.turbineId || 'No ID'})</div>`,
-                    xAnchor: 0.5,
-                    yAnchor: 2,
-                    zIndex: 10
-                );
-                overlay.setMap(map);
-                overlays.push(overlay);
-              }
-            }
-          });
-
-          if (filteredFarms.length > 0) {
-            map.setBounds(bounds, 30);
-            const currentLevel = map.getLevel();
-            if (currentLevel > 6) map.setLevel(6);
+      console.log("필터링된 터빈 수:", filteredFarms.length);
+      const lang = isEnglish ? 'en' : 'ko';
+      if (zoomLevel >= 10) {
+        const farmsByComplex = {};
+        filteredFarms.forEach(farm => {
+          if (!farmsByComplex[farm.complexId]) farmsByComplex[farm.complexId] = [];
+          farmsByComplex[farm.complexId].push(farm);
+        });
+        Object.keys(farmsByComplex).forEach(complexId => {
+          const group = farmsByComplex[complexId];
+          const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
+          const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
+          const position = new kakao.maps.LatLng(avgLat, avgLon);
+          const complexName = getTranslatedSiteInfo(complexId, 'name') || group[0].name;
+          let marker = null;
+          if (areMarkersVisible) {
+            marker = new kakao.maps.Marker({
+              position: position,
+              title: `${complexName} (${group.length}${isEnglish ? ' turbines' : '개 터빈'})`,
+              clickable: true,
+              image: markerImage
+            });
+            marker.setMap(map);
+            markers.push(marker);
           }
-        } else {
-          const farmsByComplex = {};
-          filteredFarms.forEach(farm => {
-            if (!farmsByComplex[farm.complexId]) farmsByComplex[farm.complexId] = [];
-            farmsByComplex[farm.complexId].push(farm);
-          });
-
-          Object.keys(farmsByComplex).forEach(complexId => {
-            const group = farmsByComplex[complexId];
-            const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
-            const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
-            const position = new kakao.maps.LatLng(avgLat, avgLon);
-            const complexName = getTranslatedSiteInfo(complexId, 'name') || group[0].name;
-            let marker = null;
-
-            if (areMarkersVisible) {
-              marker = new kakao.maps.Marker({
-                position: position,
-                title: `${complexName} (${group.length}${isEnglish ? ' turbines' : '개 터빈'})`,
-                clickable: true,
-                image: markerImage
-              });
-              marker.setMap(map);
-              markers.push(marker);
-            }
-
-            if (areNamesVisible) {
-              const overlay = new kakao.maps.CustomOverlay({
-                position: position,
-                content: `<div class="info-window">${translations[lang].infoWindow.replace('{{name}}', complexName).replace('{{count}}', group.length)}</div>`,
-                xAnchor: 0.5,
-                yAnchor: 2,
-                zIndex: 10
-              });
-              overlay.setMap(map);
-              overlays.push(overlay);
-            }
-
-            if (areMarkersVisible && marker) {
-              kakao.maps.event.addListener(marker, 'click', () => {
-                selectedComplex = complexId;
-                selectedManufacturer = '';
-                document.getElementById('manufacturer-dropdown').value = '';
-                document.getElementById('windfarm-dropdown').value = complexId;
-                areNamesVisible = true;
-                document.getElementById('name-toggle-button').textContent = translations[lang].nameToggle;
-                const allInfo = document.getElementById('all-info');
-                const manufacturerInfo = document.getElementById('manufacturer-info');
-                const complexInfo = document.getElementById('complex-info');
-                allInfo.style.display = 'none';
-                manufacturerInfo.style.display = 'none';
-                updateComplexInfo(group);
-                complexInfo.style.display = 'block';
-                const bounds = new kakao.maps.LatLngBounds();
-                group.forEach(farm => {
-                  if (farm.lat && farm.lon) bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
-                });
-                map.setBounds(bounds, 30);
-                const currentLevel = map.getLevel();
-                if (currentLevel > 6) map.setLevel(6);
-                updateMarkers();
-              });
-            }
-          });
-        }
-
-        if (myLocationMarker) {
-          myLocationMarker.setMap(map);
-          markers.push(myLocationMarker);
-        }
-      } finally {
-        isUpdatingMarkers = false;
+          if (areNamesVisible) {
+            const overlay = new kakao.maps.CustomOverlay({
+              position: position,
+              content: `<div class="info-window">${translations[lang].infoWindow.replace('{{name}}', complexName).replace('{{count}}', group.length)}</div>`,
+              xAnchor: 0.5,
+              yAnchor: 2,
+              zIndex: 10
+            });
+            overlay.setMap(map);
+            overlays.push(overlay);
+          }
+          if (areMarkersVisible && marker) {
+            kakao.maps.event.addListener(marker, 'click', () => {
+              selectedComplex = complexId;
+              selectedManufacturer = '';
+              document.getElementById('manufacturer-dropdown').value = '';
+              document.getElementById('windfarm-dropdown').value = complexId;
+              const allInfo = document.getElementById('all-info');
+              const manufacturerInfo = document.getElementById('manufacturer-info');
+              const complexInfo = document.getElementById('complex-info');
+              allInfo.style.display = 'none';
+              manufacturerInfo.style.display = 'none';
+              updateComplexInfo(group);
+              complexInfo.style.display = 'block';
+              map.setCenter(position);
+              const currentLevel = map.getLevel();
+              map.setLevel(currentLevel - 5);
+              updateMarkers();
+            });
+          }
+        });
+      } else {
+        const bounds = map.getBounds();
+        const visibleFarms = filteredFarms.filter(farm =>
+          farm.lat && farm.lon && bounds.contain(new kakao.maps.LatLng(farm.lat, farm.lon))
+        );
+        console.log("표시될 터빈 수:", visibleFarms.length);
+        visibleFarms.forEach(farm => {
+          const position = new kakao.maps.LatLng(farm.lat, farm.lon);
+          const complexName = getTranslatedSiteInfo(farm.complexId, 'name') || farm.name;
+          const turbineName = `${complexName} ${farm.turbineId}`;
+          let marker = null;
+          if (areMarkersVisible) {
+            marker = new kakao.maps.Marker({
+              position: position,
+              title: turbineName,
+              clickable: true,
+              image: markerImage
+            });
+            marker.setMap(map);
+            markers.push(marker);
+          }
+          if (areNamesVisible) {
+            const overlay = new kakao.maps.CustomOverlay({
+              position: position,
+              content: `<div class="info-window" onclick="toggleFarmDetails('${complexName}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${getTranslatedSiteInfo(farm.complexId, 'address') || farm.address}', ${farm.lat}, ${farm.lon}, '${farm.capacity}', '${farm.manufacturer}', '${farm.complexId}')">${turbineName}</div>`,
+              xAnchor: 0.5,
+              yAnchor: 2,
+              zIndex: 10
+            });
+            overlay.setMap(map);
+            overlays.push(overlay);
+          }
+          if (areMarkersVisible && marker) {
+            kakao.maps.event.addListener(marker, 'click', () => toggleFarmDetails(complexName, farm.turbineId, farm.type, farm.completionDate, getTranslatedSiteInfo(farm.complexId, 'address') || farm.address, farm.lat, farm.lon, farm.capacity, farm.manufacturer, farm.complexId));
+          }
+        });
+      }
+      if (myLocationMarker) {
+        myLocationMarker.setMap(map);
+        markers.push(myLocationMarker);
       }
     }
 
@@ -876,8 +1016,8 @@
       const farmsInComplex = allWindFarms.filter(farm => farm.complexId === complexId);
       const capacityCount = {};
       farmsInComplex.forEach(farm => {
-        if (farm.complex) {
-          if (capacityCount[farm.capacity] = (capacityCount[farm.capacity] || 0) + 1;
+        if (farm.capacity) {
+          capacityCount[farm.capacity] = (capacityCount[farm.capacity] || 0) + 1;
         }
       });
       const truncateText = (text, maxLength) => {
@@ -893,19 +1033,19 @@
         displayManufacturer = manufacturerInfo ? manufacturerInfo.manufacturer_en : manufacturer || translations[lang].noInfo;
       }
       const content = `
-        <div class="detail-window" onclick="window.closeInfowindow(event, this)">
-          ${translations[lang].detailWindow.name.replace('{{value}}', truncateText(turbineName, 20))}<br>
-          ${translations[lang].detailWindow.manufacturer.replace('{{value}}', truncateText(displayManufacturer, 15))}<br>
-          ${translations[lang].detailWindow.capacity.replace('{{value}}', formattedCapacity)}<br>
-          ${translations[lang].detailWindow.turbineCount.replace('{{value}}', totalTurbines)}<br>
-          ${translations[lang].detailWindow.complexCapacity.replace('{{value}}', truncateText(formattedTotalComplexCapacity, 25))}<br>
-          ${translations[lang].detailWindow.capacityBreakdown.replace('{{value}}', truncateText(capacityBreakdown, 25))}<br>
-          ${translations[lang].detailWindow.completion.replace('{{value}}', truncateText(completionDate || translations[lang].noInfo, 15))}<br>
-          ${translations[lang].detailWindow.address.replace('{{value}}', truncateText(address || translations[lang].noInfo, 20))}<br>
-        </div>
+          <div class="detail-window" onclick="window.closeInfowindow(event, this)">
+              ${translations[lang].detailWindow.name.replace('{{value}}', truncateText(turbineName, 20))}<br>
+              ${translations[lang].detailWindow.manufacturer.replace('{{value}}', truncateText(displayManufacturer, 15))}<br>
+              ${translations[lang].detailWindow.capacity.replace('{{value}}', formattedCapacity)}<br>
+              ${translations[lang].detailWindow.turbineCount.replace('{{value}}', totalTurbines)}<br>
+              ${translations[lang].detailWindow.complexCapacity.replace('{{value}}', truncateText(formattedTotalComplexCapacity, 25))}<br>
+              ${translations[lang].detailWindow.capacityBreakdown.replace('{{value}}', truncateText(capacityBreakdown, 25))}<br>
+              ${translations[lang].detailWindow.completion.replace('{{value}}', truncateText(completionDate || translations[lang].noInfo, 15))}<br>
+              ${translations[lang].detailWindow.address.replace('{{value}}', truncateText(address || translations[lang].noInfo, 20))}<br>
+          </div>
       `;
       console.log("toggleFarmDetails 호출됨:", { name, lat, lon, zoomLevel: map.getLevel() });
-      const basePosition = new kakao.LatLng(lat, lon);
+      const basePosition = new kakao.maps.LatLng(lat, lon);
       const zoomLevel = map.getLevel();
       let offsetLat = 0.0005;
       const adjustedPosition = new kakao.maps.LatLng(lat - offsetLat, lon);
