@@ -529,68 +529,88 @@
       return (kw / 1000000).toFixed(2);
     }
 
-    async function loadCSVData() {
-      try {
-        console.log("windfarm_data.csv 요청 중: /wind/windfarm_data.csv");
-        const response = await fetch(`/wind/windfarm_data.csv?t=${new Date().getTime()}`);
-        if (!response.ok) {
-          throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
-        }
-        const text = await response.text();
-        console.log("CSV 데이터:", text.substring(0, 200) + "...");
-        Papa.parse(text, {
-          header: true,
-          skipEmptyLines: true,
-          complete: function(results) {
-            allWindFarms = results.data.map(row => {
-              const name = row['단지명'] ? row['단지명'].trim() : null;
-              if (!name) return null;
-              return {
-                complexId: row['단지번호'] ? row['단지번호'].trim() : null,
-                name: name,
-                turbineId: row['풍력기번호(임시)'] ? row['풍력기번호(임시)'].trim() : null,
-                completionDate: row['준공일'] ? row['준공일'].trim() : null,
-                type: row['분류'] ? row['분류'].trim() : null,
-                address: row['주소'] ? row['주소'].trim() : null,
-                xCoord: row['엑스좌표(GRS80_C_x)'] ? parseFloat(row['엑스좌표(GRS80_C_x)']) : null,
-                yCoord: row['와이좌표(GRS80_C_y)'] ? parseFloat(row['와이좌표(GRS80_C_y)']) : null,
-                lat: row['위도(lat)'] ? parseFloat(row['위도(lat)']) : null,
-                lon: row['경도(lon)'] ? parseFloat(row['경도(lon)']) : null,
-                capacity: row['용량(kW)'] ? parseFloat(row['용량(kW)']) : null,
-                manufacturer: row['제조사'] ? row['제조사'].trim() : null,
-                operator: row['사업자'] ? row['사업자'].trim() : null
-              };
-            }).filter(row => row !== null);
-            console.log("파싱된 데이터:", allWindFarms);
-            turbineCountByComplex = {};
-            totalCapacityByComplex = {};
-            allWindFarms.forEach(farm => {
-              if (!turbineCountByComplex[farm.complexId]) {
-                turbineCountByComplex[farm.complexId] = 0;
-                totalCapacityByComplex[farm.complexId] = 0;
-              }
-              turbineCountByComplex[farm.complexId]++;
-              if (farm.capacity) {
-                totalCapacityByComplex[farm.complexId] += farm.capacity;
-              }
-            });
-            console.log("단지별 터빈 수:", turbineCountByComplex);
-            console.log("단지별 총 용량:", totalCapacityByComplex);
-            initMap();
-            populateDropdown();
-            populateManufacturerDropdown();
-            populateOperatorDropdown();
-          },
-          error: function(error) {
-            console.error('CSV 파싱 실패:', error);
-            showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvParse.replace('{{message}}', error.message));
-          }
-        });
-      } catch (error) {
-        console.error('CSV 로드 실패:', error);
-        showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvLoad.replace('{{message}}', error.message));
+      async function loadCSVData() {
+    try {
+      console.log("windfarm_data.csv 요청 중: /wind/windfarm_data.csv");
+      const response = await fetch(`/wind/windfarm_data.csv?t=${new Date().getTime()}`);
+      if (!response.ok) {
+        throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
       }
+      const text = await response.text();
+      console.log("CSV 데이터 (처음 200자):", text.substring(0, 200) + "...");
+  
+      Papa.parse(text, {
+        header: true,
+        skipEmptyLines: true,
+        encoding: "UTF-8", // 인코딩 명시
+        complete: function(results) {
+          console.log("파싱된 CSV 필드:", results.meta.fields); // 실제 열 이름 출력
+          allWindFarms = results.data.map(row => {
+            const name = row['단지명'] ? row['단지명'].trim() : null;
+            if (!name) {
+              console.warn("단지명 누락, 해당 행 스킵:", row);
+              return null;
+            }
+  
+            // 사업자 열 이름 확인 (다양한 변형 고려)
+            let operator = row['사업자'] || row['운영자'] || row['Operator'] || null;
+            if (!operator) {
+              console.warn(`사업자 정보 누락 (단지명: ${name})`);
+              operator = null; // 기본값 설정
+            } else {
+              operator = operator.trim();
+            }
+  
+            return {
+              complexId: row['단지번호'] ? row['단지번호'].trim() : null,
+              name: name,
+              turbineId: row['풍력기번호(임시)'] ? row['풍력기번호(임시)'].trim() : null,
+              completionDate: row['준공일'] ? row['준공일'].trim() : null,
+              type: row['분류'] ? row['분류'].trim() : null,
+              address: row['주소'] ? row['주소'].trim() : null,
+              xCoord: row['엑스좌표(GRS80_C_x)'] ? parseFloat(row['엑스좌표(GRS80_C_x)']) : null,
+              yCoord: row['와이좌표(GRS80_C_y)'] ? parseFloat(row['와이좌표(GRS80_C_y)']) : null,
+              lat: row['위도(lat)'] ? parseFloat(row['위도(lat)']) : null,
+              lon: row['경도(lon)'] ? parseFloat(row['경도(lon)']) : null,
+              capacity: row['용량(kW)'] ? parseFloat(row['용량(kW)']) : null,
+              manufacturer: row['제조사'] ? row['제조사'].trim() : null,
+              operator: operator
+            };
+          }).filter(row => row !== null);
+  
+          console.log("파싱된 데이터 (첫 5개):", allWindFarms.slice(0, 5));
+          console.log("사업자 목록:", [...new Set(allWindFarms.map(farm => farm.operator).filter(op => op))]);
+  
+          turbineCountByComplex = {};
+          totalCapacityByComplex = {};
+          allWindFarms.forEach(farm => {
+            if (!turbineCountByComplex[farm.complexId]) {
+              turbineCountByComplex[farm.complexId] = 0;
+              totalCapacityByComplex[farm.complexId] = 0;
+            }
+            turbineCountByComplex[farm.complexId]++;
+            if (farm.capacity) {
+              totalCapacityByComplex[farm.complexId] += farm.capacity;
+            }
+          });
+          console.log("단지별 터빈 수:", turbineCountByComplex);
+          console.log("단지별 총 용량:", totalCapacityByComplex);
+  
+          initMap();
+          populateDropdown();
+          populateManufacturerDropdown();
+          populateOperatorDropdown();
+        },
+        error: function(error) {
+          console.error('CSV 파싱 실패:', error);
+          showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvParse.replace('{{message}}', error.message));
+        }
+      });
+    } catch (error) {
+      console.error('CSV 로드 실패:', error);
+      showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvLoad.replace('{{message}}', error.message));
     }
+  }
 
     async function initializeApp() {
       console.log("앱 초기화 시작");
