@@ -220,6 +220,9 @@
     <select id="operating-period-dropdown" class="control-button">
       <option value="">운영기간</option>
     </select>
+    <select id="capacity-dropdown" class="control-button">
+  <option value="">터빈 용량</option>
+</select>
     <button id="settings-button" class="control-button">설정</button>
     <div id="settings-container" style="display: none;">
       <button id="map-type-toggle" class="control-button">기본 지도</button>
@@ -263,6 +266,12 @@
     <span id="info-operating-period-complex-count"></span><br>
     <span id="info-operating-period-turbine-count"></span>
   </div>
+  <div id="capacity-info">
+  <span id="info-capacity-range"></span><br>
+  <span id="info-capacity-total"></span><br>
+  <span id="info-capacity-complex-count"></span><br>
+  <span id="info-capacity-turbine-count"></span>
+</div>
   
   <!-- 정보 팝업 -->
   <div id="info-popup">
@@ -287,6 +296,7 @@
     let selectedComplex = '';
     let selectedOperator = '';
     let selectedOperatingPeriod = '';
+    let selectedCapacity = '';
     let isEnglish = false;
     let translations = {
       "ko": {
@@ -314,6 +324,21 @@
           "10-15": "10년 이상 15년 미만",
           "5-10": "5년 이상 10년 미만",
           "0-5": "5년 미만"
+        },
+        "capacityDropdown": "터빈 용량",
+          "capacityOptions": {
+            "0-1000": "1MW 미만",
+            "1000-2000": "1MW 이상 2MW 미만",
+            "2000-3000": "2MW 이상 3MW 미만",
+            "3000-5000": "3MW 이상 5MW 미만",
+            "5000+": "5MW 이상"
+          },
+        "capacityInfo": {
+            "range": "용량 범위: {{value}}",
+            "totalCapacity": "총 용량: {{value}} kW",
+            "complexCount": "단지 수: {{value}}",
+            "turbineCount": "터빈 수: {{value}}"
+          }
         },
         "allInfo": {
           "totalCapacity": "총 용량: {{value}} kW",
@@ -394,6 +419,21 @@
           "5-10": "5 to less than 10 years",
           "0-5": "Less than 5 years"
         },
+        "capacityDropdown": "Turbine Capacity",
+          "capacityOptions": {
+            "0-1000": "Less than 1MW",
+            "1000-2000": "1MW to less than 2MW",
+            "2000-3000": "2MW to less than 3MW",
+            "3000-5000": "3MW to less than 5MW",
+            "5000+": "5MW or more"
+          },
+          "capacityInfo": {
+            "range": "Capacity Range: {{value}}",
+            "totalCapacity": "Total Capacity: {{value}} kW",
+            "complexCount": "Complexes: {{value}}",
+            "turbineCount": "Turbines: {{value}}"
+          }
+        }
         "allInfo": {
           "totalCapacity": "Total Capacity: {{value}} kW",
           "totalCapacityGW": "Total Capacity: {{value}} GW",
@@ -516,8 +556,33 @@
       if (years >= 5) return "5-10";
       return "0-5";
     }
-
-function resetToInitial() {
+    function getCapacityRange(capacity) {
+      if (capacity === null || capacity === undefined) return null;
+      if (capacity >= 5000) return "5000+";
+      if (capacity >= 3000) return "3000-5000";
+      if (capacity >= 2000) return "2000-3000";
+      if (capacity >= 1000) return "1000-2000";
+      return "0-1000";
+    }
+        function populateCapacityDropdown() {
+          const dropdown = document.getElementById('capacity-dropdown');
+          while (dropdown.options.length > 1) dropdown.remove(1);
+          const capacities = [
+            { value: "0-1000", label: translations[isEnglish ? 'en' : 'ko'].capacityOptions["0-1000"] },
+            { value: "1000-2000", label: translations[isEnglish ? 'en' : 'ko'].capacityOptions["1000-2000"] },
+            { value: "2000-3000", label: translations[isEnglish ? 'en' : 'ko'].capacityOptions["2000-3000"] },
+            { value: "3000-5000", label: translations[isEnglish ? 'en' : 'ko'].capacityOptions["3000-5000"] },
+            { value: "5000+", label: translations[isEnglish ? 'en' : 'ko'].capacityOptions["5000+"] }
+          ];
+          capacities.forEach(capacity => {
+            const option = document.createElement('option');
+            option.value = capacity.value;
+            option.textContent = capacity.label;
+            dropdown.appendChild(option);
+          });
+        }
+function handleCapacityChange(event) {
+  selectedCapacity = event.target.value;
   selectedComplex = '';
   selectedManufacturer = '';
   selectedOperator = '';
@@ -526,18 +591,83 @@ function resetToInitial() {
   document.getElementById('manufacturer-dropdown').value = '';
   document.getElementById('operator-dropdown').value = '';
   document.getElementById('operating-period-dropdown').value = '';
-  areNamesVisible = false; // 초기화 시 이름 표시 끄기
+  areNamesVisible = true;
+  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
+  const allInfo = document.getElementById('all-info');
+  const manufacturerInfo = document.getElementById('manufacturer-info');
+  const complexInfo = document.getElementById('complex-info');
+  const operatorInfo = document.getElementById('operator-info');
+  const operatingPeriodInfo = document.getElementById('operating-period-info');
+  const capacityInfo = document.getElementById('capacity-info');
+  allInfo.style.display = 'none';
+  manufacturerInfo.style.display = 'none';
+  complexInfo.style.display = 'none';
+  operatorInfo.style.display = 'none';
+  operatingPeriodInfo.style.display = 'none';
+  let filteredFarms = allWindFarms;
+  if (selectedCapacity) {
+    filteredFarms = allWindFarms.filter(farm => {
+      if (farm.capacity === null || farm.capacity === undefined) return false;
+      return getCapacityRange(farm.capacity) === selectedCapacity;
+    });
+    const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
+    const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
+    const turbineCount = filteredFarms.length;
+    const lang = isEnglish ? 'en' : 'ko';
+    document.getElementById('info-capacity-range').innerHTML = translations[lang].capacityInfo.range.replace('{{value}}', translations[lang].capacityOptions[selectedCapacity]);
+    document.getElementById('info-capacity-total').innerHTML = translations[lang].capacityInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
+    document.getElementById('info-capacity-complex-count').innerHTML = translations[lang].capacityInfo.complexCount.replace('{{value}}', complexCount);
+    document.getElementById('info-capacity-turbine-count').innerHTML = translations[lang].capacityInfo.turbineCount.replace('{{value}}', turbineCount);
+    capacityInfo.style.display = 'block';
+  } else {
+    capacityInfo.style.display = 'none';
+    allInfo.style.display = 'block';
+    updateInfoPanels();
+  }
+  if (filteredFarms.length === 0) {
+    map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
+    map.setLevel(13);
+  } else if (filteredFarms.length === 1) {
+    const farm = filteredFarms[0];
+    map.setCenter(new kakao.maps.LatLng(farm.lat, farm.lon));
+    map.setLevel(6);
+  } else {
+    const bounds = new kakao.maps.LatLngBounds();
+    filteredFarms.forEach(farm => {
+      if (farm.lat && farm.lon) {
+        bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
+      }
+    });
+    map.setBounds(bounds);
+  }
+  updateMarkers();
+}
+        
+function resetToInitial() {
+  selectedComplex = '';
+  selectedManufacturer = '';
+  selectedOperator = '';
+  selectedOperatingPeriod = '';
+  selectedCapacity = '';
+  document.getElementById('windfarm-dropdown').value = '';
+  document.getElementById('manufacturer-dropdown').value = '';
+  document.getElementById('operator-dropdown').value = '';
+  document.getElementById('operating-period-dropdown').value = '';
+  document.getElementById('capacity-dropdown').value = '';
+  areNamesVisible = false;
   document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggleOn;
   const allInfo = document.getElementById('all-info');
   const manufacturerInfo = document.getElementById('manufacturer-info');
   const complexInfo = document.getElementById('complex-info');
   const operatorInfo = document.getElementById('operator-info');
   const operatingPeriodInfo = document.getElementById('operating-period-info');
+  const capacityInfo = document.getElementById('capacity-info');
   allInfo.style.display = 'block';
   manufacturerInfo.style.display = 'none';
   complexInfo.style.display = 'none';
   operatorInfo.style.display = 'none';
   operatingPeriodInfo.style.display = 'none';
+  capacityInfo.style.display = 'none';
   map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
   map.setLevel(13);
   map.relayout();
@@ -550,22 +680,26 @@ function resetSelectionsOnly() {
   selectedManufacturer = '';
   selectedOperator = '';
   selectedOperatingPeriod = '';
+  selectedCapacity = '';
   document.getElementById('windfarm-dropdown').value = '';
   document.getElementById('manufacturer-dropdown').value = '';
   document.getElementById('operator-dropdown').value = '';
   document.getElementById('operating-period-dropdown').value = '';
-  areNamesVisible = false; // 선택 해제 시 이름 표시 끄기
+  document.getElementById('capacity-dropdown').value = '';
+  areNamesVisible = false;
   document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggleOn;
   const allInfo = document.getElementById('all-info');
   const manufacturerInfo = document.getElementById('manufacturer-info');
   const complexInfo = document.getElementById('complex-info');
   const operatorInfo = document.getElementById('operator-info');
   const operatingPeriodInfo = document.getElementById('operating-period-info');
+  const capacityInfo = document.getElementById('capacity-info');
   allInfo.style.display = 'none';
   manufacturerInfo.style.display = 'none';
   complexInfo.style.display = 'none';
   operatorInfo.style.display = 'none';
   operatingPeriodInfo.style.display = 'none';
+  capacityInfo.style.display = 'none';
   updateInfoPanels();
   updateMarkers();
 }
@@ -618,7 +752,8 @@ function resetSelectionsOnly() {
       document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
       document.getElementById('operator-dropdown').options[0].textContent = translations[lang].operatorDropdown;
       document.getElementById('operating-period-dropdown').options[0].textContent = translations[lang].operatingPeriodDropdown;
-    
+      document.getElementById('capacity-dropdown').options[0].textContent = translations[lang].capacityDropdown;
+  
       // 드롭다운 항목 업데이트
       const windfarmDropdown = document.getElementById('windfarm-dropdown');
       const selectedValue = windfarmDropdown.value;
@@ -643,7 +778,13 @@ function resetSelectionsOnly() {
       while (operatingPeriodDropdown.options.length > 1) operatingPeriodDropdown.remove(1);
       populateOperatingPeriodDropdown();
       operatingPeriodDropdown.value = selectedOperatingPeriodValue;
-    
+
+      const capacityDropdown = document.getElementById('capacity-dropdown');
+      const selectedCapacityValue = capacityDropdown.value;
+      while (capacityDropdown.options.length > 1) capacityDropdown.remove(1);
+      populateCapacityDropdown();
+      capacityDropdown.value = selectedCapacityValue;
+          
       // 정보 패널 및 팝업 업데이트
       updateInfoPanels();
       updateMarkers();
@@ -738,6 +879,7 @@ function resetSelectionsOnly() {
             populateManufacturerDropdown();
             populateOperatorDropdown();
             populateOperatingPeriodDropdown();
+            populateCapacityDropdown();
           },
           error: function(error) {
             console.error('CSV 파싱 실패:', error);
@@ -810,6 +952,7 @@ function resetSelectionsOnly() {
       document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
       document.getElementById('operator-dropdown').addEventListener('change', handleOperatorChange);
       document.getElementById('operating-period-dropdown').addEventListener('change', handleOperatingPeriodChange);
+      document.getElementById('capacity-dropdown').addEventListener('change', handleCapacityChange);
       document.getElementById('info-popup').addEventListener('click', (e) => {
         if (e.target === document.getElementById('info-popup')) {
           toggleInfoPopup();
@@ -1199,6 +1342,19 @@ function handleOperatingPeriodChange(event) {
         document.getElementById('info-operating-period-complex-count').innerHTML = translations[lang].operatingPeriodInfo.complexCount.replace('{{value}}', complexCount);
         document.getElementById('info-operating-period-turbine-count').innerHTML = translations[lang].operatingPeriodInfo.turbineCount.replace('{{value}}', turbineCount);
       }
+      if (selectedCapacity && document.getElementById('capacity-info').style.display === 'block') {
+        const filteredFarms = allWindFarms.filter(farm => {
+          if (farm.capacity === null || farm.capacity === undefined) return false;
+          return getCapacityRange(farm.capacity) === selectedCapacity;
+        });
+        const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
+        const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
+        const turbineCount = filteredFarms.length;
+        document.getElementById('info-capacity-range').innerHTML = translations[lang].capacityInfo.range.replace('{{value}}', translations[lang].capacityOptions[selectedCapacity]);
+        document.getElementById('info-capacity-total').innerHTML = translations[lang].capacityInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
+        document.getElementById('info-capacity-complex-count').innerHTML = translations[lang].capacityInfo.complexCount.replace('{{value}}', complexCount);
+        document.getElementById('info-capacity-turbine-count').innerHTML = translations[lang].capacityInfo.turbineCount.replace('{{value}}', turbineCount);
+      }
     }
 
     function startTrackingLocation() {
@@ -1256,7 +1412,6 @@ function handleOperatingPeriodChange(event) {
 function updateMarkers() {
   clearMap();
   const zoomLevel = map.getLevel();
-  console.log("현재 줌 레벨:", zoomLevel);
   const markerImage = new kakao.maps.MarkerImage(
     '/wind/wind.png',
     new kakao.maps.Size(48, 48),
@@ -1274,11 +1429,15 @@ function updateMarkers() {
       if (farm.operatingYears === null) return false;
       return getOperatingPeriodRange(farm.operatingYears) === selectedOperatingPeriod;
     });
+  } else if (selectedCapacity) {
+    filteredFarms = allWindFarms.filter(farm => {
+      if (farm.capacity === null || farm.capacity === undefined) return false;
+      return getCapacityRange(farm.capacity) === selectedCapacity;
+    });
   }
-  console.log("필터링된 터빈 수:", filteredFarms.length);
   const lang = isEnglish ? 'en' : 'ko';
-  const forceNamesVisible = selectedComplex || selectedManufacturer || selectedOperator || selectedOperatingPeriod; // 드롭다운 선택 시 이름 강제 표시
-
+  const forceNamesVisible = selectedComplex || selectedManufacturer || selectedOperator || selectedOperatingPeriod || selectedCapacity;
+  
   if (zoomLevel >= 10 && !selectedComplex) {
     const farmsByComplex = {};
     filteredFarms.forEach(farm => {
