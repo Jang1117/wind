@@ -4,8 +4,8 @@
   <title id="page-title">Korea Wind Power Plant Map by Seungho Jang</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" id="meta-description" content="한국 풍력 발전소의 위치, 제조사, 단지, 사업자 정보를 제공하는 대화형 지도입니다. 신재생에너지와 친환경 에너지 데이터를 확인하세요.">
-  <meta name="keywords" content="한국 풍력 발전소, 풍력단지 지도, 풍력 터빈, 제조사, 사업자, 풍력, Wind Farm, Wind Power Plant, Korea Wind Farm, Korea Wind Power Plant">
+  <meta name="description" id="meta-description" content="한국 풍력 발전소의 위치, 제조사, 단지, 사업자, 운영기간 정보를 제공하는 대화형 지도입니다. 신재생에너지와 친환경 에너지 데이터를 확인하세요.">
+  <meta name="keywords" content="한국 풍력 발전소, 풍력단지 지도, 풍력 터빈, 제조사, 사업자, 운영기간, Wind Farm, Wind Power Plant, Korea Wind Farm, Korea Wind Power Plant">
   <meta name="robots" content="index, follow">
   <!-- Kakao Maps SDK -->
   <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b8113591f35c3409335bdb4b5ee5613&libraries=clusterer&autoload=false" defer></script>
@@ -94,7 +94,7 @@
       width: 120px; /* 다른 컨트롤 버튼과 동일 */
     }
     /* 정보 패널 */
-    #all-info, #manufacturer-info, #complex-info, #operator-info {
+    #all-info, #manufacturer-info, #complex-info, #operator-info, #operating-period-info {
       position: absolute;
       z-index: 10;
       background: rgba(255, 255, 255, 0.8);
@@ -107,14 +107,14 @@
       max-width: 90%;
     }
     @media screen and (min-width: 768px) {
-      #all-info, #manufacturer-info, #complex-info, #operator-info {
+      #all-info, #manufacturer-info, #complex-info, #operator-info, #operating-period-info {
         top: 10px;
         left: 50%;
         transform: translateX(-50%);
       }
     }
     @media screen and (max-width: 767px) {
-      #all-info, #manufacturer-info, #complex-info, #operator-info {
+      #all-info, #manufacturer-info, #complex-info, #operator-info, #operating-period-info {
         top: 10px;
         left: 10px;
         transform: none;
@@ -192,6 +192,9 @@
     <select id="operator-dropdown" class="control-button">
       <option value="">사업자</option>
     </select>
+    <select id="operating-period-dropdown" class="control-button">
+      <option value="">운영기간</option>
+    </select>
     <button id="settings-button" class="control-button">설정/Setting</button>
     <div id="settings-container" style="display: none;">
       <button id="map-type-toggle" class="control-button">기본 지도</button>
@@ -229,6 +232,12 @@
     <span id="info-operator-complex-count"></span><br>
     <span id="info-operator-turbine-count"></span>
   </div>
+  <div id="operating-period-info">
+    <span id="info-operating-period"></span><br>
+    <span id="info-operating-period-capacity"></span><br>
+    <span id="info-operating-period-complex-count"></span><br>
+    <span id="info-operating-period-turbine-count"></span>
+  </div>
   
   <!-- 정보 팝업 -->
   <div id="info-popup">
@@ -252,10 +261,12 @@
     let selectedManufacturer = '';
     let selectedComplex = '';
     let selectedOperator = '';
+    let selectedOperatingPeriod = '';
     let isEnglish = false;
     let translations = {};
     let siteTranslations = [];
     let manufacturerData = null;
+    const CURRENT_DATE = new Date('2025-06-01'); // Current date for operating period calculation
 
     translations = {
       "ko": {
@@ -274,8 +285,14 @@
         "windfarmDropdown": "풍력단지",
         "manufacturerDropdown": "제조사",
         "operatorDropdown": "사업자",
-        "settings": "설정/Setting",
-        "initialReset": "처음으로",
+        "operatingPeriodDropdown": "운영기간",
+        "operatingPeriodOptions": {
+          "20+": "20년 이상",
+          "15-20": "15년 이상 20년 미만",
+          "10-15": "10년 이상 15년 미만",
+          "5-10": "5년 이상 10년 미만",
+          "0-5": "5년 미만"
+        },
         "allInfo": {
           "totalCapacity": "총 용량: {{value}} kW",
           "totalCapacityGW": "총 용량: {{value}} GW",
@@ -298,6 +315,12 @@
         },
         "operatorInfo": {
           "operator": "사업자: {{value}}",
+          "totalCapacity": "총 용량: {{value}} kW",
+          "complexCount": "단지 수: {{value}}",
+          "turbineCount": "터빈 수: {{value}}"
+        },
+        "operatingPeriodInfo": {
+          "period": "운영기간: {{value}}",
           "totalCapacity": "총 용량: {{value}} kW",
           "complexCount": "단지 수: {{value}}",
           "turbineCount": "터빈 수: {{value}}"
@@ -339,8 +362,14 @@
         "windfarmDropdown": "Wind Farm",
         "manufacturerDropdown": "Manufacturer",
         "operatorDropdown": "Operator",
-        "settings": "설정/Setting",
-        "initialReset": "Home",
+        "operatingPeriodDropdown": "Operating Period",
+        "operatingPeriodOptions": {
+          "20+": "20 years or more",
+          "15-20": "15 to less than 20 years",
+          "10-15": "10 to less than 15 years",
+          "5-10": "5 to less than 10 years",
+          "0-5": "Less than 5 years"
+        },
         "allInfo": {
           "totalCapacity": "Total Capacity: {{value}} kW",
           "totalCapacityGW": "Total Capacity: {{value}} GW",
@@ -363,6 +392,12 @@
         },
         "operatorInfo": {
           "operator": "Operator: {{value}}",
+          "totalCapacity": "Total Capacity: {{value}} kW",
+          "complexCount": "Complexes: {{value}}",
+          "turbineCount": "Turbines: {{value}}"
+        },
+        "operatingPeriodInfo": {
+          "period": "Operating Period: {{value}}",
           "totalCapacity": "Total Capacity: {{value}} kW",
           "complexCount": "Complexes: {{value}}",
           "turbineCount": "Turbines: {{value}}"
@@ -433,21 +468,47 @@
       return farm ? (field === 'name' ? farm.name : farm.address) : null;
     }
 
+    function calculateOperatingPeriod(completionDate) {
+      if (!completionDate) return null;
+      try {
+        const completion = new Date(completionDate);
+        if (isNaN(completion.getTime())) return null;
+        const years = (CURRENT_DATE - completion) / (1000 * 60 * 60 * 24 * 365.25);
+        return years;
+      } catch (error) {
+        console.error("운영기간 계산 오류:", completionDate, error);
+        return null;
+      }
+    }
+
+    function getOperatingPeriodRange(years) {
+      if (years === null) return null;
+      if (years >= 20) return "20+";
+      if (years >= 15) return "15-20";
+      if (years >= 10) return "10-15";
+      if (years >= 5) return "5-10";
+      return "0-5";
+    }
+
     function resetToInitial() {
       selectedComplex = '';
       selectedManufacturer = '';
       selectedOperator = '';
+      selectedOperatingPeriod = '';
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
+      document.getElementById('operating-period-dropdown').value = '';
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
+      const operatingPeriodInfo = document.getElementById('operating-period-info');
       allInfo.style.display = 'block';
       manufacturerInfo.style.display = 'none';
       complexInfo.style.display = 'none';
       operatorInfo.style.display = 'none';
+      operatingPeriodInfo.style.display = 'none';
       map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
       map.setLevel(13);
       map.relayout();
@@ -459,17 +520,21 @@
       selectedComplex = '';
       selectedManufacturer = '';
       selectedOperator = '';
+      selectedOperatingPeriod = '';
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
+      document.getElementById('operating-period-dropdown').value = '';
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
+      const operatingPeriodInfo = document.getElementById('operating-period-info');
       allInfo.style.display = 'none';
       manufacturerInfo.style.display = 'none';
       complexInfo.style.display = 'none';
       operatorInfo.style.display = 'none';
+      operatingPeriodInfo.style.display = 'none';
       updateInfoPanels();
       updateMarkers();
     }
@@ -490,6 +555,7 @@
       document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
       document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
       document.getElementById('operator-dropdown').options[0].textContent = translations[lang].operatorDropdown;
+      document.getElementById('operating-period-dropdown').options[0].textContent = translations[lang].operatingPeriodDropdown;
     
       const windfarmDropdown = document.getElementById('windfarm-dropdown');
       const selectedValue = windfarmDropdown.value;
@@ -508,6 +574,12 @@
       while (operatorDropdown.options.length > 1) operatorDropdown.remove(1);
       populateOperatorDropdown();
       operatorDropdown.value = selectedOperatorValue;
+    
+      const operatingPeriodDropdown = document.getElementById('operating-period-dropdown');
+      const selectedOperatingPeriodValue = operatingPeriodDropdown.value;
+      while (operatingPeriodDropdown.options.length > 1) operatingPeriodDropdown.remove(1);
+      populateOperatingPeriodDropdown();
+      operatingPeriodDropdown.value = selectedOperatingPeriodValue;
     
       updateInfoPanels();
       updateMarkers();
@@ -564,11 +636,13 @@
             allWindFarms = results.data.map(row => {
               const name = row['단지명'] ? row['단지명'].trim() : null;
               if (!name) return null;
+              const completionDate = row['준공일'] ? row['준공일'].trim() : null;
               return {
                 complexId: row['단지번호'] ? row['단지번호'].trim() : null,
                 name: name,
                 turbineId: row['풍력기번호(임시)'] ? row['풍력기번호(임시)'].trim() : null,
-                completionDate: row['준공일'] ? row['준공일'].trim() : null,
+                completionDate: completionDate,
+                operatingYears: calculateOperatingPeriod(completionDate),
                 type: row['분류'] ? row['분류'].trim() : null,
                 address: row['주소'] ? row['주소'].trim() : null,
                 xCoord: row['엑스좌표(GRS80_C_x)'] ? parseFloat(row['엑스좌표(GRS80_C_x)']) : null,
@@ -599,6 +673,7 @@
             populateDropdown();
             populateManufacturerDropdown();
             populateOperatorDropdown();
+            populateOperatingPeriodDropdown();
           },
           error: function(error) {
             console.error('CSV 파싱 실패:', error);
@@ -666,6 +741,7 @@
       document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
       document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
       document.getElementById('operator-dropdown').addEventListener('change', handleOperatorChange);
+      document.getElementById('operating-period-dropdown').addEventListener('change', handleOperatingPeriodChange);
       document.getElementById('info-popup').addEventListener('click', (e) => {
         if (e.target === document.getElementById('info-popup')) {
           toggleInfoPopup();
@@ -749,19 +825,41 @@
       });
     }
 
+    function populateOperatingPeriodDropdown() {
+      const dropdown = document.getElementById('operating-period-dropdown');
+      while (dropdown.options.length > 1) dropdown.remove(1);
+      const periods = [
+        { value: "20+", label: translations[isEnglish ? 'en' : 'ko'].operatingPeriodOptions["20+"] },
+        { value: "15-20", label: translations[isEnglish ? 'en' : 'ko'].operatingPeriodOptions["15-20"] },
+        { value: "10-15", label: translations[isEnglish ? 'en' : 'ko'].operatingPeriodOptions["10-15"] },
+        { value: "5-10", label: translations[isEnglish ? 'en' : 'ko'].operatingPeriodOptions["5-10"] },
+        { value: "0-5", label: translations[isEnglish ? 'en' : 'ko'].operatingPeriodOptions["0-5"] }
+      ];
+      periods.forEach(period => {
+        const option = document.createElement('option');
+        option.value = period.value;
+        option.textContent = period.label;
+        dropdown.appendChild(option);
+      });
+    }
+
     function handleDropdownChange(event) {
       selectedComplex = event.target.value;
       selectedManufacturer = '';
       selectedOperator = '';
+      selectedOperatingPeriod = '';
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
+      document.getElementById('operating-period-dropdown').value = '';
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
+      const operatingPeriodInfo = document.getElementById('operating-period-info');
       allInfo.style.display = 'none';
       manufacturerInfo.style.display = 'none';
       operatorInfo.style.display = 'none';
+      operatingPeriodInfo.style.display = 'none';
       if (selectedComplex) {
         const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
         const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
@@ -784,15 +882,19 @@
       selectedManufacturer = event.target.value;
       selectedComplex = '';
       selectedOperator = '';
+      selectedOperatingPeriod = '';
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
+      document.getElementById('operating-period-dropdown').value = '';
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
+      const operatingPeriodInfo = document.getElementById('operating-period-info');
       allInfo.style.display = 'none';
       complexInfo.style.display = 'none';
       operatorInfo.style.display = 'none';
+      operatingPeriodInfo.style.display = 'none';
       let filteredFarms = allWindFarms;
       if (selectedManufacturer) {
         filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
@@ -833,15 +935,19 @@
       selectedOperator = event.target.value;
       selectedComplex = '';
       selectedManufacturer = '';
+      selectedOperatingPeriod = '';
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
+      document.getElementById('operating-period-dropdown').value = '';
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
+      const operatingPeriodInfo = document.getElementById('operating-period-info');
       allInfo.style.display = 'none';
       manufacturerInfo.style.display = 'none';
       complexInfo.style.display = 'none';
+      operatingPeriodInfo.style.display = 'none';
       let filteredFarms = allWindFarms;
       if (selectedOperator) {
         filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
@@ -856,6 +962,62 @@
         operatorInfo.style.display = 'block';
       } else {
         operatorInfo.style.display = 'none';
+        allInfo.style.display = 'block';
+        updateInfoPanels();
+      }
+      if (filteredFarms.length === 0) {
+        map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
+        map.setLevel(13);
+      } else if (filteredFarms.length === 1) {
+        const farm = filteredFarms[0];
+        map.setCenter(new kakao.maps.LatLng(farm.lat, farm.lon));
+        map.setLevel(6);
+      } else {
+        const bounds = new kakao.maps.LatLngBounds();
+        filteredFarms.forEach(farm => {
+          if (farm.lat && farm.lon) {
+            bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
+          }
+        });
+        map.setBounds(bounds);
+      }
+      updateMarkers();
+    }
+
+    function handleOperatingPeriodChange(event) {
+      selectedOperatingPeriod = event.target.value;
+      selectedComplex = '';
+      selectedManufacturer = '';
+      selectedOperator = '';
+      document.getElementById('windfarm-dropdown').value = '';
+      document.getElementById('manufacturer-dropdown').value = '';
+      document.getElementById('operator-dropdown').value = '';
+      const allInfo = document.getElementById('all-info');
+      const manufacturerInfo = document.getElementById('manufacturer-info');
+      const complexInfo = document.getElementById('complex-info');
+      const operatorInfo = document.getElementById('operator-info');
+      const operatingPeriodInfo = document.getElementById('operating-period-info');
+      allInfo.style.display = 'none';
+      manufacturerInfo.style.display = 'none';
+      complexInfo.style.display = 'none';
+      operatorInfo.style.display = 'none';
+      let filteredFarms = allWindFarms;
+      if (selectedOperatingPeriod) {
+        filteredFarms = allWindFarms.filter(farm => {
+          if (farm.operatingYears === null) return false;
+          return getOperatingPeriodRange(farm.operatingYears) === selectedOperatingPeriod;
+        });
+        const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
+        const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
+        const turbineCount = filteredFarms.length;
+        const lang = isEnglish ? 'en' : 'ko';
+        document.getElementById('info-operating-period').innerHTML = translations[lang].operatingPeriodInfo.period.replace('{{value}}', translations[lang].operatingPeriodOptions[selectedOperatingPeriod]);
+        document.getElementById('info-operating-period-capacity').innerHTML = translations[lang].operatingPeriodInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
+        document.getElementById('info-operating-period-complex-count').innerHTML = translations[lang].operatingPeriodInfo.complexCount.replace('{{value}}', complexCount);
+        document.getElementById('info-operating-period-turbine-count').innerHTML = translations[lang].operatingPeriodInfo.turbineCount.replace('{{value}}', turbineCount);
+        operatingPeriodInfo.style.display = 'block';
+      } else {
+        operatingPeriodInfo.style.display = 'none';
         allInfo.style.display = 'block';
         updateInfoPanels();
       }
@@ -948,6 +1110,19 @@
         document.getElementById('info-operator-complex-count').innerHTML = translations[lang].operatorInfo.complexCount.replace('{{value}}', complexCount);
         document.getElementById('info-operator-turbine-count').innerHTML = translations[lang].operatorInfo.turbineCount.replace('{{value}}', turbineCount);
       }
+      if (selectedOperatingPeriod && document.getElementById('operating-period-info').style.display === 'block') {
+        const filteredFarms = allWindFarms.filter(farm => {
+          if (farm.operatingYears === null) return false;
+          return getOperatingPeriodRange(farm.operatingYears) === selectedOperatingPeriod;
+        });
+        const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
+        const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
+        const turbineCount = filteredFarms.length;
+        document.getElementById('info-operating-period').innerHTML = translations[lang].operatingPeriodInfo.period.replace('{{value}}', translations[lang].operatingPeriodOptions[selectedOperatingPeriod]);
+        document.getElementById('info-operating-period-capacity').innerHTML = translations[lang].operatingPeriodInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
+        document.getElementById('info-operating-period-complex-count').innerHTML = translations[lang].operatingPeriodInfo.complexCount.replace('{{value}}', complexCount);
+        document.getElementById('info-operating-period-turbine-count').innerHTML = translations[lang].operatingPeriodInfo.turbineCount.replace('{{value}}', turbineCount);
+      }
     }
 
     function startTrackingLocation() {
@@ -1018,6 +1193,11 @@
         filteredFarms = allWindFarms.filter(farm => farm.complexId === selectedComplex);
       } else if (selectedOperator) {
         filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
+      } else if (selectedOperatingPeriod) {
+        filteredFarms = allWindFarms.filter(farm => {
+          if (farm.operatingYears === null) return false;
+          return getOperatingPeriodRange(farm.operatingYears) === selectedOperatingPeriod;
+        });
       }
       console.log("필터링된 터빈 수:", filteredFarms.length);
       const lang = isEnglish ? 'en' : 'ko';
@@ -1060,16 +1240,20 @@
               selectedComplex = complexId;
               selectedManufacturer = '';
               selectedOperator = '';
+              selectedOperatingPeriod = '';
               document.getElementById('manufacturer-dropdown').value = '';
               document.getElementById('operator-dropdown').value = '';
+              document.getElementById('operating-period-dropdown').value = '';
               document.getElementById('windfarm-dropdown').value = complexId;
               const allInfo = document.getElementById('all-info');
               const manufacturerInfo = document.getElementById('manufacturer-info');
               const complexInfo = document.getElementById('complex-info');
               const operatorInfo = document.getElementById('operator-info');
+              const operatingPeriodInfo = document.getElementById('operating-period-info');
               allInfo.style.display = 'none';
               manufacturerInfo.style.display = 'none';
               operatorInfo.style.display = 'none';
+              operatingPeriodInfo.style.display = 'none';
               updateComplexInfo(group);
               complexInfo.style.display = 'block';
               map.setCenter(position);
