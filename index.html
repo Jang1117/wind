@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title id="page-title">Korea Wind Power Plant Map by Seungho Jang</title>
+  <title id="page-title">한국 풍력 발전소 지도 by 장승호</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" id="meta-description" content="한국 풍력 발전소의 위치, 제조사, 사업자, 단지, 준공일 정보를 제공하는 대화형 지도입니다. 신재생에너지와 친환경 에너지 데이터를 확인하세요.">
@@ -737,7 +737,7 @@
       });
       document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
       document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
-      document.getElementById('operator-dropdown').addEventListener('change', handleOperatorChange); // click -> change 수정
+      document.getElementById('operator-dropdown').addEventListener('change', handleOperatorChange);
       document.getElementById('operation-period-dropdown').addEventListener('change', handleOperationPeriodChange);
       document.getElementById('info-popup').addEventListener('click', (e) => {
         if (e.target === document.getElementById('info-popup')) {
@@ -756,7 +756,7 @@
         document.getElementById('map-type-toggle').textContent = translations[isEnglish ? 'en' : 'ko'].mapTypeToggle;
         isSatellite = true;
       }
-      console.log("지도 유형 변경:", isSatellite ? "위성" : "기본");
+      console.log("지도 종류 변경:", isSatellite ? "위성" : "기본");
     }
 
     function toggleNamesVisibility() {
@@ -902,10 +902,10 @@
       if (selectedManufacturer) {
         filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
         const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
-        const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
+        const complexCount = [...new Set(farmsInComplex.map(farm => farm.complexId))].length;
         const turbineCount = filteredFarms.length;
         const lang = isEnglish ? 'en' : 'ko';
-        document.getElementById('info-manufacturer').innerHTML = translations[lang].manufacturerInfo.manufacturer.replace('{{value}}', selectedManufacturer);
+        document.getElementById('info-manufacturer').textContent = translations[lang].manufacturerInfo.manufacturer.replace('{{value}}', selectedManufacturer);
         document.getElementById('info-total-capacity').innerHTML = translations[lang].manufacturerInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
         document.getElementById('info-complex-count').innerHTML = translations[lang].manufacturerInfo.complexCount.replace('{{value}}', complexCount);
         document.getElementById('info-turbine-count').innerHTML = translations[lang].manufacturerInfo.turbineCount.replace('{{value}}', turbineCount);
@@ -961,7 +961,7 @@
         const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
         const turbineCount = filteredFarms.length;
         const lang = isEnglish ? 'en' : 'ko';
-        document.getElementById('info-operator').innerHTML = translations[lang].operatorInfo.operator.replace('{{value}}', selectedOperator);
+        document.getElementById('info-operator').textContent = translations[lang].operatorInfo.operator.replace('{{value}}', selectedOperator);
         document.getElementById('info-operator-capacity').innerHTML = translations[lang].operatorInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
         document.getElementById('info-operator-complex-count').innerHTML = translations[lang].operatorInfo.complexCount.replace('{{value}}', complexCount);
         document.getElementById('info-operator-turbine-count').innerHTML = translations[lang].operatorInfo.turbineCount.replace('{{value}}', turbineCount);
@@ -1077,7 +1077,7 @@
       document.getElementById('info-complex-name').innerHTML = translations[lang].complexInfo.name.replace('{{value}}', complexName);
       document.getElementById('info-complex-capacity').innerHTML = translations[lang].complexInfo.capacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
       document.getElementById('info-complex-capacity-breakdown').innerHTML = translations[lang].complexInfo.capacityBreakdown.replace('{{value}}', `(${capacityBreakdown})`);
-      document.getElementById('info-complex-manufacturer').innerHTML = translations[lang].complexInfo.manufacturers.replace('{{value}}', manufacturers);
+      document.getElementById('info-complex-manufacturers').innerHTML = translations[lang].complexInfo.manufacturers.replace('{{value}}', manufacturers);
       document.getElementById('info-complex-turbine-count').innerHTML = translations[lang].complexInfo.turbineCount.replace('{{value}}', turbineCount);
       document.getElementById('info-complex-completion').innerHTML = translations[lang].complexInfo.completion.replace('{{value}}', completionDate);
     }
@@ -1104,9 +1104,9 @@
         document.getElementById('info-turbine-count').innerHTML = translations[lang].manufacturerInfo.turbineCount.replace('{{value}}', turbineCount);
       }
       if (selectedOperator && document.getElementById('operator-info').style.display === 'block') {
-        const filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperatorValue);
+        const filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
         const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
-        const complexCount = [...new Set(farmsFilteredFarms.map(farm => farm.complexId))].length;
+        const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
         const turbineCount = filteredFarms.length;
         document.getElementById('info-operator').innerHTML = translations[lang].operatorInfo.operator.replace('{{value}}', selectedOperator);
         document.getElementById('info-operator-capacity').innerHTML = translations[lang].operatorInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
@@ -1114,17 +1114,17 @@
         document.getElementById('info-operator-turbine-count').innerHTML = translations[lang].operatorInfo.turbineCount.replace('{{value}}', turbineCount);
       }
       if (selectedComplex && document.getElementById('complex-info').style.display === 'block') {
-        const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplexId);
+        const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
         updateComplexInfo(farmsInComplex);
       }
       if (selectedOperationPeriod && document.getElementById('operation-period-info').style.display === 'block') {
         const filteredFarms = allWindFarms.filter(farm => getOperationPeriod(farm.age) === selectedOperationPeriod);
         const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
-        const complexCount = [...new Set(farmsFilteredFarms.map(farm => farm.complexId))].length;
+        const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
         const turbineCount = filteredFarms.length;
         const periodLabel = translations[lang].operationPeriods[selectedOperationPeriod];
         document.getElementById('info-operation-period').innerHTML = translations[lang].operationPeriodInfo.operationPeriod.replace('{{value}}', periodLabel);
-        document.getElementById('info-operation-capacity').innerHTML = translations[lang].operationPeriodInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity)));
+        document.getElementById('info-operation-capacity').innerHTML = translations[lang].operationPeriodInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
         document.getElementById('info-operation-complex-count').innerHTML = translations[lang].operationPeriodInfo.complexCount.replace('{{value}}', complexCount);
         document.getElementById('info-operation-turbine-count').innerHTML = translations[lang].operationPeriodInfo.turbineCount.replace('{{value}}', turbineCount);
       }
@@ -1136,12 +1136,12 @@
           position => {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
-            console.log("My location updated:", lat, lon);
+            console.log("내 위치 업데이트:", lat, lon);
             updateMyLocation(lat, lon);
           },
           error => {
-            console.error("Failed to get location:", error);
-            showErrorMessage(translations[isEnglish ? 'en' : 'ko'].errorMessage.geolocation);
+            console.error("위치 가져오기 실패:", error);
+            showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.geolocation);
           },
           {
             enableHighAccuracy: true,
@@ -1150,7 +1150,7 @@
           }
         );
       } else {
-        console.error("Geolocation not supported");
+        console.error("위치 정보 지원 안 됨");
         showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.geolocationUnsupported);
       }
     }
@@ -1185,7 +1185,7 @@
     function updateMarkers() {
       clearMap();
       const zoomLevel = map.getLevel();
-      console.log("Current zoom level:", zoomLevel);
+      console.log("현재 줌 레벨:", zoomLevel);
       const markerImage = new kakao.maps.MarkerImage(
         '/wind/wind.png',
         new kakao.maps.Size(48, 48),
@@ -1202,11 +1202,11 @@
         filteredFarms = allWindFarms.filter(farm => farm.complexId === selectedComplex);
       }
       filteredFarms = filteredFarms.filter(farm => farm.age !== null && farm.lat && farm.lon);
-      console.log("Filtered farms:", filteredFarms.length);
+      console.log("필터링된 단지:", filteredFarms.length);
       const lang = isEnglish ? 'en' : 'ko';
-      
+
       if (clickedComplex) {
-        // Display individual turbines for the clicked complex
+        // 클릭된 단지의 개별 터빈 표시
         const farmsInComplex = filteredFarms.filter(farm => farm.complexId === clickedComplex);
         farmsInComplex.forEach(farm => {
           const position = new kakao.maps.LatLng(farm.lat, farm.lon);
@@ -1227,21 +1227,20 @@
               position: position,
               content: `<div class="info-window">${translations[lang].infoWindow.replace('{{name}}', farm.name || complexName).replace('{{count}}', '1')}</div>`,
               xAnchor: 0.5,
-              yAnchor: 2,
-              zIndex: 10
+              yAnchor: 1,
+              zIndex: 2
             });
             overlay.setMap(map);
             overlays.push(overlay);
           }
           if (areMarkersVisible && marker) {
-            kakao.maps.event.addListener(marker, 'click', function() => {
-              // Show turbine details onTurbineClick(farm);
+            kakao.maps.event.addListener(marker, 'click', function() {
               toggleFarmDetails(
                 farm.name,
                 farm.turbineId,
                 farm.type,
                 farm.completionDate,
-                getTranslatedSiteInfo(farm.complexId, 'address') || farm.address,
+                farm.getTranslatedSiteInfo(farm.complexId), 'address') || farm.address,
                 farm.lat,
                 farm.lon,
                 farm.capacity,
@@ -1251,35 +1250,35 @@
               );
               const bounds = new kakao.maps.LatLngBounds();
               farmsInComplex.forEach(f => {
-                if (farm.lat && farm.lon) {
-                  bounds.extend(new kakao.maps.LatLng(farm.lat, f.laf.lon));
+                if (f.lat && f.lon) {
+                  bounds.extend(new kakao.maps.LatLng(f.lat, f.lf.lon));
                 }
               });
-              map.setBounds(bounds, 50); //50px padding
-              map.setLevel(3); // Zoom in to show turbines clearly
+              map.setBounds(bounds, 50); // 50px 패딩
+              map.setLevel(3); // 터빈을 명확히 보기 위해 줌인
             });
           }
         });
       } else {
-        // Display complex markers
+        // 단지별 마커 표시
         const farmsByComplex = {};
         filteredFarms.forEach(farm => {
-          if (!farmsByComplex[farm.complexId]) { 
-            farmsByComplex[complex.farmId] = [];
+          if (!farmsByComplex[farm.complexId]) {
+            farmsByComplex[farm[farm.complexId] = [];
           }
-          farmsByComplex[complexId].push(farm);
+          farmsByComplex[farm.complexId].push(farm);
         });
         Object.keys(farmsByComplex).forEach(complexId => {
           const group = farmsByComplex[complexId];
           const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
-          const avgLon = group.reduce((sum, f) => sum + f.lon, 0) / group.length;
+          const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
           const position = new kakao.maps.LatLng(avgLat, avgLon);
           const complexName = getTranslatedSiteInfo(complexId, 'name') || group[0].name;
           let marker = null;
           if (areMarkersVisible) {
-            marker = new kakao.maps.Marker({
+            marker = new kakao.markers.Marker({
               position: position,
-              title: `${complexName} (${group.length} ${isEnglish ? 'turbines' : '개터빈'})`,
+              title: `${complexName} (${group.length} ${isEnglish ? 'turbines' : '개 터빈'})`,
               clickable: true,
               image: markerImage
             });
@@ -1298,18 +1297,18 @@
             overlays.push(overlay);
           }
           if (areMarkersVisible && marker) {
-            kakao.event.maps.addListener(marker, 'click', function() => {
-              clickedComplex = complexId; // Set clicked complex
+            kakao.map.event.addListener(marker, 'click', function() {
+              clickedComplex = complexId; // 클릭된 단지 설정
               selectedComplex = complexId;
               selectedManufacturer = '';
               selectedOperator = '';
               selectedOperationPeriod = '';
               areNamesVisible = true;
               document.getElementById('manufacturer-dropdown').value = '';
-              .document.getElementById('operator-dropdown').value = '';
+              document.getElementById('operator-dropdown').value = '';
               document.getElementById('operation-period-dropdown').value = '';
               document.getElementById('windfarm-dropdown').value = complexId;
-              document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' ? 'ko'].nameToggle;
+              document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
               const allInfo = document.getElementById('all-info');
               const manufacturerInfo = document.getElementById('manufacturer-info');
               const complexInfo = document.getElementById('complex-info');
@@ -1325,12 +1324,12 @@
               const bounds = new kakao.maps.LatLngBounds();
               group.forEach(farm => {
                 if (farm.lat && farm.lon) {
-                  bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lafon));
+                  bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
                 }
               });
-              map.setBounds(bounds, 50); // 50px padding
-              map.setLevel(3); // Zoom in to show turbines
-              updateMapMarkers();
+              map.setBounds(bounds, 50); // 50px 패딩
+              map.setLevel(3); // 터빈을 위해 줌인
+              updateMarkers();
             });
           }
         });
@@ -1341,7 +1340,7 @@
       }
     }
 
-    window.toggleDetailsFarm = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer, complexId, operator) {
+    window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer, complexId, operator) {
       currentInfowindows.forEach(infowindow => infowindow.setMap(null));
       currentInfowindows = [];
       const lang = isEnglish ? 'en' : 'ko';
@@ -1355,7 +1354,7 @@
       const capacityCount = {};
       farmsInComplex.forEach(farm => {
         if (farm.capacity) {
-          capacityCount[farm.capacity] = (capacityCount[farm.capacity] || 0) + 1;
+          capacityCount[farm.capacity] = (capacityCount[farm.capacity] || [0]) + 1;
         }
       });
       const truncateText = (text, maxLength) => {
@@ -1363,30 +1362,31 @@
         return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
       };
       const capacityBreakdown = Object.entries(capacityCount)
-        .map(([cap, count]) => `${formatNumberWithCommas(cap)}kW * ${count}${isEnglish ? ' units' : '기'}`)
+        .map(([cap], count)) => `${formatNumberWithCommas(cap)}kW * ${count}${isEnglish ? ' units' : '기'})}`)
         .join(", ");
-        let displayManufacturer = manufacturer || translations[lang].noInfo;
-        if (isEnglish && manufacturerData && manufacturerData.manufacturers) {
-          const manufacturerInfo = manufacturerData.manufacturers.find(m => m.manufacturer === manufacturer);
-          displayManufacturer = manufacturerInfo ? manufacturerInfo.manufacturer_en : manufacturer || translations[lang].noInfo;
-        }
+      let displayManufacturer = manufacturer || translations[lang].noInfo;
+      if (isEnglish && manufacturerData && manufacturerData.manufacturers) {
+        const manufacturerInfo = manufacturerData.manufacturers.find(m => m.manufacturer === manufacturer);
+        displayManufacturer = manufacturerInfo ? manufacturerInfo.manufacturer_en : manufacturer || translations[lang].noInfo;
+      }
       const content = `
-        <div class="detail-window" onclick="window.closeInfowindow(event, this)">            ${translations[lang].detailWindow.name.replace('{{value}}', truncateText(complexName, 20))}<br>
-            ${translations[lang].detailWindow.manufacturer.replace('{{value}}', truncateText(displayManufacturer, 15))}<br>
-            ${translations[lang].detailWindow.capacity.replace('{{value}}', formattedCapacity || translations[lang].noInfo)}<br>
-            ${translations[lang].detailWindow.turbineCount.replace('{{value}}', totalTurbines)}<br>
-            ${translations[lang].detailWindow.complexCapacity.replace('{{value}}', truncateText(formattedTotalComplexCapacity, 25))}<br>
-            ${translations[lang].detailWindow.capacityBreakdown('{{value}}', truncateText(capacityBreakdown, 25))}<br>
-            ${translations[lang].detailWindow.completion.replace('{{value}}', truncateText(completionDate || translations[lang].noInfo, 25))}<br>
-            ${translations[lang].detailWindow.address.replace('{{value}}', truncateText(address || translations[lang].noInfo, 100))}<br>
-            ${translations[lang].detailWindow.operator.replace('{{value}}', truncateText(operator || translations[lang].noInfo, 25))}<br>
-          </div>
-        `;
-      console.log("toggleFarmDetails called:", { name, lat, lon, zoomLevel: map.getLevel() });
+        <div class="detail-window" onclick="window.closeInfowindow(event), 'this')">
+          ${translations[lang].detailWindow.name.replace('{{value}}', truncateText(complexName, 20)))}<br>
+          <div class="${translations[lang].detailWindow.manufacturer.replace('{{value}}', truncateText(displayManufacturer, 15)))}<br>
+          ${translations[lang].detailWindow.capacity.replace('{{value}}', formattedCapacity || translations[lang].noInfo)}<br>
+          ${translations[lang].detailWindow.turbineCount.replace('{{value}}', totalTurbines)}<br>
+          ${translations[lang].detailWindow.complexCapacity.replace('{{value}}', truncateText(formattedComplexCapacity, 25)))}<br>
+          ${translations[lang].detailWindow.capacityBreakdown.replace('{{value}}', truncateText(capacityBreakdown, 25)))}<br>
+          ${translations[lang].detailWindow.completion.replace('{{value}}', truncateText(completionDate || translations[lang].noInfo, 25)))}<br>
+          ${translations[lang].detailWindow.address.replace('{{value}}', truncateText(address || translations[lang].noInfo, 100)))}<br>
+          ${translations[lang].detailWindow.operator.replace('{{value}}', truncateText(operator || translations[lang].noInfo, 25)))}<br>
+        </div>
+      `;
+      console.log("toggleFarmDetails 호출됨:", { name, lat, lon, zoomLevel: map.getLevel() });
       const basePosition = new kakao.maps.LatLng(lat, lon);
       const zoomLevel = map.getLevel();
-      let offsetLat = 0.0005 * (zoomLevel / 3); // Adjust offset based on zoom level
-      const adjustedPosition = new kakao.adjustedLatLng(lat - offsetLat, lon);
+      let offsetLat = 0.0005 * (zoomLevel / 3); // 줌 레벨에 따라 오프셋 조정
+      const adjustedPosition = new kakao.maps.LatLng(lat - offsetLat, lon);
       const infowindow = new kakao.maps.InfoWindow({
         position: adjustedPosition,
         content: content,
@@ -1396,27 +1396,27 @@
       try {
         infowindow.open(map);
         currentInfowindows.push(infowindow);
-        console.log("Information window opened:", infowindow);
+        console.log("정보창 열림:", infowindow);
       } catch (error) {
-        console.error("Failed to open infowindow:", error);
+        console.error("정보창 열기 실패:", error);
       }
     };
 
     window.closeInfowindow = function(event, element) {
       event.stopPropagation();
       const infowindowToClose = currentInfowindows.find(infowindow => 
-        infowindow.getContent().contains(element.innerHTML)
+        infowindow.getContent().includes(element.innerHTML)
       );
       if (infowindowToClose) {
         infowindowToClose.setMap(null);
         currentInfowindows = currentInfowindows.filter(iw => iw !== infowindowToClose);
-        console.log("Infowindow closed");
+        console.log("정보창 닫힘");
       }
     };
 
     document.addEventListener('DOMContentLoaded', function() {
       kakao.maps.load(() => {
-        console.log("Kakao Maps API loaded successfully");
+        console.log("Kakao Maps API 로드 완료");
         initializeApp();
       });
     });
@@ -1424,7 +1424,7 @@
     window.addEventListener('unload', () => {
       if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
-        console.log("Location tracking stopped");
+        console.log("위치 추적 중지");
       }
     });
   </script>
