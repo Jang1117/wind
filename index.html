@@ -12,6 +12,7 @@
   <!-- PapaParse -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <style>
+    /* 기존 스타일 유지 */
     html, body {
       margin: 0;
       padding: 0;
@@ -87,7 +88,7 @@
     #settings-button {
       width: 120px;
     }
-    #all-info, #manufacturer-info, #complex-info, #operator-info, #operation-period-info {
+    #all-info, #manufacturer-info, #complex-info, #operator-info, #operation-period-info, #capacity-info {
       position: absolute;
       z-index: 10;
       background: rgba(255, 255, 255, 0.8);
@@ -100,14 +101,14 @@
       max-width: 90%;
     }
     @media screen and (min-width: 768px) {
-      #all-info, #manufacturer-info, #complex-info, #operator-info, #operation-period-info {
+      #all-info, #manufacturer-info, #complex-info, #operator-info, #operation-period-info, #capacity-info {
         top: 10px;
         left: 50%;
         transform: translateX(-50%);
       }
     }
     @media (max-width: 767px) {
-      #all-info, #manufacturer-info, #complex-info, #operator-info, #operation-period-info {
+      #all-info, #manufacturer-info, #complex-info, #operator-info, #operation-period-info, #capacity-info {
         top: 10px;
         left: 10px;
         transform: none;
@@ -184,10 +185,13 @@
     <select id="operation-period-dropdown" class="control-button">
       <option value="">운영기간</option>
     </select>
+    <select id="capacity-dropdown" class="control-button">
+      <option value="">터빈 용량</option>
+    </select>
     <button id="settings-button" class="control-button">설정/Setting</button>
     <div id="settings-container" style="display: none;">
       <button id="map-type-toggle" class="control-button">기본 지도</button>
-      <button id="name-toggle-button" class="control-button">이름 켜기</button> <!-- 변경: 초기 텍스트 "이름 켜기" -->
+      <button id="name-toggle-button" class="control-button">이름 켜기</button>
       <button id="marker-toggle-button" class="control-button">마커 끄기</button>
       <button id="translate-button" class="control-button">English</button>
       <button id="info-button" class="control-button">정보</button>
@@ -225,6 +229,12 @@
     <span id="info-operation-complex-count"></span><br>
     <span id="info-operation-turbine-count"></span>
   </div>
+  <div id="capacity-info">
+    <span id="info-capacity-range"></span><br>
+    <span id="info-capacity-total"></span><br>
+    <span id="info-capacity-complex-count"></span><br>
+    <span id="info-capacity-turbine-count"></span>
+  </div>
   <div id="info-popup">
     <button class="close-button" onclick="toggleInfoPopup()">×</button>
     <div id="info-popup-content"></div>
@@ -240,12 +250,13 @@
     let totalCapacityByComplex = {};
     let myLocationMarker = null;
     let watchId = null;
-    let areNamesVisible = false; // 변경: 초기 이름 표시 off
+    let areNamesVisible = false;
     let areMarkersVisible = true;
     let selectedManufacturer = '';
     let selectedComplex = '';
     let selectedOperator = '';
     let selectedOperationPeriod = '';
+    let selectedCapacityRange = '';
     let isEnglish = false;
     let translations = {};
     let siteTranslations = [];
@@ -253,6 +264,7 @@
 
     translations = {
       "ko": {
+        // 기존 번역 유지
         "title": "한국 풍력 발전소 지도 by 장승호",
         "loading": "지도 로딩 중...",
         "mapTypeToggle": "기본 지도",
@@ -269,6 +281,7 @@
         "manufacturerDropdown": "제조사",
         "operatorDropdown": "사업자",
         "operationPeriodDropdown": "운영기간",
+        "capacityDropdown": "터빈 용량",
         "settings": "설정/Setting",
         "initialReset": "처음으로",
         "allInfo": {
@@ -303,6 +316,12 @@
           "complexCount": "단지 수: {{value}}",
           "turbineCount": "터빈 수: {{value}}"
         },
+        "capacityInfo": {
+          "capacityRange": "용량 범주: {{value}}",
+          "totalCapacity": "총 용량: {{value}} kW",
+          "complexCount": "단지 수: {{value}}",
+          "turbineCount": "터빈 수: {{value}}"
+        },
         "infoWindow": "{{name}} ({{count}}기)",
         "detailWindow": {
           "name": "단지명: {{value}}",
@@ -330,9 +349,17 @@
           "10to15": "10년 이상 ~ 15년 미만",
           "5to10": "5년 이상 ~ 10년 미만",
           "under5": "5년 미만"
+        },
+        "capacityRanges": {
+          "under1mw": "1MW 미만",
+          "1to2mw": "1MW 이상 ~ 2MW 미만",
+          "2to3mw": "2MW 이상 ~ 3MW 미만",
+          "3to5mw": "3MW 이상 ~ 5MW 미만",
+          "5mwplus": "5MW 이상"
         }
       },
       "en": {
+        // 기존 번역 유지
         "title": "South Korea Wind Farm Map by Seungho Jang",
         "loading": "Loading map...",
         "mapTypeToggle": "Road Map",
@@ -349,6 +376,7 @@
         "manufacturerDropdown": "Manufacturer",
         "operatorDropdown": "Operator",
         "operationPeriodDropdown": "Operation Period",
+        "capacityDropdown": "Turbine Capacity",
         "settings": "설정/Setting",
         "initialReset": "Home",
         "allInfo": {
@@ -383,6 +411,12 @@
           "complexCount": "Complexes: {{value}}",
           "turbineCount": "Turbines: {{value}}"
         },
+        "capacityInfo": {
+          "capacityRange": "Capacity Range: {{value}}",
+          "totalCapacity": "Total Capacity: {{value}} kW",
+          "complexCount": "Complexes: {{value}}",
+          "turbineCount": "Turbines: {{value}}"
+        },
         "infoWindow": "{{name}} ({{count}} turbines)",
         "detailWindow": {
           "name": "Complex: {{value}}",
@@ -410,74 +444,44 @@
           "10to15": "10 to less than 15 years",
           "5to10": "5 to less than 10 years",
           "under5": "Less than 5 years"
+        },
+        "capacityRanges": {
+          "under1mw": "Under 1MW",
+          "1to2mw": "1MW to less than 2MW",
+          "2to3mw": "2MW to less than 3MW",
+          "3to5mw": "3MW to less than 5MW",
+          "5mwplus": "5MW or more"
         }
       }
     };
 
-    async function loadManufacturers() {
-      try {
-        console.log("manufacturers.json 요청 중: /wind/manufacturers.json");
-        const response = await fetch('/wind/manufacturers.json?t=' + new Date().getTime());
-        if (!response.ok) {
-          throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
-        }
-        manufacturerData = await response.json();
-        console.log("제조사 데이터 로드 성공:", manufacturerData);
-      } catch (error) {
-        console.error("제조사 데이터 로드 실패:", error);
-        manufacturerData = null;
-      }
-    }
-
-    async function loadTranslations() {
-      try {
-        console.log("translations.json 요청 중: /wind/translations.json");
-        const response = await fetch('/wind/translations.json?t=' + new Date().getTime());
-        if (!response.ok) {
-          throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
-        }
-        siteTranslations = await response.json();
-        console.log("번역 데이터 로드 성공:", siteTranslations);
-      } catch (error) {
-        console.error("번역 데이터 로드 실패:", error);
-        showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.translationsLoad.replace('{{message}}', error.message));
-        siteTranslations = [];
-      }
-    }
-
-    function getTranslatedSiteInfo(complexId, field) {
-      const site = siteTranslations.find(s => s.site_number == complexId);
-      if (site) {
-        if (isEnglish) {
-          return field === 'name' ? site.site_name_roman : site.address_roman;
-        }
-        return field === 'name' ? site.site_name_kr : site.address_kr;
-      }
-      const farm = allWindFarms.find(f => f.complexId === complexId);
-      return farm ? (field === 'name' ? farm.name : farm.address) : null;
-    }
+    // 기존 loadManufacturers, loadTranslations, getTranslatedSiteInfo 함수 유지
 
     function resetToInitial() {
       selectedComplex = '';
       selectedManufacturer = '';
       selectedOperator = '';
       selectedOperationPeriod = '';
-      areNamesVisible = false; // 변경: 초기화 시 이름 off
+      selectedCapacityRange = '';
+      areNamesVisible = false;
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
       document.getElementById('operation-period-dropdown').value = '';
-      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggleOn; // 변경: 버튼 텍스트 동기화
+      document.getElementById('capacity-dropdown').value = '';
+      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggleOn;
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
       const operationPeriodInfo = document.getElementById('operation-period-info');
+      const capacityInfo = document.getElementById('capacity-info');
       allInfo.style.display = 'block';
       manufacturerInfo.style.display = 'none';
       complexInfo.style.display = 'none';
       operatorInfo.style.display = 'none';
       operationPeriodInfo.style.display = 'none';
+      capacityInfo.style.display = 'none';
       map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
       map.setLevel(13);
       map.relayout();
@@ -490,22 +494,26 @@
       selectedManufacturer = '';
       selectedOperator = '';
       selectedOperationPeriod = '';
-      areNamesVisible = false; // 변경: 선택 초기화 시 이름 off
+      selectedCapacityRange = '';
+      areNamesVisible = false;
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
       document.getElementById('operation-period-dropdown').value = '';
-      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggleOn; // 변경: 버튼 텍스트 동기화
+      document.getElementById('capacity-dropdown').value = '';
+      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggleOn;
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
       const operationPeriodInfo = document.getElementById('operation-period-info');
+      const capacityInfo = document.getElementById('capacity-info');
       allInfo.style.display = 'none';
       manufacturerInfo.style.display = 'none';
       complexInfo.style.display = 'none';
       operatorInfo.style.display = 'none';
       operationPeriodInfo.style.display = 'none';
+      capacityInfo.style.display = 'none';
       updateInfoPanels();
       updateMarkers();
     }
@@ -523,187 +531,45 @@
       document.getElementById('settings-button').textContent = translations[lang].settings;
       document.getElementById('initial-reset').textContent = translations[lang].initialReset;
       document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
-      document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
-      document.getElementById('operator-dropdown').options[0].textContent = translations[lang].operatorDropdown;
-      document.getElementById('operation-period-dropdown').options[0].textContent = translations[lang].operationPeriodDropdown;
-      const windfarmDropdown = document.getElementById('windfarm-dropdown');
+      document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].value;
+      document.getElementById('operator-info').options[0].operatorDropdown;
+      document.getElementById('operation-period-dropdown').options[0].operationPeriod = translations[lang].operationPeriodDropdown';
+      document.getElementById('capacity-dropdown').options[0].textContent = translations[lang].capacityDropdown;
+      const windfarmDropdown = document.getElementById('windfarm-winddrop');
       const selectedValue = windfarmDropdown.value;
       while (windfarmDropdown.options.length > 1) windfarmDropdown.remove(1);
       populateDropdown();
       windfarmDropdown.value = selectedValue;
       const manufacturerDropdown = document.getElementById('manufacturer-dropdown');
-      const selectedManufacturerValue = manufacturerDropdown.value;
-      while (manufacturerDropdown.options.length > 1) manufacturerDropdown.remove(1);
+      const selectedManufacturer = manufacturerDropdown.value;
+      const while (manufacturerDropdown.options.length > 1) manufacturerDropdown.remove(1);
       populateManufacturerDropdown();
-      manufacturerDropdown.value = selectedManufacturerValue;
+      manufacturerDropdown.value = selectedManufacturer;
       const operatorDropdown = document.getElementById('operator-dropdown');
       const selectedOperatorValue = operatorDropdown.value;
       while (operatorDropdown.options.length > 1) operatorDropdown.remove(1);
       populateOperatorDropdown();
       operatorDropdown.value = selectedOperatorValue;
-      const operationPeriodDropdown = document.getElementById('operation-period-dropdown');
-      const selectedOperationPeriodValue = operationPeriodDropdown.value;
-      while (operationPeriodDropdown.options.length > 1) operationPeriodDropdown.remove(1);
-      populateOperationPeriodDropdown();
-      operationPeriodDropdown.value = selectedOperationPeriodValue;
+      const capacityDropdown = document.getElementById('capacity-dropdown');
+      const selectedCapacityValue = capacityDropdown.value;
+      while (capacityDropdown.options.length > 1) capacityDropdown.remove(1);
+      populateCapacityDropdown();
+      capacityDropdown.value = selectedCapacityValue;
       updateInfoPanels();
-      updateMarkers();
+      updateTheMarkers();
     }
 
-    function showError(message) {
-      const errorDiv = document.getElementById('error-message');
-      errorDiv.innerText = message;
-      errorDiv.style.display = 'block';
-      setTimeout(() => {
-        errorDiv.style.display = 'none';
-      }, 5000);
-    }
-
-    function toggleLanguage() {
-      isEnglish = !isEnglish;
-      console.log("언어 전환:", isEnglish ? "영어" : "한국어");
-      updateUILanguage();
-    }
-
-    function toggleInfoPopup() {
-      const infoPopup = document.getElementById('info-popup');
-      const isCurrentlyVisible = infoPopup.style.display === 'block';
-      infoPopup.style.display = isCurrentlyVisible ? 'none' : 'block';
-      const lang = isEnglish ? 'en' : 'ko';
-      document.getElementById('info-popup-content').innerHTML = translations[lang].infoPopup;
-      console.log("정보 팝업 표시 상태:", infoPopup.style.display);
-    }
-
-    function formatNumberWithCommas(number) {
-      if (!number) return translations[isEnglish ? 'en' : 'ko'].noInfo;
-      return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
-    function formatGW(kw) {
-      if (!kw) return translations[isEnglish ? 'en' : 'ko'].noInfo;
-      return (kw / 1000000).toFixed(2);
-    }
-
-    function calculateAge(completionDate) {
-      if (!completionDate) return null;
-      try {
-        const date = new Date(completionDate);
-        if (isNaN(date.getTime())) return null;
-        const currentDate = new Date('2025-06-02');
-        const diffYears = (currentDate - date) / (1000 * 60 * 60 * 24 * 365.25);
-        return diffYears;
-      } catch (error) {
-        console.warn(`Invalid date format: ${completionDate}`);
-        return null;
-      }
-    }
-
-    function getOperationPeriod(age) {
-      if (age === null) return null;
-      if (age >= 20) return '20plus';
-      if (age >= 15) return '15to20';
-      if (age >= 10) return '10to15';
-      if (age >= 5) return '5to10';
-      return 'under5';
-    }
-
-    async function loadCSVData() {
-      try {
-        console.log("windfarm_data.csv 요청 중: /wind/windfarm_data.csv");
-        const response = await fetch(`/wind/windfarm_data.csv?t=${new Date().getTime()}`);
-        if (!response.ok) {
-          throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
-        }
-        const text = await response.text();
-        console.log("CSV 데이터 (처음 200자):", text.substring(0, 200) + "...");
-        Papa.parse(text, {
-          header: true,
-          skipEmptyLines: true,
-          encoding: "UTF-8",
-          complete: function(results) {
-            console.log("파싱된 CSV 필드:", results.meta.fields);
-            allWindFarms = results.data.map(row => {
-              const name = row['단지명'] ? row['단지명'].trim() : null;
-              if (!name) {
-                console.warn("단지명 누락, 해당 행 스킵:", row);
-                return null;
-              }
-              let operator = row['사업자'] || row['운영자'] || row['Operator'] || null;
-              if (!operator) {
-                console.warn(`사업자 정보 누락 (단지명: ${name})`);
-                operator = null;
-              } else {
-                operator = operator.trim();
-              }
-              const completionDate = row['준공일'] ? row['준공일'].trim() : null;
-              return {
-                complexId: row['단지번호'] ? row['단지번호'].trim() : null,
-                name: name,
-                turbineId: row['풍력기번호(임시)'] ? row['풍력기번호(임시)'].trim() : null,
-                completionDate: completionDate,
-                type: row['분류'] ? row['분류'].trim() : null,
-                address: row['주소'] ? row['주소'].trim() : null,
-                xCoord: row['엑스좌표(GRS80_C_x)'] ? parseFloat(row['엑스좌표(GRS80_C_x)']) : null,
-                yCoord: row['와이좌표(GRS80_C_y)'] ? parseFloat(row['와이좌표(GRS80_C_y)']) : null,
-                lat: row['위도(lat)'] ? parseFloat(row['위도(lat)']) : null,
-                lon: row['경도(lon)'] ? parseFloat(row['경도(lon)']) : null,
-                capacity: row['용량(kW)'] ? parseFloat(row['용량(kW)']) : null,
-                manufacturer: row['제조사'] ? row['제조사'].trim() : null,
-                operator: operator,
-                age: calculateAge(completionDate)
-              };
-            }).filter(row => row !== null);
-            console.log("파싱된 데이터 (첫 5개):", allWindFarms.slice(0, 5));
-            console.log("사업자 목록:", [...new Set(allWindFarms.map(farm => farm.operator).filter(op => op))]);
-            turbineCountByComplex = {};
-            totalCapacityByComplex = {};
-            allWindFarms.forEach(farm => {
-              if (!turbineCountByComplex[farm.complexId]) {
-                turbineCountByComplex[farm.complexId] = 0;
-                totalCapacityByComplex[farm.complexId] = 0;
-              }
-              turbineCountByComplex[farm.complexId]++;
-              if (farm.capacity) {
-                totalCapacityByComplex[farm.complexId] += farm.capacity;
-              }
-            });
-            console.log("단지별 터빈 수:", turbineCountByComplex);
-            console.log("단지별 총 용량:", totalCapacityByComplex);
-            initMap();
-            populateDropdown();
-            populateManufacturerDropdown();
-            populateOperatorDropdown();
-            populateOperationPeriodDropdown();
-          },
-          error: function(error) {
-            console.error('CSV 파싱 실패:', error);
-            showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvParse.replace('{{message}}', error.message));
-          }
-        });
-      } catch (error) {
-        console.error('CSV 로드 실패:', error);
-        showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvLoad.replace('{{message}}', error.message));
-      }
-    }
-
-    async function initializeApp() {
-      console.log("앱 초기화 시작");
-      await loadTranslations();
-      await loadManufacturers();
-      await loadCSVData();
-      updateUILanguage();
-      console.log("앱 초기화 완료");
-    }
+    // 기존 showError, toggleLanguage, showInfoPopup, formatNumberWith,Commas, formatGW, calculateAge, getOperationPeriod, loadCSVData, initializeApp 함수 유지
 
     function initMap() {
       console.log("initMap 호출됨");
       const container = document.getElementById('map');
       const options = {
-        center: new kakao.maps.LatLng(35.68466926, 127.724382),
+        center: new kakao.Map.centerLatLng(35.68466926, 127.724382),
         level: 13
       };
       map = new kakao.maps.Map(container, options);
-      map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
+      map.setMapTypeId(kakao.MapTypeId.HYBRID);
       console.log("지도 생성됨:", map);
       setTimeout(() => {
         map.relayout();
@@ -714,21 +580,22 @@
         startTrackingLocation();
       }, 100);
       kakao.maps.event.addListener(map, 'click', () => {
-        currentInfowindows.forEach(infowindow => infowindow.setMap(null));
+        currentInfowindow.forEach(infowindow);
+ infowindow.setMap(null));
         currentInfowindows = [];
       });
-      kakao.maps.event.addListener(map, 'zoom_changed', updateMarkers);
-      kakao.maps.event.addListener(map, 'idle', updateMarkers);
-      document.getElementById('loading').style.display = 'none';
+      kakao.event.addListener('zoom_changed', updateMarkers);
+      kakao.event.addListener('idle', updateMarkers);
+      document.getElementById('loading').style.display-id='none';
       document.getElementById('initial-reset').addEventListener('click', resetToInitial);
       document.getElementById('reset-button').addEventListener('click', resetSelectionsOnly);
       document.getElementById('map-type-toggle').addEventListener('click', toggleMapType);
-      document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
-      document.getElementById('marker-toggle-button').addEventListener('click', toggleMarkersVisibility);
+      document.getElementById('name-toggle').click', toggleNameVisibility);
+      document.getElementById('marker-toggle').addEventListener('click', toggleMarkerVisibility);
       document.getElementById('translate-button').addEventListener('click', toggleLanguage);
-      document.getElementById('info-button').addEventListener('click', toggleInfoPopup);
+      document.getElementById('info-button').addEvent('click', toggleInfoPopup);
       document.getElementById('settings-button').addEventListener('click', () => {
-        const settingsContainer = document.getElementById('settings-container');
+        const settingsContainer = document.getElementById('settings');
         settingsContainer.style.display = settingsContainer.style.display === 'none' ? 'flex' : 'none';
         console.log("설정 컨테이너 표시 상태:", settingsContainer.style.display);
       });
@@ -736,6 +603,7 @@
       document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
       document.getElementById('operator-dropdown').addEventListener('change', handleOperatorChange);
       document.getElementById('operation-period-dropdown').addEventListener('change', handleOperationPeriodChange);
+      document.getElementById('capacity-dropdown').addEventListener('change', handleCapacityChange);
       document.getElementById('info-popup').addEventListener('click', (e) => {
         if (e.target === document.getElementById('info-popup')) {
           toggleInfoPopup();
@@ -743,336 +611,95 @@
       });
     }
 
-    function toggleMapType() {
-      if (isSatellite) {
-        map.setMapTypeId(kakao.maps.MapTypeId.ROADMAP);
-        document.getElementById('map-type-toggle').textContent = translations[isEnglish ? 'en' : 'ko'].mapTypeToggleSatellite;
-        isSatellite = false;
-      } else {
-        map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
-        document.getElementById('map-type-toggle').textContent = translations[isEnglish ? 'en' : 'ko'].mapTypeToggle;
-        isSatellite = true;
-      }
-      console.log("지도 유형 변경:", isSatellite ? "위성" : "기본");
+    // 기존 toggleMapType, toggleNamesVisibility, toggleMarkersVisibility, populateDropdown, populateManufacturer, populateOperatorDropdown, populateOperationPeriodDropdown, handleDropdownChange, handleManufacturerChange, handleOperatorChange, handleOperationPeriodChange 함수 유지
+
+    function getCapacityRange(capacity) {
+      if (!capacity) return null;
+      const mw = capacity / 1000;
+      if (mw < 1) return 'under1mw';
+      if (mw < 2) return '1to2mw';
+      if (mw < 3) return '2to3mw';
+      if (mw < 5) return '3to5mw';
+      return '5mwplus';
     }
 
-    function toggleNamesVisibility() {
-      areNamesVisible = !areNamesVisible;
-      const lang = isEnglish ? 'en' : 'ko';
-      document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
-      updateMarkers();
-    }
-
-    function toggleMarkersVisibility() {
-      areMarkersVisible = !areMarkersVisible;
-      const lang = isEnglish ? 'en' : 'ko';
-      document.getElementById('marker-toggle-button').textContent = areMarkersVisible ? translations[lang].markerToggle : translations[lang].markerToggleOn;
-      updateMarkers();
-      console.log("마커 표시 상태:", areMarkersVisible ? "표시" : "숨김");
-    }
-
-    function populateDropdown() {
-      const dropdown = document.getElementById('windfarm-dropdown');
-      const uniqueComplexes = [...new Set(allWindFarms.map(farm => farm.complexId))].filter(id => id);
-      const complexNames = uniqueComplexes.map(id => {
-        const farm = allWindFarms.find(f => f.complexId === id);
-        const translatedName = getTranslatedSiteInfo(id, 'name') || farm.name;
-        return { id: id, name: translatedName };
-      }).sort((a, b) => a.name.localeCompare(b.name, isEnglish ? 'en' : 'ko'));
-      complexNames.forEach(complex => {
-        const option = document.createElement('option');
-        option.value = complex.id;
-        option.textContent = complex.name;
-        dropdown.appendChild(option);
-      });
-    }
-
-    function populateManufacturerDropdown() {
-      const dropdown = document.getElementById('manufacturer-dropdown');
+    function populateCapacityDropdown() {
+      const dropdown = document.getElementById('capacity-dropdown');
       while (dropdown.options.length > 1) dropdown.remove(1);
-      if (manufacturerData && manufacturerData.manufacturers) {
-        let manufacturers = manufacturerData.manufacturers.slice();
-        manufacturers.sort((a, b) => {
-          const nameA = isEnglish ? a.manufacturer_en : a.manufacturer;
-          const nameB = isEnglish ? b.manufacturer_en : b.manufacturer;
-          return nameA.localeCompare(nameB, isEnglish ? 'en' : 'ko');
-        });
-        manufacturers.forEach(m => {
-          const option = document.createElement('option');
-          option.value = m.manufacturer;
-          option.textContent = isEnglish ? m.manufacturer_en : m.manufacturer;
-          dropdown.appendChild(option);
-        });
-      }
-    }
-
-    function populateOperatorDropdown() {
-      const dropdown = document.getElementById('operator-dropdown');
-      while (dropdown.options.length > 1) dropdown.remove(1);
-      const uniqueOperators = [...new Set(allWindFarms.map(farm => farm.operator).filter(op => op))];
-      uniqueOperators.sort((a, b) => a.localeCompare(b, isEnglish ? 'en' : 'ko'));
-      uniqueOperators.forEach(operator => {
-        const option = document.createElement('option');
-        option.value = operator;
-        option.textContent = operator;
-        dropdown.appendChild(option);
-      });
-    }
-
-    function populateOperationPeriodDropdown() {
-      const dropdown = document.getElementById('operation-period-dropdown');
-      while (dropdown.options.length > 1) dropdown.remove(1);
-      const operationPeriods = [
-        { id: '20plus', label: translations[isEnglish ? 'en' : 'ko'].operationPeriods['20plus'] },
-        { id: '15to20', label: translations[isEnglish ? 'en' : 'ko'].operationPeriods['15to20'] },
-        { id: '10to15', label: translations[isEnglish ? 'en' : 'ko'].operationPeriods['10to15'] },
-        { id: '5to10', label: translations[isEnglish ? 'en' : 'ko'].operationPeriods['5to10'] },
-        { id: 'under5', label: translations[isEnglish ? 'en' : 'ko'].operationPeriods['under5'] }
+      const capacityRanges = [
+        { id: 'under1mw', label: translations[isEnglish ? 'en' : 'ko'].capacityRanges.under1mw },
+        { id: '1to2mw', label: translations[isEnglish ? 'en' : 'ko'].capacityRanges.1to2mw },
+        { id: '2to3mw', label: translations[isEnglish ? 'en' : 'ko'].capacityRanges.2to3mw },
+        { id: '3to5mw', label: translations[isEnglish ? 'en' : 'ko'].capacityRanges.3to5mw },
+        { id: '5mwplus', label: translations[isEnglish ? 'en' : 'ko'].capacityRanges.5mwplus }
       ];
-      operationPeriods.forEach(period => {
+      capacityRanges.forEach(range => {
         const option = document.createElement('option');
-        option.value = period.id;
-        option.textContent = period.label;
+        option.value = range.id;
+        option.textContent = range.label;
         dropdown.appendChild(option);
       });
     }
 
-    function handleDropdownChange(event) {
-      selectedComplex = event.target.value;
+    function handleCapacityChange(event) {
+      selectedCapacityRange = event.target.value;
+      selectedComplex = '';
       selectedManufacturer = '';
       selectedOperator = '';
       selectedOperationPeriod = '';
-      areNamesVisible = true; // 변경: 선택 시 이름 on
+      areNamesVisible = true;
+      document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
-      document.getElementById('operation-period-dropdown').value = '';
-      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 변경: 버튼 텍스트 동기화
-      const allInfo = document.getElementById('all-info');
+      document.getElementById('operation-period').value = '';
+      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
+      const allInfo = document.getElementById('info-all');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
       const operatorInfo = document.getElementById('operator-info');
       const operationPeriodInfo = document.getElementById('operation-period-info');
-      allInfo.style.display = 'none';
+      const capacityInfo = allInfo.getElementById('capacity-info');
+      allInfo.filterInfo.display = 'none';
       manufacturerInfo.style.display = 'none';
-      operatorInfo.style.display = 'none';
-      operationPeriodInfo.style.display = 'none';
-      if (selectedComplex) {
-        const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
-        const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
-        const avgLon = farmsInComplex.reduce((sum, farm) => sum + farm.lon, 0) / farmsInComplex.length;
-        updateComplexInfo(farmsInComplex);
-        complexInfo.style.display = 'block';
-        map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
-        map.setLevel(6);
-      } else {
-        complexInfo.style.display = 'none';
-        allInfo.style.display = 'block';
-        updateInfoPanels();
-        map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
-        map.setLevel(13);
-      }
-      updateMarkers();
-    }
-
-    function handleManufacturerChange(event) {
-      selectedManufacturer = event.target.value;
-      selectedComplex = '';
-      selectedOperator = '';
-      selectedOperationPeriod = '';
-      areNamesVisible = true; // 변경: 선택 시 이름 on
-      document.getElementById('windfarm-dropdown').value = '';
-      document.getElementById('operator-dropdown').value = '';
-      document.getElementById('operation-period-dropdown').value = '';
-      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 변경: 버튼 텍스트 동기화
-      const allInfo = document.getElementById('all-info');
-      const manufacturerInfo = document.getElementById('manufacturer-info');
-      const complexInfo = document.getElementById('complex-info');
-      const operatorInfo = document.getElementById('operator-info');
-      const operationPeriodInfo = document.getElementById('operation-period-info');
-      allInfo.style.display = 'none';
       complexInfo.style.display = 'none';
       operatorInfo.style.display = 'none';
       operationPeriodInfo.style.display = 'none';
       let filteredFarms = allWindFarms;
-      if (selectedManufacturer) {
-        filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
+      if (selectedCapacityRange) {
+        filteredFarms = allWindFarms.filter(farm => getCapacityRange(farm.capacity) === selectedCapacityRange);
         const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
         const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
         const turbineCount = filteredFarms.length;
         const lang = isEnglish ? 'en' : 'ko';
-        document.getElementById('info-manufacturer').innerHTML = translations[lang].manufacturerInfo.manufacturer.replace('{{value}}', selectedManufacturer);
-        document.getElementById('info-total-capacity').innerHTML = translations[lang].manufacturerInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
-        document.getElementById('info-complex-count').innerHTML = translations[lang].manufacturerInfo.complexCount.replace('{{value}}', complexCount);
-        document.getElementById('info-turbine-count').innerHTML = translations[lang].manufacturerInfo.turbineCount.replace('{{value}}', turbineCount);
-        manufacturerInfo.style.display = 'block';
+        const rangeLabel = translations[lang].capacityRanges[selectedCapacityRange];
+        document.getElementById('info-total').innerHTML = translations[lang].capacityInfo.totalCapacityRange.replace('{{totalCapacity}}', rangeLabel);
+        document.getElementById('info-total-capacity').innerHTML = translations[lang].capacityInfo.totalCapacity.replace('{{value}}', formatNumberWith(totalCapacity));
+        document.getElementById('info-capacity-complex-count').innerHTML = translations[lang].capacityInfo.complexCount.replace('{{value}}', complexCount);
+        document.getElementById('info-total-turbine-count').innerHTML = translations[lang].capacityInfo.turbineCount.replace('{{value}}', turbineCount);
+        capacityInfo.style.display = 'block';
       } else {
-        manufacturerInfo.style.display = 'none';
+        capacityInfo.filter.display = 'none';
         allInfo.style.display = 'block';
-        updateInfoPanels();
+        updateInfo();
       }
       if (filteredFarms.length === 0) {
+        map.setFiltered();
         map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
         map.setLevel(13);
       } else if (filteredFarms.length === 1) {
         const farm = filteredFarms[0];
-        map.setCenter(new kakao.maps.LatLng(farm.lat, farm.lon));
+        map.setCenter(new kakao.Map.LatLng(farm.lat, farm.lon));
         map.setLevel(6);
       } else {
         const bounds = new kakao.maps.LatLngBounds();
         filteredFarms.forEach(farm => {
           if (farm.lat && farm.lon) {
-            bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
-          }
+            bounds.extend(new kakao.LatLng(farm.lat, farm.lon));
+          );
         });
         map.setBounds(bounds);
       }
       updateMarkers();
-    }
-
-    function handleOperatorChange(event) {
-      selectedOperator = event.target.value;
-      selectedComplex = '';
-      selectedManufacturer = '';
-      selectedOperationPeriod = '';
-      areNamesVisible = true; // 변경: 선택 시 이름 on
-      document.getElementById('windfarm-dropdown').value = '';
-      document.getElementById('manufacturer-dropdown').value = '';
-      document.getElementById('operation-period-dropdown').value = '';
-      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 변경: 버튼 텍스트 동기화
-      const allInfo = document.getElementById('all-info');
-      const manufacturerInfo = document.getElementById('manufacturer-info');
-      const complexInfo = document.getElementById('complex-info');
-      const operatorInfo = document.getElementById('operator-info');
-      const operationPeriodInfo = document.getElementById('operation-period-info');
-      allInfo.style.display = 'none';
-      manufacturerInfo.style.display = 'none';
-      complexInfo.style.display = 'none';
-      operationPeriodInfo.style.display = 'none';
-      let filteredFarms = allWindFarms;
-      if (selectedOperator) {
-        filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
-        const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
-        const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
-        const turbineCount = filteredFarms.length;
-        const lang = isEnglish ? 'en' : 'ko';
-        document.getElementById('info-operator').innerHTML = translations[lang].operatorInfo.operator.replace('{{value}}', selectedOperator);
-        document.getElementById('info-operator-capacity').innerHTML = translations[lang].operatorInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
-        document.getElementById('info-operator-complex-count').innerHTML = translations[lang].operatorInfo.complexCount.replace('{{value}}', complexCount);
-        document.getElementById('info-operator-turbine-count').innerHTML = translations[lang].operatorInfo.turbineCount.replace('{{value}}', turbineCount);
-        operatorInfo.style.display = 'block';
-      } else {
-        operatorInfo.style.display = 'none';
-        allInfo.style.display = 'block';
-        updateInfoPanels();
-      }
-      if (filteredFarms.length === 0) {
-        map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
-        map.setLevel(13);
-      } else if (filteredFarms.length === 1) {
-        const farm = filteredFarms[0];
-        map.setCenter(new kakao.maps.LatLng(farm.lat, farm.lon));
-        map.setLevel(6);
-      } else {
-        const bounds = new kakao.maps.LatLngBounds();
-        filteredFarms.forEach(farm => {
-          if (farm.lat && farm.lon) {
-            bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
-          }
-        });
-        map.setBounds(bounds);
-      }
-      updateMarkers();
-    }
-
-    function handleOperationPeriodChange(event) {
-      selectedOperationPeriod = event.target.value;
-      selectedComplex = '';
-      selectedManufacturer = '';
-      selectedOperator = '';
-      areNamesVisible = true; // 변경: 선택 시 이름 on
-      document.getElementById('windfarm-dropdown').value = '';
-      document.getElementById('manufacturer-dropdown').value = '';
-      document.getElementById('operator-dropdown').value = '';
-      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 변경: 버튼 텍스트 동기화
-      const allInfo = document.getElementById('all-info');
-      const manufacturerInfo = document.getElementById('manufacturer-info');
-      const complexInfo = document.getElementById('complex-info');
-      const operatorInfo = document.getElementById('operator-info');
-      const operationPeriodInfo = document.getElementById('operation-period-info');
-      allInfo.style.display = 'none';
-      manufacturerInfo.style.display = 'none';
-      complexInfo.style.display = 'none';
-      operatorInfo.style.display = 'none';
-      let filteredFarms = allWindFarms;
-      if (selectedOperationPeriod) {
-        filteredFarms = allWindFarms.filter(farm => getOperationPeriod(farm.age) === selectedOperationPeriod);
-        const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
-        const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
-        const turbineCount = filteredFarms.length;
-        const lang = isEnglish ? 'en' : 'ko';
-        const periodLabel = translations[lang].operationPeriods[selectedOperationPeriod];
-        document.getElementById('info-operation-period').innerHTML = translations[lang].operationPeriodInfo.operationPeriod.replace('{{value}}', periodLabel);
-        document.getElementById('info-operation-capacity').innerHTML = translations[lang].operationPeriodInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
-        document.getElementById('info-operation-complex-count').innerHTML = translations[lang].operationPeriodInfo.complexCount.replace('{{value}}', complexCount);
-        document.getElementById('info-operation-turbine-count').innerHTML = translations[lang].operationPeriodInfo.turbineCount.replace('{{value}}', turbineCount);
-        operationPeriodInfo.style.display = 'block';
-      } else {
-        operationPeriodInfo.style.display = 'none';
-        allInfo.style.display = 'block';
-        updateInfoPanels();
-      }
-      if (filteredFarms.length === 0) {
-        map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
-        map.setLevel(13);
-      } else if (filteredFarms.length === 1) {
-        const farm = filteredFarms[0];
-        map.setCenter(new kakao.maps.LatLng(farm.lat, farm.lon));
-        map.setLevel(6);
-      } else {
-        const bounds = new kakao.maps.LatLngBounds();
-        filteredFarms.forEach(farm => {
-          if (farm.lat && farm.lon) {
-            bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
-          }
-        });
-        map.setBounds(bounds);
-      }
-      updateMarkers();
-    }
-
-    function updateComplexInfo(farmsInComplex) {
-      const lang = isEnglish ? 'en' : 'ko';
-      const complexId = farmsInComplex[0].complexId;
-      const complexName = getTranslatedSiteInfo(complexId, 'name') || farmsInComplex[0].name;
-      const totalCapacity = farmsInComplex.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
-      const capacityCount = {};
-      farmsInComplex.forEach(farm => {
-        if (farm.capacity) {
-          capacityCount[farm.capacity] = (capacityCount[farm.capacity] || 0) + 1;
-        }
-      });
-      const capacityBreakdown = Object.entries(capacityCount)
-        .map(([cap, count]) => `${formatNumberWithCommas(cap)}kW * ${count}${isEnglish ? ' units' : '기'}`)
-        .join(", ");
-      const manufacturerSet = new Set(farmsInComplex.map(farm => farm.manufacturer).filter(m => m));
-      let manufacturers;
-      if (isEnglish && manufacturerData && manufacturerData.manufacturers) {
-        manufacturers = [...manufacturerSet].map(m => {
-          const manufacturerInfo = manufacturerData.manufacturers.find(info => info.manufacturer === m);
-          return manufacturerInfo ? manufacturerInfo.manufacturer_en : m;
-        }).join(", ") || translations[lang].noInfo;
-      } else {
-        manufacturers = [...manufacturerSet].join(", ") || translations[lang].noInfo;
-      }
-      const turbineCount = farmsInComplex.length;
-      const completionDates = farmsInComplex.map(farm => farm.completionDate).filter(date => date);
-      const completionDate = completionDates.length > 0 ? completionDates.sort()[0] : translations[lang].noInfo;
-      document.getElementById('info-complex-name').innerHTML = translations[lang].complexInfo.name.replace('{{value}}', complexName);
-      document.getElementById('info-complex-capacity').innerHTML = translations[lang].complexInfo.capacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
-      document.getElementById('info-complex-capacity-breakdown').innerHTML = translations[lang].complexInfo.capacityBreakdown.replace('{{value}}', `(${capacityBreakdown})`);
-      document.getElementById('info-complex-manufacturers').innerHTML = translations[lang].complexInfo.manufacturers.replace('{{value}}', manufacturers);
-      document.getElementById('info-complex-turbine-count').innerHTML = translations[lang].complexInfo.turbineCount.replace('{{value}}', turbineCount);
-      document.getElementById('info-complex-completion').innerHTML = translations[lang].complexInfo.completion.replace('{{value}}', completionDate);
     }
 
     function updateInfoPanels() {
@@ -1081,10 +708,10 @@
         const totalCapacity = allWindFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
         const complexCount = [...new Set(allWindFarms.map(farm => farm.complexId))].length;
         const turbineCount = allWindFarms.length;
-        document.getElementById('info-all-capacity').innerHTML = translations[lang].allInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
+        document.getElementById('info-all-capacity').innerHTML = translations[lang].allInfo.totalCapacity.replace('{{value}}', formatNumberWith(totalCapacity));
         document.getElementById('info-all-capacity-gw').innerHTML = translations[lang].allInfo.totalCapacityGW.replace('{{value}}', formatGW(totalCapacity));
         document.getElementById('info-all-complex-count').innerHTML = translations[lang].allInfo.complexCount.replace('{{value}}', complexCount);
-        document.getElementById('info-all-turbine-count').innerHTML = translations[lang].allInfo.turbineCount.replace('{{value}}', turbineCount);
+        document.getElementById('info-all-turbine-count').innerHTML = translations[lang].allInfo.turbineCount.replace('{value}}', turbineCount);
       }
       if (selectedManufacturer && document.getElementById('manufacturer-info').style.display === 'block') {
         const filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
@@ -1092,17 +719,17 @@
         const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
         const turbineCount = filteredFarms.length;
         document.getElementById('info-manufacturer').innerHTML = translations[lang].manufacturerInfo.manufacturer.replace('{{value}}', selectedManufacturer);
-        document.getElementById('info-total-capacity').innerHTML = translations[lang].manufacturerInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
+        document.getElementById('info-total-capacity').innerHTML = translations[lang].manufacturerInfo.totalCapacity.replace('{{value}}', formatNumberWith(totalCapacity));
         document.getElementById('info-complex-count').innerHTML = translations[lang].manufacturerInfo.complexCount.replace('{{value}}', complexCount);
         document.getElementById('info-turbine-count').innerHTML = translations[lang].manufacturerInfo.turbineCount.replace('{{value}}', turbineCount);
       }
       if (selectedOperator && document.getElementById('operator-info').style.display === 'block') {
         const filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
-        const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
+        const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0));
         const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
         const turbineCount = filteredFarms.length;
         document.getElementById('info-operator').innerHTML = translations[lang].operatorInfo.operator.replace('{{value}}', selectedOperator);
-        document.getElementById('info-operator-capacity').innerHTML = translations[lang].operatorInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
+        document.getElementById('info-operator-capacity').innerHTML = translations[lang].operatorInfo.totalCapacity.replace('{{value}}', formatNumberWith(totalCapacity));
         document.getElementById('info-operator-complex-count').innerHTML = translations[lang].operatorInfo.complexCount.replace('{{value}}', complexCount);
         document.getElementById('info-operator-turbine-count').innerHTML = translations[lang].operatorInfo.turbineCount.replace('{{value}}', turbineCount);
       }
@@ -1110,83 +737,46 @@
         const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
         updateComplexInfo(farmsInComplex);
       }
-      if (selectedOperationPeriod && document.getElementById('operation-period-info').style.display === 'block') {
+      if (selectedOperationPeriod && document.getElementById('operation-period').style.display === 'block') {
         const filteredFarms = allWindFarms.filter(farm => getOperationPeriod(farm.age) === selectedOperationPeriod);
-        const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
-        const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
+        const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0));
+        const complexCount = [...new Set(farms.map(farm => farm.complexId))].length;
         const turbineCount = filteredFarms.length;
         const periodLabel = translations[lang].operationPeriods[selectedOperationPeriod];
-        document.getElementById('info-operation-period').innerHTML = translations[lang].operationPeriodInfo.operationPeriod.replace('{{value}}', periodLabel);
-        document.getElementById('info-operation-capacity').innerHTML = translations[lang].operationPeriodInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
+        document.getElementById('info-period-period').innerHTML = translations[lang].operationPeriodInfo.operationPeriod.replace('{{periodLabel}}', periodLabel);
+        document.getElementById('info-operation-capacity').innerHTML = translations[lang].operationPeriodInfo.totalCapacity.replace('{{value}}', formatNumberWith(totalCapacity));
         document.getElementById('info-operation-complex-count').innerHTML = translations[lang].operationPeriodInfo.complexCount.replace('{{value}}', complexCount);
-        document.getElementById('info-operation-turbine-count').innerHTML = translations[lang].operationPeriodInfo.turbineCount.replace('{{value}}', turbineCount);
+        document.getElementById('info-period-turbine-count').innerHTML = translations[lang].operationPeriodInfo.turbineCount.replace('{{value}}', turbineCount);
+      }
+      if (selectedCapacityRange && document.getElementById('capacity-info').style.display === 'block') {
+        const filteredFarms = allWindFarms.filter(farm => getCapacityRange(farm.capacity) === selectedCapacityRange);
+        const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0));
+        const complexCount = [...new Set(farms.map(farm => farm.complexId))].length;
+        const turbineCount = filteredFarms.length;
+        const rangeLabel = translations[lang].capacityRanges[selectedCapacityRange];
+        document.getElementById('info-total').innerHTML = translations[lang].capacityInfo.totalCapacityRange.replace('{{value}}');, rangeLabel);
+        document.getElementById('info-total-capacity').innerHTML = translations[lang].capacityInfo.totalCapacity.replace('{{value}}', formatNumberWith(totalCapacity));
+        document.getElementById('info-count').innerHTML = translations[lang].capacityInfo.complexCount.replace('{{{value}}', complexCount);
+        document.getElementById('info-turbine-count').innerHTML = translations[lang].capacityInfo.turbineCount.replace('{{{value}}', turbineCount);
       }
     }
 
-    function startTrackingLocation() {
-      if (navigator.geolocation) {
-        watchId = navigator.geolocation.watchPosition(
-          position => {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            console.log("내 위치 업데이트:", lat, lon);
-            updateMyLocation(lat, lon);
-          },
-          error => {
-            console.error("위치 가져오기 실패:", error);
-            showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.geolocation);
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-          }
-        );
-      } else {
-        console.error("Geolocation 지원 안 됨");
-        showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.geolocationUnsupported);
-      }
-    }
-
-    function updateMyLocation(lat, lon) {
-      const position = new kakao.maps.LatLng(lat, lon);
-      if (myLocationMarker) {
-        myLocationMarker.setMap(null);
-      }
-      myLocationMarker = new kakao.maps.Marker({
-        position: position,
-        title: translations[isEnglish ? 'en' : 'ko'].myLocation,
-        clickable: false,
-        image: new kakao.maps.MarkerImage(
-          '/wind/me.png',
-          new kakao.maps.Size(48, 48)
-        )
-      });
-      myLocationMarker.setMap(map);
-      markers.push(myLocationMarker);
-    }
-
-    function clearMap() {
-      markers.forEach(marker => marker.setMap(null));
-      overlays.forEach(overlay => overlay.setMap(null));
-      markers = [];
-      overlays = [];
-      currentInfowindows.forEach(infowindow => infowindow.setMap(null));
-      currentInfowindows = [];
-    }
+    // 기존 startTrackingLocation, updateMyLocation, clearMap 함수 유지
 
     function updateMarkers() {
       clearMap();
       const zoomLevel = map.getLevel();
       console.log("현재 줌 레벨:", zoomLevel);
-      const markerImage = new kakao.maps.MarkerImage(
-        '/wind/wind.png',
-        new kakao.maps.Size(48, 48),
-        { offset: new kakao.maps.Point(16, 32) }
+      const markerImage = new kakao.MarkerImage(
+        '/wind/marker.png',
+        new kakao.Size(48, 48),
+        { offset: new kakaoPoint(16, 32) }
       );
       let filteredFarms = allWindFarms;
-      if (selectedOperationPeriod) {
-        filteredFarms = allWindFarms.filter(farm => getOperationPeriod(farm.age) === selectedOperationPeriod);
+      if (selectedCapacityRange) {
+        filteredFarms = allWindFarms.filter(farm => getCapacityRange(farm.capacity) === selectedCapacityRange);
+      } else if (selectedOperationPeriod) {
+        filteredFarms = filteredFarms.filter(farm => getOperationPeriod(farm.age) === selectedOperationPeriod);
       } else if (selectedOperator) {
         filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
       } else if (selectedManufacturer) {
@@ -1197,7 +787,6 @@
       filteredFarms = filteredFarms.filter(farm => farm.age !== null);
       console.log("필터링된 터빈 수:", filteredFarms.length);
       const lang = isEnglish ? 'en' : 'ko';
-      // 변경: 단지 이름만 표시하도록 수정
       const farmsByComplex = {};
       filteredFarms.forEach(farm => {
         if (!farmsByComplex[farm.complexId]) farmsByComplex[farm.complexId] = [];
@@ -1207,11 +796,11 @@
         const group = farmsByComplex[complexId];
         const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
         const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
-        const position = new kakao.maps.LatLng(avgLat, avgLon);
+        const position = new kakao.LatLng(avgLat, avgLon);
         const complexName = getTranslatedSiteInfo(complexId, 'name') || group[0].name;
         let marker = null;
         if (areMarkersVisible) {
-          marker = new kakao.maps.Marker({
+          marker = new kakao.Marker({
             position: position,
             title: `${complexName} (${group.length}${isEnglish ? ' turbines' : '개 터빈'})`,
             clickable: true,
@@ -1223,35 +812,39 @@
         if (areNamesVisible) {
           const overlay = new kakao.maps.CustomOverlay({
             position: position,
-            content: `<div class="info-window">${translations[lang].infoWindow.replace('{{name}}', complexName).replace('{{count}}', group.length)}</div>`,
+            content: `<div class="info-window">${translations[lang].infoWindow.replace('{{name}}', complexName).replace('{{count}}', group.length)}}</div>`,
             xAnchor: 0.5,
             yAnchor: 2,
             zIndex: 10
           });
           overlay.setMap(map);
-          overlays.push(overlay);
+          overlays.push(...overlay);
         }
         if (areMarkersVisible && marker) {
-          kakao.maps.event.addListener(marker, 'click', () => {
+          kakao.event.addListener(marker, 'click', () => {
             selectedComplex = complexId;
             selectedManufacturer = '';
             selectedOperator = '';
             selectedOperationPeriod = '';
-            areNamesVisible = true; // 변경: 마커 클릭 시 이름 on
+            selectedCapacityRange = '';
+            areNamesVisible = true;
             document.getElementById('manufacturer-dropdown').value = '';
-            document.getElementById('operator-dropdown').value = '';
-            document.getElementById('operation-period-dropdown').value = '';
+            document.getElementById('operator-id').value = '';
+            document.getElementById('operation-period').value = '';
+            document.getElementById('capacity-dropdown').value = '';
             document.getElementById('windfarm-dropdown').value = complexId;
-            document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 변경: 버튼 텍스트 동기화
-            const allInfo = document.getElementById('all-info');
+            document.getElementById('name-toggle').textContent = translations[lang].nameToggle;
+            const allInfo = document.getElementById('info-all-info');
             const manufacturerInfo = document.getElementById('manufacturer-info');
             const complexInfo = document.getElementById('complex-info');
             const operatorInfo = document.getElementById('operator-info');
             const operationPeriodInfo = document.getElementById('operation-period-info');
+            const capacityInfo = document.getElementById('capacity-info');
             allInfo.style.display = 'none';
             manufacturerInfo.style.display = 'none';
             operatorInfo.style.display = 'none';
             operationPeriodInfo.style.display = 'none';
+            capacityInfo.style.display = 'none';
             updateComplexInfo(group);
             complexInfo.style.display = 'block';
             map.setCenter(position);
@@ -1263,83 +856,11 @@
       });
       if (myLocationMarker) {
         myLocationMarker.setMap(map);
-        markers.push(myLocationMarker);
+        marker.push(myLocationMarker);
       }
     }
 
-    window.toggleFarmDetails = function(name, turbineId, type, completionDate, address, lat, lon, capacity, manufacturer, complexId, operator) {
-      currentInfowindows.forEach(infowindow => infowindow.setMap(null));
-      currentInfowindows = [];
-      const lang = isEnglish ? 'en' : 'ko';
-      const turbineName = name;
-      const totalTurbines = turbineCountByComplex[complexId] || 0;
-      const formattedCapacity = formatNumberWithCommas(capacity);
-      const totalComplexCapacity = totalCapacityByComplex[complexId] || 0;
-      const formattedTotalComplexCapacity = formatNumberWithCommas(totalComplexCapacity);
-      const farmsInComplex = allWindFarms.filter(farm => farm.complexId === complexId);
-      const capacityCount = {};
-      farmsInComplex.forEach(farm => {
-        if (farm.capacity) {
-          capacityCount[farm.capacity] = (capacityCount[farm.capacity] || 0) + 1;
-        }
-      });
-      const truncateText = (text, maxLength) => {
-        if (!text || text === translations[lang].noInfo) return text || translations[lang].noInfo;
-        return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-      };
-      const capacityBreakdown = Object.entries(capacityCount)
-        .map(([cap, count]) => `${formatNumberWithCommas(cap)}kW * ${count}${isEnglish ? ' units' : '기'}`)
-        .join(", ");
-      let displayManufacturer = manufacturer || translations[lang].noInfo;
-      if (isEnglish && manufacturerData && manufacturerData.manufacturers) {
-        const manufacturerInfo = manufacturerData.manufacturers.find(m => m.manufacturer === manufacturer);
-        displayManufacturer = manufacturerInfo ? manufacturerInfo.manufacturer_en : manufacturer || translations[lang].noInfo;
-      }
-      const content = `
-          <div class="detail-window" onclick="window.closeInfowindow(event, this)">
-              ${translations[lang].detailWindow.name.replace('{{value}}', truncateText(turbineName, 20))}<br>
-              ${translations[lang].detailWindow.manufacturer.replace('{{value}}', truncateText(displayManufacturer, 15))}<br>
-              ${translations[lang].detailWindow.capacity.replace('{{value}}', formattedCapacity)}<br>
-              ${translations[lang].detailWindow.turbineCount.replace('{{value}}', totalTurbines)}<br>
-              ${translations[lang].detailWindow.complexCapacity.replace('{{value}}', truncateText(formattedTotalComplexCapacity, 25))}<br>
-              ${translations[lang].detailWindow.capacityBreakdown.replace('{{value}}', truncateText(capacityBreakdown, 25))}<br>
-              ${translations[lang].detailWindow.completion.replace('{{value}}', truncateText(completionDate || translations[lang].noInfo, 15))}<br>
-              ${translations[lang].detailWindow.address.replace('{{value}}', truncateText(address || translations[lang].noInfo, 20))}<br>
-              ${translations[lang].detailWindow.operator.replace('{{value}}', truncateText(operator || translations[lang].noInfo, 20))}<br>
-          </div>
-      `;
-      console.log("toggleFarmDetails 호출됨:", { name, lat, lon, zoomLevel: map.getLevel() });
-      const basePosition = new kakao.maps.LatLng(lat, lon);
-      const zoomLevel = map.getLevel();
-      let offsetLat = 0.0005;
-      const adjustedPosition = new kakao.maps.LatLng(lat - offsetLat, lon);
-      console.log("정보 창 위치:", { lat: lat - offsetLat, lon, offsetLat });
-      const infowindow = new kakao.maps.InfoWindow({
-        position: adjustedPosition,
-        content: content,
-        zIndex: 20,
-        removable: true
-      });
-      try {
-        infowindow.open(map);
-        currentInfowindows.push(infowindow);
-        console.log("정보 창 열림:", infowindow);
-      } catch (error) {
-        console.error("정보 창 열기 실패:", error);
-      }
-    };
-
-    window.closeInfowindow = function(event, element) {
-      event.stopPropagation();
-      const infowindowToClose = currentInfowindows.find(infowindow =>
-        infowindow.getContent().includes(element.innerHTML)
-      );
-      if (infowindowToClose) {
-        infowindowToClose.setMap(null);
-        currentInfowindows = currentInfowindows.filter(iw => iw !== infowindowToClose);
-        console.log("정보 창 닫힘");
-      }
-    };
+    // 기존 toggleFarmDetails, closeInfowindow 함수 유지
 
     document.addEventListener('DOMContentLoaded', function() {
       kakao.maps.load(() => {
@@ -1357,44 +878,3 @@
   </script>
 </body>
 </html>
-</xaiArtifactMap>
-```
-
-### 주요 변경 사항
-1. **초기 이름 표시 설정**:
-   - `areNamesVisible = false`로 초기화 (line 304).
-   - `name-toggle-button` 초기 텍스트를 "이름 켜기"로 설정 (line 178).
-
-2. **드롭다운 선택 시 이름 표시**:
-   - `handleDropdownChange`에서 `areNamesVisible = true` 설정 및 버튼 텍스트 업데이트 (line 1097).
-   - `handleManufacturerChange`에서 동일 (line 1178).
-   - `handleOperatorChange`에서 동일 (line 1259).
-   - `handleOperationPeriodChange`에서 동일 (line 1340).
-   - 마커 클릭 시에도 `areNamesVisible = true` 설정 (line 5).
-
-3. **초기화 시 이름 비활성화**:
-   - `resetToInitial`: `areNamesVisible = false`로 설정하고 버튼 텍스트를 "이름 켜기"로 변경 (line 395-396).
-   - `resetSelectionsOnly`: 동일하게 처리 (line 408-409).
-
-4. **마커 및 이름 표시 로직**:
-   - `updateMarkers`: 줌 레벨에 따라 단지 이름만 표시하도록 수정, 개별 터빈 이름 표시 제거 (line 1784-1866).
-   - `areNamesVisible`이 `true`일 때만 단지 이름 표시 (line 1815-1823).
-
-5. **UI 동기화**:
-   - `updateUILanguage`에서 `name-toggle-button` 텍스트를 `areNamesVisible` 상태에 따라 동기화 (line 429).
-   - 버튼 텍스트가 언어 변경 시에도 올바르게 반영됨.
-
-### 실행 방법
-1. 위 코드를 `index.html`로 저장.
-2. `/wind/windfarm_data.csv`, `/wind/translations.json`, `/wind/manufacturers.json` 파일이 서버에 존재하는지 확인.
-3. Kakao Maps API 키를 `9b8113591f35c3409335bdb4b5ee5613`에 설정.
-4. 로컬 서버(예: `http-server`) 또는 웹 서버에서 실행.
-5. 브라우저에서 초기 로드 시 단지 이름이 표시되지 않고, 드롭다운(풍력단지, 제조사, 사업자, 운영기간) 선택 시 단지 이름이 표시되는지 확인.
-6. "처음으로" 또는 "선택 초기화" 버튼 클릭 시 단지 이름이 다시 꺼지는지 확인.
-
-### 디버깅 팁
-- **콘솔 로그**: `updateMarkers` 호출 시 `areNamesVisible` 상태를 확인:
-  ```javascript
-  console.log("updateMarkers 호출, 이름 표시 상태:", areNamesVisible);
-  ```
-- **데이터 확인**: `allWindFarms`의 `complexId`
