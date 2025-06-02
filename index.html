@@ -717,8 +717,13 @@
         currentInfowindows.forEach(infowindow => infowindow.setMap(null));
         currentInfowindows = [];
       });
-      kakao.maps.event.addListener(map, 'zoom_changed', updateMarkers);
-      kakao.maps.event.addListener(map, 'idle', updateMarkers);
+      // zoom_changed와 idle 이벤트에 조건 추가
+      kakao.maps.event.addListener(map, 'zoom_changed', () => {
+        if (!selectedComplex) updateMarkers(); // selectedComplex가 없을 때만 호출
+      });
+      kakao.maps.event.addListener(map, 'idle', () => {
+        if (!selectedComplex) updateMarkers(); // selectedComplex가 없을 때만 호출
+      });
       document.getElementById('loading').style.display = 'none';
       document.getElementById('initial-reset').addEventListener('click', resetToInitial);
       document.getElementById('reset-button').addEventListener('click', resetSelectionsOnly);
@@ -743,6 +748,7 @@
       });
     }
 
+    
     function toggleMapType() {
       if (isSatellite) {
         map.setMapTypeId(kakao.maps.MapTypeId.ROADMAP);
@@ -842,11 +848,11 @@
       selectedManufacturer = '';
       selectedOperator = '';
       selectedOperationPeriod = '';
-      areNamesVisible = true; // 변경: 선택 시 이름 on
+      areNamesVisible = true;
       document.getElementById('manufacturer-dropdown').value = '';
       document.getElementById('operator-dropdown').value = '';
       document.getElementById('operation-period-dropdown').value = '';
-      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 변경: 버튼 텍스트 동기화
+      document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
@@ -858,12 +864,21 @@
       operationPeriodInfo.style.display = 'none';
       if (selectedComplex) {
         const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
-        const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
-        const avgLon = farmsInComplex.reduce((sum, farm) => sum + farm.lon, 0) / farmsInComplex.length;
+        const bounds = new kakao.maps.LatLngBounds();
+        farmsInComplex.forEach(farm => {
+          if (farm.lat && farm.lon) {
+            bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
+          }
+        });
         updateComplexInfo(farmsInComplex);
         complexInfo.style.display = 'block';
-        map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
-        map.setLevel(6);
+        if (farmsInComplex.length > 0) {
+          map.setBounds(bounds, 50);
+          const currentLevel = map.getLevel();
+          if (currentLevel > 6) {
+            map.setLevel(6);
+          }
+        }
       } else {
         complexInfo.style.display = 'none';
         allInfo.style.display = 'block';
@@ -1175,71 +1190,123 @@
       currentInfowindows = [];
     }
 
+    let isUpdatingMarkers = false;
+
     function updateMarkers() {
-      clearMap();
-      const zoomLevel = map.getLevel();
-      console.log("현재 줌 레벨:", zoomLevel);
-      const markerImage = new kakao.maps.MarkerImage(
-        '/wind/wind.png',
-        new kakao.maps.Size(48, 48),
-        { offset: new kakao.maps.Point(16, 32) }
-      );
-      let filteredFarms = allWindFarms;
-      if (selectedOperationPeriod) {
-        filteredFarms = allWindFarms.filter(farm => getOperationPeriod(farm.age) === selectedOperationPeriod);
-      } else if (selectedOperator) {
-        filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
-      } else if (selectedManufacturer) {
-        filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
-      } else if (selectedComplex) {
-        filteredFarms = allWindFarms.filter(farm => farm.complexId === selectedComplex);
+      if (isUpdatingMarkers) {
+        console.log("updateMarkers 재귀 호출 방지");
+        return;
       }
-      filteredFarms = filteredFarms.filter(farm => farm.age !== null);
-      console.log("필터링된 터빈 수:", filteredFarms.length);
-      const lang = isEnglish ? 'en' : 'ko';
+      isUpdatingMarkers = true;
     
-      if (selectedComplex) {
-        // Display individual turbines for the selected complex
-        const bounds = new kakao.maps.LatLngBounds();
-        filteredFarms.forEach(farm => {
-          if (farm.lat && farm.lon) {
-            const position = new kakao.maps.LatLng(farm.lat, farm.lon);
-            bounds.extend(position);
+      try {
+        clearMap();
+        const zoomLevel = map.getLevel();
+        console.log("현재 줌 레벨:", zoomLevel);
+        const markerImage = new kakao.maps.MarkerImage(
+          '/wind/wind.png',
+          new kakao.maps.Size(48, 48),
+          { offset: new kakao.maps.Point(16, 32) }
+        );
+        let filteredFarms = allWindFarms;
+        if (selectedOperationPeriod) {
+          filteredFarms = allWindFarms.filter(farm => getOperationPeriod(farm.age) === selectedOperationPeriod);
+        } else if (selectedOperator) {
+          filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
+        } else if (selectedManufacturer) {
+          filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
+        } else if (selectedComplex) {
+          filteredFarms = allWindFarms.filter(farm => farm.complexId === selectedComplex);
+        }
+        filteredFarms = filteredFarms.filter(farm => farm.age !== null);
+        console.log("필터링된 터빈 수:", filteredFarms.length);
+        const lang = isEnglish ? 'en' : 'ko';
     
-            // Add marker for each turbine if markers are visible
+        if (selectedComplex) {
+          const bounds = new kakao.maps.LatLngBounds();
+          filteredFarms.forEach(farm => {
+            if (farm.lat && farm.lon) {
+              const position = new kakao.maps.LatLng(farm.lat, farm.lon);
+              bounds.extend(position);
+    
+              if (areMarkersVisible) {
+                const marker = new kakao.maps.Marker({
+                  position: position,
+                  title: `${farm.name} (${farm.turbineId || 'No ID'})`,
+                  clickable: true,
+                  image: markerImage
+                });
+                marker.setMap(map);
+                markers.push(marker);
+    
+                kakao.maps.event.addListener(marker, 'click', () => {
+                  window.toggleFarmDetails(
+                    getTranslatedSiteInfo(farm.complexId, 'name') || farm.name,
+                    farm.turbineId,
+                    farm.type,
+                    farm.completionDate,
+                    getTranslatedSiteInfo(farm.complexId, 'address') || farm.address,
+                    farm.lat,
+                    farm.lon,
+                    farm.capacity,
+                    farm.manufacturer,
+                    farm.complexId,
+                    farm.operator
+                  );
+                });
+              }
+    
+              if (areNamesVisible) {
+                const overlay = new kakao.maps.CustomOverlay({
+                  position: position,
+                  content: `<div class="info-window">${farm.name} (${farm.turbineId || 'No ID'})</div>`,
+                  xAnchor: 0.5,
+                  yAnchor: 2,
+                  zIndex: 10
+                });
+                overlay.setMap(map);
+                overlays.push(overlay);
+              }
+            }
+          });
+    
+          if (filteredFarms.length > 0) {
+            map.setBounds(bounds, 50);
+            const currentLevel = map.getLevel();
+            if (currentLevel > 6) {
+              map.setLevel(6);
+            }
+          }
+        } else {
+          const farmsByComplex = {};
+          filteredFarms.forEach(farm => {
+            if (!farmsByComplex[farm.complexId]) farmsByComplex[farm.complexId] = [];
+            farmsByComplex[farm.complexId].push(farm);
+          });
+    
+          Object.keys(farmsByComplex).forEach(complexId => {
+            const group = farmsByComplex[complexId];
+            const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
+            const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
+            const position = new kakao.maps.LatLng(avgLat, avgLon);
+            const complexName = getTranslatedSiteInfo(complexId, 'name') || group[0].name;
+            let marker = null;
+    
             if (areMarkersVisible) {
-              const marker = new kakao.maps.Marker({
+              marker = new kakao.maps.Marker({
                 position: position,
-                title: `${farm.name} (${farm.turbineId || 'No ID'})`,
+                title: `${complexName} (${group.length}${isEnglish ? ' turbines' : '개 터빈'})`,
                 clickable: true,
                 image: markerImage
               });
               marker.setMap(map);
               markers.push(marker);
-    
-              // Add click event to show turbine details
-              kakao.maps.event.addListener(marker, 'click', () => {
-                window.toggleFarmDetails(
-                  getTranslatedSiteInfo(farm.complexId, 'name') || farm.name,
-                  farm.turbineId,
-                  farm.type,
-                  farm.completionDate,
-                  getTranslatedSiteInfo(farm.complexId, 'address') || farm.address,
-                  farm.lat,
-                  farm.lon,
-                  farm.capacity,
-                  farm.manufacturer,
-                  farm.complexId,
-                  farm.operator
-                );
-              });
             }
     
-            // Add name overlay for each turbine if names are visible
             if (areNamesVisible) {
               const overlay = new kakao.maps.CustomOverlay({
                 position: position,
-                content: `<div class="info-window">${farm.name} (${farm.turbineId || 'No ID'})</div>`,
+                content: `<div class="info-window">${translations[lang].infoWindow.replace('{{name}}', complexName).replace('{{count}}', group.length)}</div>`,
                 xAnchor: 0.5,
                 yAnchor: 2,
                 zIndex: 10
@@ -1247,89 +1314,44 @@
               overlay.setMap(map);
               overlays.push(overlay);
             }
-          }
-        });
     
-        // Adjust map to show all turbines in the selected complex
-        if (filteredFarms.length > 0) {
-          map.setBounds(bounds, 50); // 50px padding for better visibility
-          // Ensure zoom level is reasonable (e.g., not too close)
-          const currentLevel = map.getLevel();
-          if (currentLevel > 6) {
-            map.setLevel(6); // Set a maximum zoom level to avoid over-zooming
-          }
+            if (areMarkersVisible && marker) {
+              kakao.maps.event.addListener(marker, 'click', () => {
+                selectedComplex = complexId;
+                selectedManufacturer = '';
+                selectedOperator = '';
+                selectedOperationPeriod = '';
+                areNamesVisible = true;
+                document.getElementById('manufacturer-dropdown').value = '';
+                document.getElementById('operator-dropdown').value = '';
+                document.getElementById('operation-period-dropdown').value = '';
+                document.getElementById('windfarm-dropdown').value = complexId;
+                document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
+                const allInfo = document.getElementById('all-info');
+                const manufacturerInfo = document.getElementById('manufacturer-info');
+                const complexInfo = document.getElementById('complex-info');
+                const operatorInfo = document.getElementById('operator-info');
+                const operationPeriodInfo = document.getElementById('operation-period-info');
+                allInfo.style.display = 'none';
+                manufacturerInfo.style.display = 'none';
+                operatorInfo.style.display = 'none';
+                operationPeriodInfo.style.display = 'none';
+                updateComplexInfo(group);
+                complexInfo.style.display = 'block';
+                // updateMarkers 호출 제거
+                map.setCenter(position);
+                map.setLevel(6); // 고정된 줌 레벨로 설정
+              });
+            }
+          });
         }
-      } else {
-        // Default behavior: show complex-level markers
-        const farmsByComplex = {};
-        filteredFarms.forEach(farm => {
-          if (!farmsByComplex[farm.complexId]) farmsByComplex[farm.complexId] = [];
-          farmsByComplex[farm.complexId].push(farm);
-        });
     
-        Object.keys(farmsByComplex).forEach(complexId => {
-          const group = farmsByComplex[complexId];
-          const avgLat = group.reduce((sum, farm) => sum + farm.lat, 0) / group.length;
-          const avgLon = group.reduce((sum, farm) => sum + farm.lon, 0) / group.length;
-          const position = new kakao.maps.LatLng(avgLat, avgLon);
-          const complexName = getTranslatedSiteInfo(complexId, 'name') || group[0].name;
-          let marker = null;
-    
-          if (areMarkersVisible) {
-            marker = new kakao.maps.Marker({
-              position: position,
-              title: `${complexName} (${group.length}${isEnglish ? ' turbines' : '개 터빈'})`,
-              clickable: true,
-              image: markerImage
-            });
-            marker.setMap(map);
-            markers.push(marker);
-          }
-    
-          if (areNamesVisible) {
-            const overlay = new kakao.maps.CustomOverlay({
-              position: position,
-              content: `<div class="info-window">${translations[lang].infoWindow.replace('{{name}}', complexName).replace('{{count}}', group.length)}</div>`,
-              xAnchor: 0.5,
-              yAnchor: 2,
-              zIndex: 10
-            });
-            overlay.setMap(map);
-            overlays.push(overlay);
-          }
-    
-          if (areMarkersVisible && marker) {
-            kakao.maps.event.addListener(marker, 'click', () => {
-              selectedComplex = complexId;
-              selectedManufacturer = '';
-              selectedOperator = '';
-              selectedOperationPeriod = '';
-              areNamesVisible = true; // Enable names when clicking a marker
-              document.getElementById('manufacturer-dropdown').value = '';
-              document.getElementById('operator-dropdown').value = '';
-              document.getElementById('operation-period-dropdown').value = '';
-              document.getElementById('windfarm-dropdown').value = complexId;
-              document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
-              const allInfo = document.getElementById('all-info');
-              const manufacturerInfo = document.getElementById('manufacturer-info');
-              const complexInfo = document.getElementById('complex-info');
-              const operatorInfo = document.getElementById('operator-info');
-              const operationPeriodInfo = document.getElementById('operation-period-info');
-              allInfo.style.display = 'none';
-              manufacturerInfo.style.display = 'none';
-              operatorInfo.style.display = 'none';
-              operationPeriodInfo.style.display = 'none';
-              updateComplexInfo(group);
-              complexInfo.style.display = 'block';
-              updateMarkers(); // Update markers to show individual turbines
-            });
-          }
-        });
-      }
-    
-      if (myLocationMarker) {
-        myLocationMarker.setMap(map);
-        markers.push(myLocationMarker);
+        if (myLocationMarker) {
+          myLocationMarker.setMap(map);
+          markers.push(myLocationMarker);
+        }
+      } finally {
+        isUpdatingMarkers = false;
       }
     }
 
