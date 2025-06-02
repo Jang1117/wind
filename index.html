@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html> 
+<html>
 <head>
   <title id="page-title">Korea Wind Power Plant Map by Seungho Jang</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" id="meta-description" content="한국 풍력 발전소의 위치, 제조사, 단지, 사업자, 운영기간 정보를 제공하는 대화형 지도입니다. 신재생에너지와 친환경 에너지 데이터를 확인하세요.">
+  <meta name="description" id="meta-description" content="한국 풍력 발전소의 위치, 제조사, 단지, 사업자, 운영기간 정보를 제공하는 대화형 지도입니다 Historical Map of Wind Farms in Korea. Providing information on location, manufacturer, complex, operator, and operating period.">
   <meta name="keywords" content="한국 풍력 발전소, 풍력단지 지도, 풍력 터빈, 제조사, 사업자, 운영기간, Wind Farm, Wind Power Plant, Korea Wind Farm, Korea Wind Power Plant">
   <meta name="robots" content="index, follow">
   <!-- Kakao Maps SDK -->
   <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=KAKAO_APP_KEY&libraries=clusterer&autoload=false" defer></script>
   <!-- PapaParse -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <!-- Google Fonts for Noto Sans KR -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
   <style>
     html, body {
       margin: 0;
@@ -73,32 +75,33 @@
       overflow: visible;
       z-index: 10001;
     }
-      #initial-reset,
-      #settings-button,
-      #reset-button {
-        width: 120px;
-        background: rgba(255, 255, 255, 0.95);
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        font-family: 'Noto Sans KR', Arial, sans-serif;
-        font-weight: 500;
-        text-align: center;
-        box-sizing: border-box;
-        height: 34px;
-        line-height: 34px; /* 수직 중앙 정렬 */
-        color: #000000; /* 검정 글자 */
-        padding: 0 10px;
-        overflow: visible;
-        z-index: 10001;
-      }
     /* 드롭다운에도 버튼 스타일 적용 */
-      select.control-button {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-      }
+    select.control-button {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+    /* 초기화면, 설정, 선택 초기화 버튼 스타일 명시적 통일 */
+    #initial-reset,
+    #settings-button,
+    #reset-button {
+      width: 120px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: 'Noto Sans KR', Arial, sans-serif;
+      font-weight: 500;
+      text-align: center;
+      box-sizing: border-box;
+      height: 34px;
+      line-height: 34px; /* 수직 중앙 정렬 */
+      color: #000000; /* 검정 글자 */
+      padding: 0 10px;
+      overflow: visible;
+      z-index: 10001;
+    }
     /* 설정 컨테이너 */
     #settings-container {
       display: none; /* 처음에는 숨김 */
@@ -114,10 +117,6 @@
     /* 설정 컨테이너 내부 버튼 스타일 */
     #settings-container .control-button {
       width: 100px; /* 내부 버튼은 100px로 축소 */
-    }
-    /* 설정 버튼 스타일 */
-    #settings-button {
-      width: 120px; /* 다른 컨트롤 버튼과 동일 */
     }
     /* 정보 패널 */
     #all-info, #manufacturer-info, #complex-info, #operator-info, #operating-period-info {
@@ -291,33 +290,17 @@
     let isEnglish = false;
     let translations = {
       "ko": {
-        "initialReset": "초기화면",
-        "reset": "선택 해제",
-        "settings": "설정",
-        // [Other translations unchanged]
-      },
-      "en": {
-        "initialReset": "Home",
-        "reset": "Select Reset",
-        "settings": "Settings",
-        // [Other translations unchanged]
-      }
-    };
-    let siteTranslations = [];
-    let manufacturerData = null;
-    const CURRENT_DATE = new Date('2025-06-01'); // Current date for operating period calculation
-
-    translations = {
-      "ko": {
         "title": "한국 풍력 발전소 지도 by 장승호",
         "loading": "지도 로딩 중...",
+        "initialReset": "처음으로",
+        "reset": "선택 해제",
+        "settings": "설정",
         "mapTypeToggle": "기본 지도",
         "mapTypeToggleSatellite": "위성 지도",
         "nameToggle": "이름 끄기",
         "nameToggleOn": "이름 켜기",
         "markerToggle": "마커 끄기",
         "markerToggleOn": "마커 켜기",
-        "reset": "선택 초기화",
         "translate": "English",
         "infoButton": "정보",
         "infoPopup": "제작자: 장승호<br>Email: 7911171g@gmail.com",
@@ -388,13 +371,15 @@
       "en": {
         "title": "South Korea Wind Farm Map by Seungho Jang",
         "loading": "Loading map...",
+        "initialReset": "Home",
+        "reset": "Select Reset",
+        "settings": "Settings",
         "mapTypeToggle": "Road Map",
         "mapTypeToggleSatellite": "Satellite Map",
         "nameToggle": "Hide Name",
         "nameToggleOn": "Show Name",
         "markerToggle": "Hide Marker",
         "markerToggleOn": "Show Marker",
-        "reset": "Select Reset",
         "translate": "한국어",
         "infoButton": "Info",
         "infoPopup": "Creator: Seungho Jang<br>Email: 7911171g@gmail.com",
@@ -463,6 +448,9 @@
         "myLocation": "My Location"
       }
     };
+    let siteTranslations = [];
+    let manufacturerData = null;
+    const CURRENT_DATE = new Date('2025-06-01'); // Current date for operating period calculation
 
     async function loadManufacturers() {
       try {
@@ -581,41 +569,53 @@
     function updateUILanguage() {
       console.log("updateUILanguage 실행, isEnglish:", isEnglish);
       const lang = isEnglish ? 'en' : 'ko';
+      
+      // 버튼 요소 가져오기
       const initialResetBtn = document.getElementById('initial-reset');
       const resetBtn = document.getElementById('reset-button');
       const settingsBtn = document.getElementById('settings-button');
+      
+      // 디버깅: 요소 존재 여부 및 텍스트 설정 확인
       if (initialResetBtn) {
-        initialResetBtn.textContent = translations[lang].initialReset || "초기화면";
+        initialResetBtn.textContent = translations[lang].initialReset || "처음으로";
+        console.log("initial-reset text set to:", initialResetBtn.textContent);
       } else {
         console.error("initial-reset 버튼을 찾을 수 없습니다.");
       }
+      
       if (resetBtn) {
         resetBtn.textContent = translations[lang].reset || "선택 해제";
+        console.log("reset-button text set to:", resetBtn.textContent);
       } else {
         console.error("reset-button 버튼을 찾을 수 없습니다.");
       }
+      
       if (settingsBtn) {
         settingsBtn.textContent = translations[lang].settings || "설정";
+        console.log("settings-button text set to:", settingsBtn.textContent);
       } else {
         console.error("settings-button 버튼을 찾을 수 없습니다.");
       }
-      document.getElementById('page-title').textContent = translations[lang].title;
-      document.getElementById('meta-description').content = translations[lang].title;
-      document.getElementById('loading').textContent = translations[lang].loading;
+      
+      // 페이지 제목 및 메타 데이터 업데이트
+      document.getElementById('page-title').textContent = translations[lang].title || "한국 풍력 발전소 지도 by 장승호";
+      document.getElementById('meta-description').content = translations[lang].title || "한국 풍력 발전소의 위치, 제조사, 단지, 사업자, 운영기간 정보를 제공하는 대화형 지도입니다.";
+      document.getElementById('loading').textContent = translations[lang].loading || "지도 로딩 중...";
+      
+      // 설정 컨테이너 버튼 업데이트
       document.getElementById('map-type-toggle').textContent = isSatellite ? translations[lang].mapTypeToggle : translations[lang].mapTypeToggleSatellite;
       document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
       document.getElementById('marker-toggle-button').textContent = areMarkersVisible ? translations[lang].markerToggle : translations[lang].markerToggleOn;
       document.getElementById('translate-button').textContent = translations[lang].translate;
       document.getElementById('info-button').textContent = translations[lang].infoButton;
-      document.getElementById('reset-button').textContent = translations[lang].reset;
-      document.getElementById('settings-button').textContent = translations[lang].settings;
-      document.getElementById('initial-reset').textContent = translations[lang].initialReset;
       
+      // 드롭다운 첫 번째 옵션 텍스트 업데이트
       document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
       document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
       document.getElementById('operator-dropdown').options[0].textContent = translations[lang].operatorDropdown;
       document.getElementById('operating-period-dropdown').options[0].textContent = translations[lang].operatingPeriodDropdown;
     
+      // 드롭다운 항목 업데이트
       const windfarmDropdown = document.getElementById('windfarm-dropdown');
       const selectedValue = windfarmDropdown.value;
       while (windfarmDropdown.options.length > 1) windfarmDropdown.remove(1);
@@ -640,6 +640,7 @@
       populateOperatingPeriodDropdown();
       operatingPeriodDropdown.value = selectedOperatingPeriodValue;
     
+      // 정보 패널 및 팝업 업데이트
       updateInfoPanels();
       updateMarkers();
       document.getElementById('info-popup-content').innerHTML = translations[lang].infoPopup;
@@ -747,10 +748,14 @@
 
     async function initializeApp() {
       console.log("앱 초기화 시작");
-      await loadTranslations();
-      await loadManufacturers();
-      await loadCSVData();
-      updateUILanguage();
+      try {
+        await Promise.all([loadTranslations(), loadManufacturers(), loadCSVData()]);
+        console.log("모든 데이터 로드 완료");
+        updateUILanguage(); // 모든 데이터 로드 후 UI 업데이트
+      } catch (error) {
+        console.error("앱 초기화 중 오류:", error);
+        showError("앱 초기화 실패: " + error.message);
+      }
       console.log("앱 초기화 완료");
     }
 
@@ -1204,7 +1209,7 @@
           }
         );
       } else {
-        console.error("Geolocation 지원 안 됨");
+        console.error("Ge FocalPoint(지점) 지원 안 됨");
         showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.geolocationUnsupported);
       }
     }
