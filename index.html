@@ -4,8 +4,8 @@
   <title id="page-title">Korea Wind Power Plant Map by Seungho Jang</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" id="meta-description" content="한국 풍력 발전소의 위치, 제조사, 단지 정보를 제공하는 대화형 지도입니다. 신재생에너지와 친환경 에너지 데이터를 확인하세요.">
-  <meta name="keywords" content="한국 풍력 발전소, 풍력단지 지도, 풍력 터빈, 제조사, 풍력, Wind Farm, Wind Power Plant, Korea Wind Farm, Korea Wind Power Plant">
+  <meta name="description" id="meta-description" content="한국 풍력 발전소의 위치, 제조사, 단지, 사업자 정보를 제공하는 대화형 지도입니다. 신재생에너지와 친환경 에너지 데이터를 확인하세요.">
+  <meta name="keywords" content="한국 풍력 발전소, 풍력단지 지도, 풍력 터빈, 제조사, 사업자, 풍력, Wind Farm, Wind Power Plant, Korea Wind Farm, Korea Wind Power Plant">
   <meta name="robots" content="index, follow">
   <!-- Kakao Maps SDK -->
   <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=KAKAO_APP_KEY&libraries=clusterer&autoload=false" defer></script>
@@ -94,7 +94,7 @@
       width: 120px; /* 다른 컨트롤 버튼과 동일 */
     }
     /* 정보 패널 */
-    #all-info, #manufacturer-info, #complex-info {
+    #all-info, #manufacturer-info, #complex-info, #operator-info {
       position: absolute;
       z-index: 10;
       background: rgba(255, 255, 255, 0.8);
@@ -107,14 +107,14 @@
       max-width: 90%;
     }
     @media screen and (min-width: 768px) {
-      #all-info, #manufacturer-info, #complex-info {
+      #all-info, #manufacturer-info, #complex-info, #operator-info {
         top: 10px;
         left: 50%;
         transform: translateX(-50%);
       }
     }
     @media screen and (max-width: 767px) {
-      #all-info, #manufacturer-info, #complex-info {
+      #all-info, #manufacturer-info, #complex-info, #operator-info {
         top: 10px;
         left: 10px;
         transform: none;
@@ -189,6 +189,9 @@
     <select id="manufacturer-dropdown" class="control-button">
       <option value="">제조사</option>
     </select>
+    <select id="operator-dropdown" class="control-button">
+      <option value="">사업자</option>
+    </select>
     <button id="settings-button" class="control-button">설정/Setting</button>
     <div id="settings-container" style="display: none;">
       <button id="map-type-toggle" class="control-button">기본 지도</button>
@@ -220,6 +223,12 @@
     <span id="info-complex-turbine-count"></span><br>
     <span id="info-complex-completion"></span>
   </div>
+  <div id="operator-info">
+    <span id="info-operator"></span><br>
+    <span id="info-operator-capacity"></span><br>
+    <span id="info-operator-complex-count"></span><br>
+    <span id="info-operator-turbine-count"></span>
+  </div>
   
   <!-- 정보 팝업 -->
   <div id="info-popup">
@@ -242,6 +251,7 @@
     let areMarkersVisible = true;
     let selectedManufacturer = '';
     let selectedComplex = '';
+    let selectedOperator = '';
     let isEnglish = false;
     let translations = {};
     let siteTranslations = [];
@@ -263,6 +273,7 @@
         "infoPopup": "제작자: 장승호<br>Email: 7911171g@gmail.com",
         "windfarmDropdown": "풍력단지",
         "manufacturerDropdown": "제조사",
+        "operatorDropdown": "사업자",
         "settings": "설정/Setting",
         "initialReset": "처음으로",
         "allInfo": {
@@ -284,6 +295,12 @@
           "manufacturers": "제조사: {{value}}",
           "turbineCount": "터빈 수: {{value}}",
           "completion": "준공일: {{value}}"
+        },
+        "operatorInfo": {
+          "operator": "사업자: {{value}}",
+          "totalCapacity": "총 용량: {{value}} kW",
+          "complexCount": "단지 수: {{value}}",
+          "turbineCount": "터빈 수: {{value}}"
         },
         "infoWindow": "{{name}} ({{count}}기)",
         "detailWindow": {
@@ -321,6 +338,7 @@
         "infoPopup": "Creator: Seungho Jang<br>Email: 7911171g@gmail.com",
         "windfarmDropdown": "Wind Farm",
         "manufacturerDropdown": "Manufacturer",
+        "operatorDropdown": "Operator",
         "settings": "설정/Setting",
         "initialReset": "Home",
         "allInfo": {
@@ -342,6 +360,12 @@
           "manufacturers": "Manufacturers: {{value}}",
           "turbineCount": "Turbines: {{value}}",
           "completion": "Completion: {{value}}"
+        },
+        "operatorInfo": {
+          "operator": "Operator: {{value}}",
+          "totalCapacity": "Total Capacity: {{value}} kW",
+          "complexCount": "Complexes: {{value}}",
+          "turbineCount": "Turbines: {{value}}"
         },
         "infoWindow": "{{name}} ({{count}} turbines)",
         "detailWindow": {
@@ -412,14 +436,18 @@
     function resetToInitial() {
       selectedComplex = '';
       selectedManufacturer = '';
+      selectedOperator = '';
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
+      document.getElementById('operator-dropdown').value = '';
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
+      const operatorInfo = document.getElementById('operator-info');
       allInfo.style.display = 'block';
       manufacturerInfo.style.display = 'none';
       complexInfo.style.display = 'none';
+      operatorInfo.style.display = 'none';
       map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
       map.setLevel(13);
       map.relayout();
@@ -430,14 +458,18 @@
     function resetSelectionsOnly() {
       selectedComplex = '';
       selectedManufacturer = '';
+      selectedOperator = '';
       document.getElementById('windfarm-dropdown').value = '';
       document.getElementById('manufacturer-dropdown').value = '';
+      document.getElementById('operator-dropdown').value = '';
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
+      const operatorInfo = document.getElementById('operator-info');
       allInfo.style.display = 'none';
       manufacturerInfo.style.display = 'none';
       complexInfo.style.display = 'none';
+      operatorInfo.style.display = 'none';
       updateInfoPanels();
       updateMarkers();
     }
@@ -445,6 +477,7 @@
     function updateUILanguage() {
       const lang = isEnglish ? 'en' : 'ko';
       document.getElementById('page-title').textContent = translations[lang].title;
+      document.getElementById('meta-description').content = translations[lang].title;
       document.getElementById('loading').textContent = translations[lang].loading;
       document.getElementById('map-type-toggle').textContent = isSatellite ? translations[lang].mapTypeToggle : translations[lang].mapTypeToggleSatellite;
       document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
@@ -456,6 +489,7 @@
       document.getElementById('initial-reset').textContent = translations[lang].initialReset;
       document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
       document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
+      document.getElementById('operator-dropdown').options[0].textContent = translations[lang].operatorDropdown;
     
       const windfarmDropdown = document.getElementById('windfarm-dropdown');
       const selectedValue = windfarmDropdown.value;
@@ -469,9 +503,14 @@
       populateManufacturerDropdown();
       manufacturerDropdown.value = selectedManufacturerValue;
     
+      const operatorDropdown = document.getElementById('operator-dropdown');
+      const selectedOperatorValue = operatorDropdown.value;
+      while (operatorDropdown.options.length > 1) operatorDropdown.remove(1);
+      populateOperatorDropdown();
+      operatorDropdown.value = selectedOperatorValue;
+    
       updateInfoPanels();
       updateMarkers();
-      // 정보 팝업 내용 업데이트
       document.getElementById('info-popup-content').innerHTML = translations[lang].infoPopup;
     }
 
@@ -490,18 +529,12 @@
       updateUILanguage();
     }
 
-    // 수정된 toggleInfoPopup 함수
     function toggleInfoPopup() {
       const infoPopup = document.getElementById('info-popup');
       const isCurrentlyVisible = infoPopup.style.display === 'block';
-      
-      // 팝업 표시/숨김 전환
       infoPopup.style.display = isCurrentlyVisible ? 'none' : 'block';
-      
-      // 팝업 콘텐츠 업데이트
       const lang = isEnglish ? 'en' : 'ko';
       document.getElementById('info-popup-content').innerHTML = translations[lang].infoPopup;
-      
       console.log("정보 팝업 표시 상태:", infoPopup.style.display);
     }
 
@@ -519,9 +552,9 @@
       try {
         console.log("windfarm_data.csv 요청 중: /wind/windfarm_data.csv");
         const response = await fetch(`/wind/windfarm_data.csv?t=${new Date().getTime()}`);
-            if (!response.ok) {
-              throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
-            }
+        if (!response.ok) {
+          throw new Error(`HTTP 오류! 상태: ${response.status} - ${response.statusText}`);
+        }
         const text = await response.text();
         console.log("CSV 데이터:", text.substring(0, 200) + "...");
         Papa.parse(text, {
@@ -543,7 +576,8 @@
                 lat: row['위도(lat)'] ? parseFloat(row['위도(lat)']) : null,
                 lon: row['경도(lon)'] ? parseFloat(row['경도(lon)']) : null,
                 capacity: row['용량(kW)'] ? parseFloat(row['용량(kW)']) : null,
-                manufacturer: row['제조사'] ? row['제조사'].trim() : null
+                manufacturer: row['제조사'] ? row['제조사'].trim() : null,
+                operator: row['사업자'] ? row['사업자'].trim() : null
               };
             }).filter(row => row !== null);
             console.log("파싱된 데이터:", allWindFarms);
@@ -564,6 +598,7 @@
             initMap();
             populateDropdown();
             populateManufacturerDropdown();
+            populateOperatorDropdown();
           },
           error: function(error) {
             console.error('CSV 파싱 실패:', error);
@@ -571,17 +606,17 @@
           }
         });
       } catch (error) {
-          console.error('CSV 로드 실패:', error);
-          showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvLoad.replace('{{message}}', error.message));
-        }
+        console.error('CSV 로드 실패:', error);
+        showError(translations[isEnglish ? 'en' : 'ko'].errorMessage.csvLoad.replace('{{message}}', error.message));
       }
+    }
 
     async function initializeApp() {
       console.log("앱 초기화 시작");
       await loadTranslations();
       await loadManufacturers();
       await loadCSVData();
-      updateUILanguage(); // 추가: 초기 언어 설정 및 UI 초기화
+      updateUILanguage();
       console.log("앱 초기화 완료");
     }
 
@@ -616,8 +651,6 @@
       document.getElementById('name-toggle-button').addEventListener('click', toggleNamesVisibility);
       document.getElementById('marker-toggle-button').addEventListener('click', toggleMarkersVisibility);
       document.getElementById('translate-button').addEventListener('click', toggleLanguage);
-      
-      // 수정된 info-button 이벤트 리스너 등록
       const infoButton = document.getElementById('info-button');
       if (infoButton) {
         infoButton.addEventListener('click', toggleInfoPopup);
@@ -625,7 +658,6 @@
       } else {
         console.error("info-button 요소를 찾을 수 없습니다");
       }
-      
       document.getElementById('settings-button').addEventListener('click', () => {
         const settingsContainer = document.getElementById('settings-container');
         settingsContainer.style.display = settingsContainer.style.display === 'none' ? 'flex' : 'none';
@@ -633,7 +665,7 @@
       });
       document.getElementById('windfarm-dropdown').addEventListener('change', handleDropdownChange);
       document.getElementById('manufacturer-dropdown').addEventListener('change', handleManufacturerChange);
-      // 팝업 외부 클릭 시 닫기
+      document.getElementById('operator-dropdown').addEventListener('change', handleOperatorChange);
       document.getElementById('info-popup').addEventListener('click', (e) => {
         if (e.target === document.getElementById('info-popup')) {
           toggleInfoPopup();
@@ -704,15 +736,32 @@
       }
     }
 
+    function populateOperatorDropdown() {
+      const dropdown = document.getElementById('operator-dropdown');
+      while (dropdown.options.length > 1) dropdown.remove(1);
+      const uniqueOperators = [...new Set(allWindFarms.map(farm => farm.operator))].filter(op => op);
+      uniqueOperators.sort((a, b) => a.localeCompare(b, isEnglish ? 'en' : 'ko'));
+      uniqueOperators.forEach(operator => {
+        const option = document.createElement('option');
+        option.value = operator;
+        option.textContent = operator;
+        dropdown.appendChild(option);
+      });
+    }
+
     function handleDropdownChange(event) {
       selectedComplex = event.target.value;
       selectedManufacturer = '';
+      selectedOperator = '';
       document.getElementById('manufacturer-dropdown').value = '';
+      document.getElementById('operator-dropdown').value = '';
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
+      const operatorInfo = document.getElementById('operator-info');
       allInfo.style.display = 'none';
       manufacturerInfo.style.display = 'none';
+      operatorInfo.style.display = 'none';
       if (selectedComplex) {
         const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
         const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
@@ -734,12 +783,16 @@
     function handleManufacturerChange(event) {
       selectedManufacturer = event.target.value;
       selectedComplex = '';
+      selectedOperator = '';
       document.getElementById('windfarm-dropdown').value = '';
+      document.getElementById('operator-dropdown').value = '';
       const allInfo = document.getElementById('all-info');
       const manufacturerInfo = document.getElementById('manufacturer-info');
       const complexInfo = document.getElementById('complex-info');
+      const operatorInfo = document.getElementById('operator-info');
       allInfo.style.display = 'none';
       complexInfo.style.display = 'none';
+      operatorInfo.style.display = 'none';
       let filteredFarms = allWindFarms;
       if (selectedManufacturer) {
         filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
@@ -754,6 +807,55 @@
         manufacturerInfo.style.display = 'block';
       } else {
         manufacturerInfo.style.display = 'none';
+        allInfo.style.display = 'block';
+        updateInfoPanels();
+      }
+      if (filteredFarms.length === 0) {
+        map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
+        map.setLevel(13);
+      } else if (filteredFarms.length === 1) {
+        const farm = filteredFarms[0];
+        map.setCenter(new kakao.maps.LatLng(farm.lat, farm.lon));
+        map.setLevel(6);
+      } else {
+        const bounds = new kakao.maps.LatLngBounds();
+        filteredFarms.forEach(farm => {
+          if (farm.lat && farm.lon) {
+            bounds.extend(new kakao.maps.LatLng(farm.lat, farm.lon));
+          }
+        });
+        map.setBounds(bounds);
+      }
+      updateMarkers();
+    }
+
+    function handleOperatorChange(event) {
+      selectedOperator = event.target.value;
+      selectedComplex = '';
+      selectedManufacturer = '';
+      document.getElementById('windfarm-dropdown').value = '';
+      document.getElementById('manufacturer-dropdown').value = '';
+      const allInfo = document.getElementById('all-info');
+      const manufacturerInfo = document.getElementById('manufacturer-info');
+      const complexInfo = document.getElementById('complex-info');
+      const operatorInfo = document.getElementById('operator-info');
+      allInfo.style.display = 'none';
+      manufacturerInfo.style.display = 'none';
+      complexInfo.style.display = 'none';
+      let filteredFarms = allWindFarms;
+      if (selectedOperator) {
+        filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
+        const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
+        const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
+        const turbineCount = filteredFarms.length;
+        const lang = isEnglish ? 'en' : 'ko';
+        document.getElementById('info-operator').innerHTML = translations[lang].operatorInfo.operator.replace('{{value}}', selectedOperator);
+        document.getElementById('info-operator-capacity').innerHTML = translations[lang].operatorInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
+        document.getElementById('info-operator-complex-count').innerHTML = translations[lang].operatorInfo.complexCount.replace('{{value}}', complexCount);
+        document.getElementById('info-operator-turbine-count').innerHTML = translations[lang].operatorInfo.turbineCount.replace('{{value}}', turbineCount);
+        operatorInfo.style.display = 'block';
+      } else {
+        operatorInfo.style.display = 'none';
         allInfo.style.display = 'block';
         updateInfoPanels();
       }
@@ -836,6 +938,16 @@
         const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
         updateComplexInfo(farmsInComplex);
       }
+      if (selectedOperator && document.getElementById('operator-info').style.display === 'block') {
+        const filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
+        const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
+        const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
+        const turbineCount = filteredFarms.length;
+        document.getElementById('info-operator').innerHTML = translations[lang].operatorInfo.operator.replace('{{value}}', selectedOperator);
+        document.getElementById('info-operator-capacity').innerHTML = translations[lang].operatorInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
+        document.getElementById('info-operator-complex-count').innerHTML = translations[lang].operatorInfo.complexCount.replace('{{value}}', complexCount);
+        document.getElementById('info-operator-turbine-count').innerHTML = translations[lang].operatorInfo.turbineCount.replace('{{value}}', turbineCount);
+      }
     }
 
     function startTrackingLocation() {
@@ -904,6 +1016,8 @@
         filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
       } else if (selectedComplex) {
         filteredFarms = allWindFarms.filter(farm => farm.complexId === selectedComplex);
+      } else if (selectedOperator) {
+        filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
       }
       console.log("필터링된 터빈 수:", filteredFarms.length);
       const lang = isEnglish ? 'en' : 'ko';
@@ -945,13 +1059,17 @@
             kakao.maps.event.addListener(marker, 'click', () => {
               selectedComplex = complexId;
               selectedManufacturer = '';
+              selectedOperator = '';
               document.getElementById('manufacturer-dropdown').value = '';
+              document.getElementById('operator-dropdown').value = '';
               document.getElementById('windfarm-dropdown').value = complexId;
               const allInfo = document.getElementById('all-info');
               const manufacturerInfo = document.getElementById('manufacturer-info');
               const complexInfo = document.getElementById('complex-info');
+              const operatorInfo = document.getElementById('operator-info');
               allInfo.style.display = 'none';
               manufacturerInfo.style.display = 'none';
+              operatorInfo.style.display = 'none';
               updateComplexInfo(group);
               complexInfo.style.display = 'block';
               map.setCenter(position);
