@@ -642,11 +642,11 @@ function handleCapacityChange(event) {
   }
   if (filteredFarms.length === 0) {
     map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
-    map.setLevel(13);
+    map.setLevel(10);
   } else if (filteredFarms.length === 1) {
     const farm = filteredFarms[0];
     map.setCenter(new kakao.maps.LatLng(farm.lat, farm.lon));
-    map.setLevel(6);
+    map.setLevel(10);
   } else {
     const bounds = new kakao.maps.LatLngBounds();
     filteredFarms.forEach(farm => {
@@ -655,6 +655,7 @@ function handleCapacityChange(event) {
       }
     });
     map.setBounds(bounds);
+    map.setLevel(10); // 단지 마커가 보이도록 줌 레벨 고정
   }
   updateMarkers();
 }
@@ -685,7 +686,7 @@ function resetToInitial() {
   operatingPeriodInfo.style.display = 'none';
   capacityInfo.style.display = 'none';
   map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
-  map.setLevel(13);
+  map.setLevel(10); // 단지 마커가 보이도록 줌 레벨 설정
   map.relayout();
   updateMarkers();
   updateInfoPanels();
@@ -699,7 +700,6 @@ function resetSelectionsOnly() {
   selectedCapacity = '';
   document.getElementById('windfarm-dropdown').value = '';
   document.getElementById('manufacturer-dropdown').value = '';
-  document.getElementById('operator-dropdown').value = '';
   document.getElementById('operating-period-dropdown').value = '';
   document.getElementById('capacity-dropdown').value = '';
   areNamesVisible = false;
@@ -710,12 +710,13 @@ function resetSelectionsOnly() {
   const operatorInfo = document.getElementById('operator-info');
   const operatingPeriodInfo = document.getElementById('operating-period-info');
   const capacityInfo = document.getElementById('capacity-info');
-  allInfo.style.display = 'none';
+  allInfo.style.display = 'block';
   manufacturerInfo.style.display = 'none';
   complexInfo.style.display = 'none';
   operatorInfo.style.display = 'none';
   operatingPeriodInfo.style.display = 'none';
   capacityInfo.style.display = 'none';
+  map.setLevel(10); // 단지 마커가 보이도록 줌 레벨 설정
   updateInfoPanels();
   updateMarkers();
 }
@@ -1089,20 +1090,24 @@ function handleDropdownChange(event) {
   selectedManufacturer = '';
   selectedOperator = '';
   selectedOperatingPeriod = '';
+  selectedCapacity = '';
   document.getElementById('manufacturer-dropdown').value = '';
   document.getElementById('operator-dropdown').value = '';
   document.getElementById('operating-period-dropdown').value = '';
+  document.getElementById('capacity-dropdown').value = '';
   const allInfo = document.getElementById('all-info');
   const manufacturerInfo = document.getElementById('manufacturer-info');
   const complexInfo = document.getElementById('complex-info');
   const operatorInfo = document.getElementById('operator-info');
   const operatingPeriodInfo = document.getElementById('operating-period-info');
+  const capacityInfo = document.getElementById('capacity-info');
   allInfo.style.display = 'none';
   manufacturerInfo.style.display = 'none';
   operatorInfo.style.display = 'none';
   operatingPeriodInfo.style.display = 'none';
-  areNamesVisible = true; // 드롭다운 선택 시 이름 표시 강제
-  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 버튼 텍스트 업데이트
+  capacityInfo.style.display = 'none';
+  areNamesVisible = true;
+  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
   if (selectedComplex) {
     const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
     const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
@@ -1110,13 +1115,13 @@ function handleDropdownChange(event) {
     updateComplexInfo(farmsInComplex);
     complexInfo.style.display = 'block';
     map.setCenter(new kakao.maps.LatLng(avgLat, avgLon));
-    map.setLevel(6);
+    map.setLevel(10); // 줌 레벨을 10으로 설정하여 단지 마커 표시
   } else {
     complexInfo.style.display = 'none';
     allInfo.style.display = 'block';
     updateInfoPanels();
     map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
-    map.setLevel(13);
+    map.setLevel(10); // 기본 상태에서도 단지 마커가 보이도록
   }
   updateMarkers();
 }
@@ -1126,20 +1131,24 @@ function handleManufacturerChange(event) {
   selectedComplex = '';
   selectedOperator = '';
   selectedOperatingPeriod = '';
+  selectedCapacity = '';
   document.getElementById('windfarm-dropdown').value = '';
   document.getElementById('operator-dropdown').value = '';
   document.getElementById('operating-period-dropdown').value = '';
+  document.getElementById('capacity-dropdown').value = '';
   const allInfo = document.getElementById('all-info');
   const manufacturerInfo = document.getElementById('manufacturer-info');
   const complexInfo = document.getElementById('complex-info');
   const operatorInfo = document.getElementById('operator-info');
   const operatingPeriodInfo = document.getElementById('operating-period-info');
+  const capacityInfo = document.getElementById('capacity-info');
   allInfo.style.display = 'none';
   complexInfo.style.display = 'none';
   operatorInfo.style.display = 'none';
   operatingPeriodInfo.style.display = 'none';
-  areNamesVisible = true; // 드롭다운 선택 시 이름 표시 강제
-  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 버튼 텍스트 업데이트
+  capacityInfo.style.display = 'none';
+  areNamesVisible = true;
+  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
   let filteredFarms = allWindFarms;
   if (selectedManufacturer) {
     filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
@@ -1159,11 +1168,11 @@ function handleManufacturerChange(event) {
   }
   if (filteredFarms.length === 0) {
     map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
-    map.setLevel(13);
+    map.setLevel(10);
   } else if (filteredFarms.length === 1) {
     const farm = filteredFarms[0];
     map.setCenter(new kakao.maps.LatLng(farm.lat, farm.lon));
-    map.setLevel(6);
+    map.setLevel(10);
   } else {
     const bounds = new kakao.maps.LatLngBounds();
     filteredFarms.forEach(farm => {
@@ -1172,6 +1181,7 @@ function handleManufacturerChange(event) {
       }
     });
     map.setBounds(bounds);
+    map.setLevel(10); // 단지 마커가 보이도록 줌 레벨 고정
   }
   updateMarkers();
 }
@@ -1223,11 +1233,11 @@ function handleOperatorChange(event) {
   }
   if (filteredFarms.length === 0) {
     map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
-    map.setLevel(13);
+    map.setLevel(10);
   } else if (filteredFarms.length === 1) {
     const farm = filteredFarms[0];
     map.setCenter(new kakao.maps.LatLng(farm.lat, farm.lon));
-    map.setLevel(6);
+    map.setLevel(10);
   } else {
     const bounds = new kakao.maps.LatLngBounds();
     filteredFarms.forEach(farm => {
@@ -1236,6 +1246,7 @@ function handleOperatorChange(event) {
       }
     });
     map.setBounds(bounds);
+    map.setLevel(10); // 단지 마커가 보이도록 줌 레벨 고정
   }
   updateMarkers();
 }
@@ -1245,20 +1256,24 @@ function handleOperatingPeriodChange(event) {
   selectedComplex = '';
   selectedManufacturer = '';
   selectedOperator = '';
+  selectedCapacity = '';
   document.getElementById('windfarm-dropdown').value = '';
   document.getElementById('manufacturer-dropdown').value = '';
   document.getElementById('operator-dropdown').value = '';
+  document.getElementById('capacity-dropdown').value = '';
   const allInfo = document.getElementById('all-info');
   const manufacturerInfo = document.getElementById('manufacturer-info');
   const complexInfo = document.getElementById('complex-info');
   const operatorInfo = document.getElementById('operator-info');
   const operatingPeriodInfo = document.getElementById('operating-period-info');
+  const capacityInfo = document.getElementById('capacity-info');
   allInfo.style.display = 'none';
   manufacturerInfo.style.display = 'none';
   complexInfo.style.display = 'none';
   operatorInfo.style.display = 'none';
-  areNamesVisible = true; // 드롭다운 선택 시 이름 표시 강제
-  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 버튼 텍스트 업데이트
+  capacityInfo.style.display = 'none';
+  areNamesVisible = true;
+  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
   let filteredFarms = allWindFarms;
   if (selectedOperatingPeriod) {
     filteredFarms = allWindFarms.filter(farm => {
@@ -1281,11 +1296,11 @@ function handleOperatingPeriodChange(event) {
   }
   if (filteredFarms.length === 0) {
     map.setCenter(new kakao.maps.LatLng(35.68466926, 127.724382));
-    map.setLevel(13);
+    map.setLevel(10);
   } else if (filteredFarms.length === 1) {
     const farm = filteredFarms[0];
     map.setCenter(new kakao.maps.LatLng(farm.lat, farm.lon));
-    map.setLevel(6);
+    map.setLevel(10);
   } else {
     const bounds = new kakao.maps.LatLngBounds();
     filteredFarms.forEach(farm => {
@@ -1294,6 +1309,7 @@ function handleOperatingPeriodChange(event) {
       }
     });
     map.setBounds(bounds);
+    map.setLevel(10); // 단지 마커가 보이도록 줌 레벨 고정
   }
   updateMarkers();
 }
