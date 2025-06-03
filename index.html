@@ -598,7 +598,12 @@
           });
         }
 function handleCapacityChange(event) {
-  selectedCapacity = event.target.value;
+  const value = event.target.value;
+  if (value === '') {
+    resetToInitial();
+    return;
+  }
+  selectedCapacity = value;
   selectedComplex = '';
   selectedManufacturer = '';
   selectedOperator = '';
@@ -607,8 +612,6 @@ function handleCapacityChange(event) {
   document.getElementById('manufacturer-dropdown').value = '';
   document.getElementById('operator-dropdown').value = '';
   document.getElementById('operating-period-dropdown').value = '';
-  areNamesVisible = true;
-  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
   const allInfo = document.getElementById('all-info');
   const manufacturerInfo = document.getElementById('manufacturer-info');
   const complexInfo = document.getElementById('complex-info');
@@ -620,6 +623,8 @@ function handleCapacityChange(event) {
   complexInfo.style.display = 'none';
   operatorInfo.style.display = 'none';
   operatingPeriodInfo.style.display = 'none';
+  areNamesVisible = true;
+  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
   let filteredFarms = allWindFarms;
   if (selectedCapacity) {
     filteredFarms = allWindFarms.filter(farm => {
@@ -1085,24 +1090,33 @@ function resetSelectionsOnly() {
     }
 
 function handleDropdownChange(event) {
-  selectedComplex = event.target.value;
+  const value = event.target.value;
+  if (value === '') {
+    resetToInitial();
+    return;
+  }
+  selectedComplex = value;
   selectedManufacturer = '';
   selectedOperator = '';
   selectedOperatingPeriod = '';
+  selectedCapacity = '';
   document.getElementById('manufacturer-dropdown').value = '';
   document.getElementById('operator-dropdown').value = '';
   document.getElementById('operating-period-dropdown').value = '';
+  document.getElementById('capacity-dropdown').value = '';
   const allInfo = document.getElementById('all-info');
   const manufacturerInfo = document.getElementById('manufacturer-info');
   const complexInfo = document.getElementById('complex-info');
   const operatorInfo = document.getElementById('operator-info');
   const operatingPeriodInfo = document.getElementById('operating-period-info');
+  const capacityInfo = document.getElementById('capacity-info');
   allInfo.style.display = 'none';
   manufacturerInfo.style.display = 'none';
   operatorInfo.style.display = 'none';
   operatingPeriodInfo.style.display = 'none';
-  areNamesVisible = true; // 드롭다운 선택 시 이름 표시 강제
-  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 버튼 텍스트 업데이트
+  capacityInfo.style.display = 'none';
+  areNamesVisible = true;
+  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
   if (selectedComplex) {
     const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
     const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
@@ -1122,24 +1136,33 @@ function handleDropdownChange(event) {
 }
 
 function handleManufacturerChange(event) {
-  selectedManufacturer = event.target.value;
+  const value = event.target.value;
+  if (value === '') {
+    resetToInitial();
+    return;
+  }
+  selectedManufacturer = value;
   selectedComplex = '';
   selectedOperator = '';
   selectedOperatingPeriod = '';
+  selectedCapacity = '';
   document.getElementById('windfarm-dropdown').value = '';
   document.getElementById('operator-dropdown').value = '';
   document.getElementById('operating-period-dropdown').value = '';
+  document.getElementById('capacity-dropdown').value = '';
   const allInfo = document.getElementById('all-info');
   const manufacturerInfo = document.getElementById('manufacturer-info');
   const complexInfo = document.getElementById('complex-info');
   const operatorInfo = document.getElementById('operator-info');
   const operatingPeriodInfo = document.getElementById('operating-period-info');
+  const capacityInfo = document.getElementById('capacity-info');
   allInfo.style.display = 'none';
   complexInfo.style.display = 'none';
   operatorInfo.style.display = 'none';
   operatingPeriodInfo.style.display = 'none';
-  areNamesVisible = true; // 드롭다운 선택 시 이름 표시 강제
-  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 버튼 텍스트 업데이트
+  capacityInfo.style.display = 'none';
+  areNamesVisible = true;
+  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
   let filteredFarms = allWindFarms;
   if (selectedManufacturer) {
     filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
@@ -1177,7 +1200,12 @@ function handleManufacturerChange(event) {
 }
 
 function handleOperatorChange(event) {
-  selectedOperator = event.target.value;
+  const value = event.target.value;
+  if (value === '') {
+    resetToInitial();
+    return;
+  }
+  selectedOperator = value;
   selectedComplex = '';
   selectedManufacturer = '';
   selectedOperatingPeriod = '';
@@ -1241,24 +1269,33 @@ function handleOperatorChange(event) {
 }
 
 function handleOperatingPeriodChange(event) {
-  selectedOperatingPeriod = event.target.value;
+  const value = event.target.value;
+  if (value === '') {
+    resetToInitial();
+    return;
+  }
+  selectedOperatingPeriod = value;
   selectedComplex = '';
   selectedManufacturer = '';
   selectedOperator = '';
+  selectedCapacity = '';
   document.getElementById('windfarm-dropdown').value = '';
   document.getElementById('manufacturer-dropdown').value = '';
   document.getElementById('operator-dropdown').value = '';
+  document.getElementById('capacity-dropdown').value = '';
   const allInfo = document.getElementById('all-info');
   const manufacturerInfo = document.getElementById('manufacturer-info');
   const complexInfo = document.getElementById('complex-info');
   const operatorInfo = document.getElementById('operator-info');
   const operatingPeriodInfo = document.getElementById('operating-period-info');
+  const capacityInfo = document.getElementById('capacity-info');
   allInfo.style.display = 'none';
   manufacturerInfo.style.display = 'none';
   complexInfo.style.display = 'none';
   operatorInfo.style.display = 'none';
-  areNamesVisible = true; // 드롭다운 선택 시 이름 표시 강제
-  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle; // 버튼 텍스트 업데이트
+  capacityInfo.style.display = 'none';
+  areNamesVisible = true;
+  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
   let filteredFarms = allWindFarms;
   if (selectedOperatingPeriod) {
     filteredFarms = allWindFarms.filter(farm => {
