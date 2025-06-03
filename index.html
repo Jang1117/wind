@@ -725,92 +725,77 @@ function resetSelectionsOnly() {
   updateMarkers();
 }
 
-    function updateUILanguage() {
-      console.log("updateUILanguage 실행, isEnglish:", isEnglish);
-      const lang = isEnglish ? 'en' : 'ko';
-      
-      // 버튼 요소 가져오기
-      const initialResetBtn = document.getElementById('initial-reset');
-      const resetBtn = document.getElementById('reset-button');
-      const settingsBtn = document.getElementById('settings-button');
-      
-      // 디버깅: 요소 존재 여부 및 텍스트 설정 확인
-      if (initialResetBtn) {
-        initialResetBtn.textContent = translations[lang].initialReset || "처음으로";
-        console.log("initial-reset text set to:", initialResetBtn.textContent);
-      } else {
-        console.error("initial-reset 버튼을 찾을 수 없습니다.");
-      }
-      
-      if (resetBtn) {
-        resetBtn.textContent = translations[lang].reset || "선택 해제";
-        console.log("reset-button text set to:", resetBtn.textContent);
-      } else {
-        console.error("reset-button 버튼을 찾을 수 없습니다.");
-      }
-      
-      if (settingsBtn) {
-        settingsBtn.textContent = translations[lang].settings || "설정";
-        console.log("settings-button text set to:", settingsBtn.textContent);
-      } else {
-        console.error("settings-button 버튼을 찾을 수 없습니다.");
-      }
-      
-      // 페이지 제목 및 메타 데이터 업데이트
-      document.getElementById('page-title').textContent = translations[lang].title || "한국 풍력 발전소 지도 by 장승호";
-      document.getElementById('meta-description').content = translations[lang].title || "한국 풍력 발전소의 위치, 제조사, 단지, 사업자, 운영기간 정보를 제공하는 대화형 지도입니다.";
-      document.getElementById('loading').textContent = translations[lang].loading || "지도 로딩 중...";
-      
-      // 설정 컨테이너 버튼 업데이트
-      document.getElementById('map-type-toggle').textContent = isSatellite ? translations[lang].mapTypeToggle : translations[lang].mapTypeToggleSatellite;
-      document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
-      document.getElementById('marker-toggle-button').textContent = areMarkersVisible ? translations[lang].markerToggle : translations[lang].markerToggleOn;
-      document.getElementById('translate-button').textContent = translations[lang].translate;
-      document.getElementById('info-button').textContent = translations[lang].infoButton;
-      
-      // 드롭다운 첫 번째 옵션 텍스트 업데이트
-      document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
-      document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
-      document.getElementById('operator-dropdown').options[0].textContent = translations[lang].operatorDropdown;
-      document.getElementById('operating-period-dropdown').options[0].textContent = translations[lang].operatingPeriodDropdown;
-      document.getElementById('capacity-dropdown').options[0].textContent = translations[lang].capacityDropdown;
-  
-      // 드롭다운 항목 업데이트
-      const windfarmDropdown = document.getElementById('windfarm-dropdown');
-      const selectedValue = windfarmDropdown.value;
-      while (windfarmDropdown.options.length > 1) windfarmDropdown.remove(1);
-      populateDropdown();
-      windfarmDropdown.value = selectedValue;
-    
-      const manufacturerDropdown = document.getElementById('manufacturer-dropdown');
-      const selectedManufacturerValue = manufacturerDropdown.value;
-      while (manufacturerDropdown.options.length > 1) manufacturerDropdown.remove(1);
-      populateManufacturerDropdown();
-      manufacturerDropdown.value = selectedManufacturerValue;
-    
-      const operatorDropdown = document.getElementById('operator-dropdown');
-      const selectedOperatorValue = operatorDropdown.value;
-      while (operatorDropdown.options.length > 1) operatorDropdown.remove(1);
-      populateOperatorDropdown();
-      operatorDropdown.value = selectedOperatorValue;
-    
-      const operatingPeriodDropdown = document.getElementById('operating-period-dropdown');
-      const selectedOperatingPeriodValue = operatingPeriodDropdown.value;
-      while (operatingPeriodDropdown.options.length > 1) operatingPeriodDropdown.remove(1);
-      populateOperatingPeriodDropdown();
-      operatingPeriodDropdown.value = selectedOperatingPeriodValue;
+function updateUILanguage() {
+  console.log("updateUILanguage 실행, isEnglish:", isEnglish);
+  const lang = isEnglish ? 'en' : 'ko';
+  const initialResetBtn = document.getElementById('initial-reset');
+  const resetBtn = document.getElementById('reset-button');
+  const settingsBtn = document.getElementById('settings-button');
+  if (initialResetBtn) initialResetBtn.textContent = translations[lang].initialReset || "처음으로";
+  if (resetBtn) resetBtn.textContent = translations[lang].reset || "선택 해제";
+  if (settingsBtn) settingsBtn.textContent = translations[lang].settings || "설정";
+  document.getElementById('page-title').textContent = translations[lang].title || "한국 풍력 발전소 지도 by 장승호";
+  document.getElementById('meta-description').content = translations[lang].title || "한국 풍력 발전소의 위치, 제조사, 단지, 사업자, 운영기간 정보를 제공하는 대화형 지도입니다.";
+  document.getElementById('loading').textContent = translations[lang].loading || "지도 로딩 중...";
+  document.getElementById('map-type-toggle').textContent = isSatellite ? translations[lang].mapTypeToggle : translations[lang].mapTypeToggleSatellite;
+  document.getElementById('name-toggle-button').textContent = areNamesVisible ? translations[lang].nameToggle : translations[lang].nameToggleOn;
+  document.getElementById('marker-toggle-button').textContent = areMarkersVisible ? translations[lang].markerToggle : translations[lang].markerToggleOn;
+  document.getElementById('translate-button').textContent = translations[lang].translate;
+  document.getElementById('info-button').textContent = translations[lang].infoButton;
+  document.getElementById('windfarm-dropdown').options[0].textContent = translations[lang].windfarmDropdown;
+  document.getElementById('manufacturer-dropdown').options[0].textContent = translations[lang].manufacturerDropdown;
+  document.getElementById('operator-dropdown').options[0].textContent = translations[lang].operatorDropdown;
+  document.getElementById('operating-period-dropdown').options[0].textContent = translations[lang].operatingPeriodDropdown;
+  document.getElementById('capacity-dropdown').options[0].textContent = translations[lang].capacityDropdown;
 
-      const capacityDropdown = document.getElementById('capacity-dropdown');
-      const selectedCapacityValue = capacityDropdown.value;
-      while (capacityDropdown.options.length > 1) capacityDropdown.remove(1);
-      populateCapacityDropdown();
-      capacityDropdown.value = selectedCapacityValue;
-          
-      // 정보 패널 및 팝업 업데이트
-      updateInfoPanels();
-      updateMarkers();
-      document.getElementById('info-popup-content').innerHTML = translations[lang].infoPopup;
+  // 드롭다운 재구성 및 선택 값 동기화
+  const windfarmDropdown = document.getElementById('windfarm-dropdown');
+  const selectedComplexId = windfarmDropdown.value;
+  while (windfarmDropdown.options.length > 1) windfarmDropdown.remove(1);
+  populateDropdown();
+  windfarmDropdown.value = selectedComplexId;
+
+  const manufacturerDropdown = document.getElementById('manufacturer-dropdown');
+  const selectedManufacturerValue = manufacturerDropdown.value;
+  while (manufacturerDropdown.options.length > 1) manufacturerDropdown.remove(1);
+  populateManufacturerDropdown();
+  manufacturerDropdown.value = selectedManufacturerValue;
+
+  const operatorDropdown = document.getElementById('operator-dropdown');
+  let selectedOperatorValue = selectedOperator; // 현재 선택된 사업자 값
+  while (operatorDropdown.options.length > 1) operatorDropdown.remove(1);
+  populateOperatorDropdown();
+  // 영어로 전환 시 사업자 이름 매핑
+  if (selectedOperatorValue && operatorData && operatorData.operators) {
+    const operatorInfo = operatorData.operators.find(op => isEnglish ? op.operator_en === selectedOperatorValue || op.operator === selectedOperatorValue : op.operator === selectedOperatorValue);
+    if (operatorInfo) {
+      selectedOperator = operatorInfo.operator; // 내부적으로 한국어 이름으로 유지
+      operatorDropdown.value = operatorInfo.operator;
+    } else {
+      operatorDropdown.value = '';
+      selectedOperator = '';
     }
+  } else {
+    operatorDropdown.value = '';
+    selectedOperator = '';
+  }
+
+  const operatingPeriodDropdown = document.getElementById('operating-period-dropdown');
+  const selectedOperatingPeriodValue = operatingPeriodDropdown.value;
+  while (operatingPeriodDropdown.options.length > 1) operatingPeriodDropdown.remove(1);
+  populateOperatingPeriodDropdown();
+  operatingPeriodDropdown.value = selectedOperatingPeriodValue;
+
+  const capacityDropdown = document.getElementById('capacity-dropdown');
+  const selectedCapacityValue = capacityDropdown.value;
+  while (capacityDropdown.options.length > 1) capacityDropdown.remove(1);
+  populateCapacityDropdown();
+  capacityDropdown.value = selectedCapacityValue;
+
+  updateInfoPanels();
+  updateMarkers();
+  document.getElementById('info-popup-content').innerHTML = translations[lang].infoPopup;
+}
 
     function showError(message) {
       const errorDiv = document.getElementById('error-message');
@@ -1205,7 +1190,7 @@ function handleOperatorChange(event) {
     resetToInitial();
     return;
   }
-  selectedOperator = value;
+  selectedOperator = value; // 한국어 사업자 이름으로 저장
   selectedComplex = '';
   selectedManufacturer = '';
   selectedOperatingPeriod = '';
@@ -1240,7 +1225,7 @@ function handleOperatorChange(event) {
       displayOperator = operatorInfo ? operatorInfo.operator_en : selectedOperator;
     }
     document.getElementById('info-operator').innerHTML = translations[lang].operatorInfo.operator.replace('{{value}}', displayOperator);
-    document.getElementById('info-operator-capacity').innerHTML = translations[lang].operatorInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
+    document.getElementById('info-operator-capacity').innerHTML = translations[lang].operatorInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity) || translations[lang].noInfo);
     document.getElementById('info-operator-complex-count').innerHTML = translations[lang].operatorInfo.complexCount.replace('{{value}}', complexCount);
     document.getElementById('info-operator-turbine-count').innerHTML = translations[lang].operatorInfo.turbineCount.replace('{{value}}', turbineCount);
     operatorInfo.style.display = 'block';
@@ -1372,8 +1357,6 @@ function handleOperatingPeriodChange(event) {
 
 function updateInfoPanels() {
   const lang = isEnglish ? 'en' : 'ko';
-  
-  // 전체 정보 패널 업데이트
   if (allWindFarms.length > 0) {
     const totalCapacity = allWindFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
     const complexCount = [...new Set(allWindFarms.map(farm => farm.complexId))].length;
@@ -1383,8 +1366,6 @@ function updateInfoPanels() {
     document.getElementById('info-all-complex-count').innerHTML = translations[lang].allInfo.complexCount.replace('{{value}}', complexCount);
     document.getElementById('info-all-turbine-count').innerHTML = translations[lang].allInfo.turbineCount.replace('{{value}}', turbineCount);
   }
-  
-  // 제조사 정보 패널 업데이트
   if (selectedManufacturer && document.getElementById('manufacturer-info').style.display === 'block') {
     const filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
     const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
@@ -1400,16 +1381,12 @@ function updateInfoPanels() {
     document.getElementById('info-complex-count').innerHTML = translations[lang].manufacturerInfo.complexCount.replace('{{value}}', complexCount);
     document.getElementById('info-turbine-count').innerHTML = translations[lang].manufacturerInfo.turbineCount.replace('{{value}}', turbineCount);
   }
-  
-  // 단지 정보 패널 업데이트
   if (selectedComplex && document.getElementById('complex-info').style.display === 'block') {
     const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
     updateComplexInfo(farmsInComplex);
   }
-  
-  // 사업자 정보 패널 업데이트
   if (selectedOperator && document.getElementById('operator-info').style.display === 'block') {
-    const filteredFarms = allWindFarms.filter(farm => farm.operator === 'selectedOperator');
+    const filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
     const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
     const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
     const turbineCount = filteredFarms.length;
@@ -1419,12 +1396,10 @@ function updateInfoPanels() {
       displayOperator = operatorInfo ? operatorInfo.operator_en : selectedOperator;
     }
     document.getElementById('info-operator').innerHTML = translations[lang].operatorInfo.operator.replace('{{value}}', displayOperator);
-    document.getElementById('info-operator-capacity').innerHTML = translations[lang].operatorInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity));
+    document.getElementById('info-operator-capacity').innerHTML = translations[lang].operatorInfo.totalCapacity.replace('{{value}}', formatNumberWithCommas(totalCapacity) || translations[lang].noInfo);
     document.getElementById('info-operator-complex-count').innerHTML = translations[lang].operatorInfo.complexCount.replace('{{value}}', complexCount);
     document.getElementById('info-operator-turbine-count').innerHTML = translations[lang].operatorInfo.turbineCount.replace('{{value}}', turbineCount);
   }
-  
-  // 운영 기간 정보 패널 업데이트
   if (selectedOperatingPeriod && document.getElementById('operating-period-info').style.display === 'block') {
     const filteredFarms = allWindFarms.filter(farm => {
       if (farm.operatingYears === null) return false;
@@ -1438,8 +1413,6 @@ function updateInfoPanels() {
     document.getElementById('info-operating-period-complex-count').innerHTML = translations[lang].operatingPeriodInfo.complexCount.replace('{{value}}', complexCount);
     document.getElementById('info-operating-period-turbine-count').innerHTML = translations[lang].operatingPeriodInfo.turbineCount.replace('{{value}}', turbineCount);
   }
-  
-  // 용량 정보 패널 업데이트
   if (selectedCapacity && document.getElementById('capacity-info').style.display === 'block') {
     const filteredFarms = allWindFarms.filter(farm => {
       if (farm.capacity === null || farm.capacity === undefined) return false;
