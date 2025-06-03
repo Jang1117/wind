@@ -1372,7 +1372,7 @@ function updateInfoPanels() {
   
   // 사업자 정보 패널 업데이트
   if (selectedOperator && document.getElementById('operator-info').style.display === 'block') {
-    const filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator');
+    const filteredFarms = allWindFarms.filter(farm => farm.operator === 'selectedOperator');
     const totalCapacity = filteredFarms.reduce((sum, farm) => sum + (farm.capacity || 0), 0);
     const complexCount = [...new Set(filteredFarms.map(farm => farm.complexId))].length;
     const turbineCount = filteredFarms.length;
