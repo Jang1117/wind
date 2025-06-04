@@ -141,8 +141,8 @@
   },
   {
     "site_number": 22,
-    "site_name_kr": "영월접산",
-    "site_name_roman": "Yeongweoljeobsan",
+    "site_name_kr": "영월 접산",
+    "site_name_roman": "Yeongweol Jeobsan",
     "address_kr": "강원도 영월군",
     "address_roman": "Gangweondo Yeongweolgun"
   },
@@ -253,8 +253,8 @@
   },
   {
     "site_number": 39,
-    "site_name_kr": "영광지산",
-    "site_name_roman": "Yeonggwangjisan",
+    "site_name_kr": "영광 지산",
+    "site_name_roman": "Yeonggwang Jisan",
     "address_kr": "전라남도 영광군 백수읍 지산리 1510-1",
     "address_roman": "Jeonranamdo Yeonggwanggun Baegsueub Jisanri 1510-1"
   },
@@ -373,35 +373,35 @@
   {
     "site_number": 56,
     "site_name_kr": "동복 북촌",
-    "site_name_roman": "Dongbogbugcon",
+    "site_name_roman": "Dongbog Bugcon",
     "address_kr": "제주도 제주시 구좌읍 북촌12길 248",
     "address_roman": "Jejudo Jejusi Gujwaeub Bugcon12Gil 248"
   },
   {
     "site_number": 57,
     "site_name_kr": "영광 백수",
-    "site_name_roman": "Yeonggwangbaegsu",
+    "site_name_roman": "Yeonggwang Baegsu",
     "address_kr": "전라남도 영광군 백수읍 백수로 479 (상사리 1453-1)",
     "address_roman": "Jeonranamdo Yeonggwanggun Baegsueub Baegsuro 479 (Sangsari 1453-1)"
   },
   {
     "site_number": 58,
     "site_name_kr": "제주 김녕",
-    "site_name_roman": "Jejugimnyeong",
+    "site_name_roman": "Jeju Gimnyeong",
     "address_kr": "제주도 제주시 구좌읍 김송로 280 (김녕리 70)",
     "address_roman": "Jejudo Jejusi Gujwaeub Gimsongro 280 (Gimnyeongri 70)"
   },
   {
     "site_number": 60,
-    "site_name_kr": "GS영양1",
-    "site_name_roman": "GSyeongyang1",
+    "site_name_kr": "GS 영양1",
+    "site_name_roman": "GS Yeongyang1",
     "address_kr": "경상북도 영양군 영양읍 무네미길 183-54 무창리 산 62",
     "address_roman": "Gyeongsangbugdo Yeongyanggun Yeongyangeub Munemigil 183-54 Mucangri San 62"
   },
   {
     "site_number": 61,
     "site_name_kr": "군산 산단",
-    "site_name_roman": "Gunsansandan",
+    "site_name_roman": "Gunsan Sandan",
     "address_kr": "전라북도 군산시 외항로 1372 (비응도동) 비응도동 19,21,22,23,24,35",
     "address_roman": "Jeonrabugdo Gunsansi Oehangro 1372 (Bieungdodong) Bieungdodong 19,21,22,23,24,35"
   },
@@ -450,14 +450,14 @@
   {
     "site_number": 68,
     "site_name_kr": "제주 상명",
-    "site_name_roman": "Jejusangmyeong",
+    "site_name_roman": "Jeju Sangmyeong",
     "address_kr": "제주도 제주시 한림읍 금악서길 177",
     "address_roman": "Jejudo Jejusi Hanrimeub Geumagseogil 177"
   },
   {
     "site_number": 69,
     "site_name_kr": "홍성 모산도",
-    "site_name_roman": "Hongseongmosando",
+    "site_name_roman": "Hongseong Mosando",
     "address_kr": "충청남도 홍성군 서부면 홍보로 1183 신리 616, 616-2,616-12,616-13,616-15",
     "address_roman": "Cungceongnamdo Hongseonggun Seobumyeon Hongboro 1183 Sinri 616, 616-2,616-12,616-13,616-15"
   },
@@ -471,7 +471,7 @@
   {
     "site_number": 71,
     "site_name_kr": "여수 금성",
-    "site_name_roman": "Yeosugeumseong",
+    "site_name_roman": "Yeosu Geumseong",
     "address_kr": "전라남도 여수시 돌산읍 성두길 9-15 금성리 산154-5",
     "address_roman": "Jeonranamdo Yeosusi Dolsaneub Seongdugil 9-15 Geumseongri San154-5"
   },
@@ -485,21 +485,21 @@
   {
     "site_number": 73,
     "site_name_kr": "GS천북",
-    "site_name_roman": "GSceonbug",
+    "site_name_roman": "GS Ceonbug",
     "address_kr": "경상북도 경주시 천북면 천북산단로2길 103 천북풍력발전소",
     "address_roman": "Gyeongsangbugdo Gyeongjusi Ceonbugmyeon Ceonbugsandanro2Gil 103 Ceonbugpungryeogbaljeonso"
   },
   {
     "site_number": 74,
     "site_name_kr": "경주 강동",
-    "site_name_roman": "Gyeongjugangdong",
+    "site_name_roman": "Gyeongju Gangdong",
     "address_kr": "경상북도 경주시 강동면 사라길 213-21 왕신리 산47-1",
     "address_roman": "Gyeongsangbugdo Gyeongjusi Gangdongmyeon Saragil 213-21 Wangsinri San47-1"
   },
   {
     "site_number": 75,
     "site_name_kr": "영광 약수",
-    "site_name_roman": "Yeonggwangyagsu",
+    "site_name_roman": "Yeonggwang Yagsu",
     "address_kr": "전라남도 영광군 영광읍 옥당로 108 2층",
     "address_roman": "Jeonranamdo Yeonggwanggun Yeonggwangeub Ogdangro 108 2Ceung"
   },
@@ -534,7 +534,7 @@
   {
     "site_number": 80,
     "site_name_kr": "강릉 대기리",
-    "site_name_roman": "Gangreungdaegiri",
+    "site_name_roman": "Gangreung Daegiri",
     "address_kr": "강원도 강릉시 왕산면 안반데기2길 3",
     "address_roman": "Gangweondo Gangreungsi Wangsanmyeon Anbandegi2Gil 3"
   },
@@ -576,7 +576,7 @@
   {
     "site_number": 86,
     "site_name_kr": "순천 계월리",
-    "site_name_roman": "Sunceongyeweolri",
+    "site_name_roman": "Sunceon Gyeweolri",
     "address_kr": "전라남도 순천시 월등면 송치길 98 (야망연수원) / 전남 순천 월등면 계월리 산150-2",
     "address_roman": "Jeonranamdo Sunceonsi Weoldeungmyeon Songcigil 98 (Yamangyeonsuweon) / Jeonnam Sunceon Weoldeungmyeon Gyeweolri San150-2"
   },
@@ -590,7 +590,7 @@
   {
     "site_number": 88,
     "site_name_kr": "영양 무창",
-    "site_name_roman": "Yeongyangmucang",
+    "site_name_roman": "Yeongyang Mucang",
     "address_kr": "경상북도 영양군 영양읍 영양창수로 983-130 / 무창리 산62-36, 3-2, 110, 108",
     "address_roman": "Gyeongsangbugdo Yeongyanggun Yeongyangeub Yeongyangcangsuro 983-130 / Mucangri San62-36, 3-2, 110, 108"
   },
@@ -618,7 +618,7 @@
   {
     "site_number": 92,
     "site_name_kr": "포항 신광",
-    "site_name_roman": "Pohangsingwang",
+    "site_name_roman": "Pohang Singwang",
     "address_kr": "경상북도 포항시 북구 흥해읍 도음로 297-70 / 신광면 냉수리 산14-1산15-1,산16-2,산17,산62-1,산63-1,산64외 9필지",
     "address_roman": "Gyeongsangbugdo Pohangsi Buggu Heunghaeeub Doeumro 297-70 / Singwangmyeon Naengsuri San14-1San15-1,San16-2,San17,San62-1,San63-1,San64Oe 9Pilji"
   },
@@ -646,7 +646,7 @@
   {
     "site_number": 96,
     "site_name_kr": "영광 실증",
-    "site_name_roman": "Yeonggwangsiljeung",
+    "site_name_roman": "Yeonggwang Siljeung",
     "address_kr": "전라남도 영광군 백수읍 백수로3길 132-1",
     "address_roman": "Jeonranamdo Yeonggwanggun Baegsueub Baegsuro3Gil 132-1"
   },
@@ -688,14 +688,14 @@
   {
     "site_number": 102,
     "site_name_kr": "제주 수망",
-    "site_name_roman": "Jejusumang",
+    "site_name_roman": "Jeju Sumang",
     "address_kr": "제주도 서귀포시 제주도 서귀포시",
     "address_roman": "Jejudo Seogwiposi Jejudo Seogwiposi"
   },
   {
     "site_number": 103,
     "site_name_kr": "영양 양구",
-    "site_name_roman": "Yeongyangyanggu",
+    "site_name_roman": "Yeongyang Yanggu",
     "address_kr": "경상북도 영양군 석보면 홍계길 449-7",
     "address_roman": "Gyeongsangbugdo Yeongyanggun Seogbomyeon Honggyegil 449-7"
   },
@@ -758,21 +758,21 @@
   {
     "site_number": 112,
     "site_name_kr": "양산 원동",
-    "site_name_roman": "Yangsanweondong",
+    "site_name_roman": "Yangsan Weondong",
     "address_kr": "경남 양산시 원동면 영포리 산21-3(늘밭로방향)",
     "address_roman": "Gyeongnam Yangsansi Weondongmyeon Yeongpori San21-3(Neulbatrobanghyang)"
   },
   {
     "site_number": 113,
     "site_name_kr": "경주 호림",
-    "site_name_roman": "Gyeongjuhorim",
+    "site_name_roman": "Gyeongju Horim",
     "address_kr": "경상북도 경주시 강동면 강동산단로 43-3",
     "address_roman": "Gyeongsangbugdo Gyeongjusi Gangdongmyeon Gangdongsandanro 43-3"
   },
   {
     "site_number": 114,
     "site_name_kr": "태백 원동",
-    "site_name_roman": "Taebaegweondong",
+    "site_name_roman": "Taebaeg Weondong",
     "address_kr": "강원특별자치도 태백시 원동 산 13-7",
     "address_roman": "Gangweonteugbyeoljacido Taebaegsi Weondong San 13-7"
   },
@@ -786,7 +786,7 @@
   {
     "site_number": 116,
     "site_name_kr": "평창 청산",
-    "site_name_roman": "Pyeongcangceongsan",
+    "site_name_roman": "Pyeongcang Ceongsan",
     "address_kr": "강원특별자치도 평창군 봉평면 진조리 산 80-5",
     "address_roman": "Gangweonteugbyeoljacido Pyeongcanggun Bongpyeongmyeon Jinjori San 80-5"
   },
@@ -800,7 +800,7 @@
   {
     "site_number": 118,
     "site_name_kr": "태백 금봉1",
-    "site_name_roman": "Taebaeggeumbong1",
+    "site_name_roman": "Taebaeg Geumbong1",
     "address_kr": "강원특별자치도 태백시 황지동 287-75",
     "address_roman": "Gangweonteugbyeoljacido Taebaegsi Hwangjidong 287-75"
   },
@@ -814,21 +814,21 @@
   {
     "site_number": 120,
     "site_name_kr": "GS영양2",
-    "site_name_roman": "Gsyeongyang2",
+    "site_name_roman": "GS Yeongyang2",
     "address_kr": "경상북도 영양군 석보면 삼의리 일대",
     "address_roman": "Gyeongsangbugdo Yeongyanggun Seogbomyeon Samyiri Ildae"
   },
   {
     "site_number": 121,
     "site_name_kr": "화순 금성산",
-    "site_name_roman": "Hwasungeumseongsan",
+    "site_name_roman": "Hwasun Geumseongsan",
     "address_kr": "전남 화순군 청풍면 일대",
     "address_roman": "Jeonnam Hwasungun Ceongpungmyeon Ildae"
   },
   {
     "site_number": 122,
     "site_name_kr": "제주 어음",
-    "site_name_roman": "Jejueoeum",
+    "site_name_roman": "Jejue Oeum",
     "address_kr": "제주도 제주시 애월읍",
     "address_roman": "Jejudo Jejusi Aeweoleub"
   },
@@ -842,15 +842,29 @@
   {
     "site_number": 124,
     "site_name_kr": "영월구래주민",
-    "site_name_roman": "Yeongweolguraejumin",
+    "site_name_roman": "Yeongweol Guraejumin",
     "address_kr": "강원도 영월군 상동읍",
     "address_roman": "Gangweondo Yeongweolgun Sangdongeub"
   },
   {
     "site_number": 125,
     "site_name_kr": "영월에코윈드",
-    "site_name_roman": "Yeongweolekowindeu",
+    "site_name_roman": "Yeongweol Ecowind",
     "address_kr": "강원도 영월군 상동읍",
     "address_roman": "Gangweondo Yeongweolgun Sangdongeub"
+  },
+  {
+    "site_number": 126,
+    "site_name_kr": "자은주민바람",
+    "site_name_roman": "Jaeun Jumin Baram",
+    "address_kr": "전남 신안군 자은면",
+    "address_roman": "Jeonranamdo Sinangun Jaeunmyeon"
+  },
+  {
+    "site_number": 127,
+    "site_name_kr": "영덕 호지마을",
+    "site_name_roman": "Yeongdeok Hojimaeul",
+    "address_kr": "경북 영덕군 영해면",
+    "address_roman": "Gyeongsangbugdo Yeongdukgun Yeonghaemyeon"
   }
 ]
