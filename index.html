@@ -1481,6 +1481,7 @@ function updateInfoPanels() {
     }
 
 function updateMarkers() {
+  console.log("현재 줌 레벨:", map.getLevel()); // 줌 레벨 출력
   clearMap();
   const zoomLevel = map.getLevel();
   const markerImage = new kakao.maps.MarkerImage(
