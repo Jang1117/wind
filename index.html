@@ -1508,8 +1508,7 @@ function updateMarkers() {
     });
   }
   const lang = isEnglish ? 'en' : 'ko';
-  // const forceNamesVisible = selectedComplex || selectedManufacturer || selectedOperator || selectedOperatingPeriod || selectedCapacity;
-  
+
   if (zoomLevel >= 10 && !selectedComplex) {
     const farmsByComplex = {};
     filteredFarms.forEach(farm => {
@@ -1533,7 +1532,7 @@ function updateMarkers() {
         marker.setMap(map);
         markers.push(marker);
       }
-      if (areNamesVisible || forceNamesVisible) { // 이름 강제 표시
+      if (areNamesVisible) { // forceNamesVisible 제거
         const overlay = new kakao.maps.CustomOverlay({
           position: position,
           content: `<div class="info-window">${translations[lang].infoWindow.replace('{{name}}', complexName).replace('{{count}}', group.length)}</div>`,
@@ -1550,19 +1549,23 @@ function updateMarkers() {
           selectedManufacturer = '';
           selectedOperator = '';
           selectedOperatingPeriod = '';
+          selectedCapacity = ''; // 추가: 용량 선택 초기화
           document.getElementById('manufacturer-dropdown').value = '';
           document.getElementById('operator-dropdown').value = '';
           document.getElementById('operating-period-dropdown').value = '';
+          document.getElementById('capacity-dropdown').value = ''; // 추가: 용량 드롭다운 초기화
           document.getElementById('windfarm-dropdown').value = complexId;
           const allInfo = document.getElementById('all-info');
           const manufacturerInfo = document.getElementById('manufacturer-info');
           const complexInfo = document.getElementById('complex-info');
           const operatorInfo = document.getElementById('operator-info');
           const operatingPeriodInfo = document.getElementById('operating-period-info');
+          const capacityInfo = document.getElementById('capacity-info');
           allInfo.style.display = 'none';
           manufacturerInfo.style.display = 'none';
           operatorInfo.style.display = 'none';
           operatingPeriodInfo.style.display = 'none';
+          capacityInfo.style.display = 'none';
           updateComplexInfo(group);
           complexInfo.style.display = 'block';
           map.setCenter(position);
@@ -1592,7 +1595,7 @@ function updateMarkers() {
         marker.setMap(map);
         markers.push(marker);
       }
-      if (areNamesVisible || forceNamesVisible) { // 이름 강제 표시
+      if (areNamesVisible) { // forceNamesVisible 제거
         const overlay = new kakao.maps.CustomOverlay({
           position: position,
           content: `<div class="info-window" onclick="toggleFarmDetails('${complexName}', '${farm.turbineId}', '${farm.type}', '${farm.completionDate}', '${getTranslatedSiteInfo(farm.complexId, 'address') || farm.address}', ${farm.lat}, ${farm.lon}, '${farm.capacity}', '${farm.manufacturer}', '${farm.complexId}')">${turbineName}</div>`,
