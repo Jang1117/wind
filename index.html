@@ -623,8 +623,8 @@ function handleCapacityChange(event) {
   complexInfo.style.display = 'none';
   operatorInfo.style.display = 'none';
   operatingPeriodInfo.style.display = 'none';
-  areNamesVisible = true;
-  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
+  // areNamesVisible = true;
+  // document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
   let filteredFarms = allWindFarms;
   if (selectedCapacity) {
     filteredFarms = allWindFarms.filter(farm => {
@@ -1100,8 +1100,8 @@ function handleDropdownChange(event) {
   operatorInfo.style.display = 'none';
   operatingPeriodInfo.style.display = 'none';
   capacityInfo.style.display = 'none';
-  areNamesVisible = true;
-  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
+  // areNamesVisible = true;
+  // document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
   if (selectedComplex) {
     const farmsInComplex = allWindFarms.filter(farm => farm.complexId === selectedComplex);
     const avgLat = farmsInComplex.reduce((sum, farm) => sum + farm.lat, 0) / farmsInComplex.length;
@@ -1146,8 +1146,8 @@ function handleManufacturerChange(event) {
   operatorInfo.style.display = 'none';
   operatingPeriodInfo.style.display = 'none';
   capacityInfo.style.display = 'none';
-  areNamesVisible = true;
-  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
+ // areNamesVisible = true;
+ // document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
   let filteredFarms = allWindFarms;
   if (selectedManufacturer) {
     filteredFarms = allWindFarms.filter(farm => farm.manufacturer === selectedManufacturer);
@@ -1210,8 +1210,8 @@ function handleOperatorChange(event) {
   complexInfo.style.display = 'none';
   operatingPeriodInfo.style.display = 'none';
   capacityInfo.style.display = 'none';
-  areNamesVisible = true;
-  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
+  // areNamesVisible = true;
+  // document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
   let filteredFarms = allWindFarms;
   if (selectedOperator) {
     filteredFarms = allWindFarms.filter(farm => farm.operator === selectedOperator);
@@ -1279,8 +1279,8 @@ function handleOperatingPeriodChange(event) {
   complexInfo.style.display = 'none';
   operatorInfo.style.display = 'none';
   capacityInfo.style.display = 'none';
-  areNamesVisible = true;
-  document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
+  // areNamesVisible = true;
+  // document.getElementById('name-toggle-button').textContent = translations[isEnglish ? 'en' : 'ko'].nameToggle;
   let filteredFarms = allWindFarms;
   if (selectedOperatingPeriod) {
     filteredFarms = allWindFarms.filter(farm => {
@@ -1508,7 +1508,7 @@ function updateMarkers() {
     });
   }
   const lang = isEnglish ? 'en' : 'ko';
-  const forceNamesVisible = selectedComplex || selectedManufacturer || selectedOperator || selectedOperatingPeriod || selectedCapacity;
+  // const forceNamesVisible = selectedComplex || selectedManufacturer || selectedOperator || selectedOperatingPeriod || selectedCapacity;
   
   if (zoomLevel >= 10 && !selectedComplex) {
     const farmsByComplex = {};
