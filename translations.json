@@ -866,5 +866,12 @@
     "site_name_roman": "Yeongdeok Hojimaeul",
     "address_kr": "경북 영덕군 영해면",
     "address_roman": "Gyeongsangbugdo Yeongdukgun Yeonghaemyeon"
+  },
+  {
+    "site_number": 128,
+    "site_name_kr": "오미산",
+    "site_name_roman": "Omisan",
+    "address_kr": "경북 봉화군 석포면 석포리 산 1-2",
+    "address_roman": "Gyeongsangbugdo Bonghwagun Seokpo-myeon Seokpo-ri San 1-2"
   }
 ]
